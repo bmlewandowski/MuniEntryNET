@@ -1,0 +1,73 @@
+@inherits LayoutComponentBase
+
+<div style="display:flex;min-height:100vh">
+    <aside style="width:260px;background:#f5f5f5;padding:1rem 0.5rem 1rem 1rem;">
+        <h3 style="margin-top:0">Forms</h3>
+        <nav>
+            <details open>
+                <summary><b>Criminal / Plea & Sentencing</b></summary>
+                <ul>
+                    <li><a href="/criminal/fine-only-plea-only">Fine Only Dialog</a></li>
+                    <li><a href="/criminal/diversion-plea">Diversion Dialog</a></li>
+                    <li><a href="/criminal/leap-admission-plea">LEAP Plea Admission Dialog</a></li>
+                    <li><a href="/criminal/leap-valid-sentencing">LEAP Admission - Already Valid Dialog</a></li>
+                    <li><a href="/criminal/jail-cc-plea">Plea Only - Future Sentencing Dialog</a></li>
+                    <li><a href="/criminal/trial-sentencing">Sentencing Only - Already Plead Dialog</a></li>
+                    <li><a href="/criminal/not-guilty-plea">Not Guilty Plea Dialog</a></li>
+                    <li><a href="/criminal/not-guilty-appear-bond-special">Not Guilty Plea / Appear on Warrant / Bond Modification Special Bond Conditions Dialog</a></li>
+                    <li><a href="/criminal/appear-on-warrant-no-plea">Appear on Warrant (No Plea) Dialog</a></li>
+                    <li><a href="/criminal/bond-modification-revocation">Bond Modification/Revocation Dialog</a></li>
+                    <li><a href="/criminal/community-service-secondary">Community Service, License Suspension, Fingerprinting & Victim Notification, Immobilize/Impound and other Conditions Secondary Dialogs</a></li>
+                    <li><a href="/criminal/arraignment-fta-bond">Arraignment / Failure to Appear / Bond Dialogs</a></li>
+                    <li><a href="/criminal/sealing-deny-privileges">Criminal Sealing / Deny Privileges Dialogs</a></li>
+                </ul>
+            </details>
+            <details>
+                <summary><b>Scheduling / Court Events</b></summary>
+                <ul>
+                    <li><a href="/scheduling/entry-hearings">Scheduling Entry / Hearings</a></li>
+                    <li><a href="/scheduling/final-jury-notice-of-hearing">Hemmeter/Rohrer Final/Jury Notice of Hearing Dialog</a></li>
+                    <li><a href="/scheduling/trial-to-court-notice-of-hearing">Hemmeter/Rohrer Trial to Court Notice of Hearing Dialog</a></li>
+                    <li><a href="/scheduling/general-notice-of-hearing">Hemmeter/Rohrer General Notice of Hearing Dialog</a></li>
+                </ul>
+            </details>
+            <details>
+                <summary><b>Probation / Community Control</b></summary>
+                <ul>
+                    <li><a href="/probation/violation-bond">Preliminary Probation Violation and Bond Dialog</a></li>
+                    <li><a href="/probation/community-control-terms-notices">Terms of Community Control / Notice of Community Control Violation Hearing Dialogs</a></li>
+                </ul>
+            </details>
+            <details>
+                <summary><b>Admin / Courtroom Operations</b></summary>
+                <ul>
+                    <li><a href="/admin/workflows-fiscal">Fiscal Journal Entries Dialog</a></li>
+                    <li><a href="/admin/juror-payment">Juror Payment Dialog</a></li>
+                    <li><a href="/admin/time-to-pay-order">Time to Pay Order Dialog</a></li>
+                </ul>
+            </details>
+            <details>
+                <summary><b>Notices / Freeform / Civil</b></summary>
+                <ul>
+                    <li><a href="/notices/notices-freeform-civil">Civil Freeform Entry Dialog</a></li>
+                </ul>
+            </details>
+            <details>
+                <summary><b>Driving / Traffic</b></summary>
+                <ul>
+                    <li><a href="/driving/driving-privileges">Grant Limited Driving Privileges Dialog</a></li>
+                </ul>
+            </details>
+            <details>
+                <summary><b>Miscellaneous</b></summary>
+                <ul>
+                    <li><a href="/misc/competency-civil-sealing-juror">Competency / Criminal Sealing / Juror Dialogs</a></li>
+                    <li><a href="/misc/main-window">Main application window</a></li>
+                </ul>
+            </details>
+        </nav>
+    </aside>
+    <main style="flex:1;padding:2rem 2rem 2rem 1rem;min-width:0">
+        @Body
+    </main>
+</div>

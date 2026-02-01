@@ -1,0 +1,53 @@
+@page "/criminal/fine-only-plea-only"
+@using Munientry.Poc.Client.Shared.Models
+@using Microsoft.AspNetCore.Components.Forms
+@inject NavigationManager Navigation
+
+<h2>Fine Only Dialog</h2>
+<!-- Legacy: fine_only_plea_dialog_ui.py, plea_only_dialog_ui.py -->
+
+<EditForm Model="model" OnValidSubmit="HandleSubmit">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+	<div>
+		<label>Case Number</label><br />
+		<InputText @bind-Value="model.CaseNumber" />
+	</div>
+	<div>
+		<label>Defendant Name</label><br />
+		<InputText @bind-Value="model.DefendantName" />
+	</div>
+	<div>
+		<label>Charge</label><br />
+		<InputText @bind-Value="model.Charge" />
+	</div>
+	<div>
+		<label>Fine Amount</label><br />
+		<InputNumber @bind-Value="model.FineAmount" TValue="decimal?" />
+	</div>
+	<div style="margin-top:1rem">
+		<button type="submit">Submit</button>
+		<span style="margin-left:1rem">@_message</span>
+	</div>
+</EditForm>
+
+@code {
+	private FineOnlyDto model = new();
+	private string _message = "";
+
+	private async Task HandleSubmit()
+	{
+		try
+		{
+			var apiBase = Navigation.BaseUri.Replace(":3000", ":5000");
+			var client = new System.Net.Http.HttpClient { BaseAddress = new Uri(apiBase) };
+			var res = await client.PostAsJsonAsync("api/fineonly", model);
+			if (res.IsSuccessStatusCode) _message = "Submitted!";
+			else _message = "Error: " + res.StatusCode;
+		}
+		catch (Exception ex)
+		{
+			_message = ex.Message;
+		}
+	}
+}

@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MuniEntry POC - Blazor</title>
+    <base href="/" />
+    <link href="css/app.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="app">Loading...</div>
+    <script>
+      window.downloadFile = (fileName, mimeType, bytes) => {
+        const blob = new Blob([new Uint8Array(bytes)], { type: mimeType });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(link.href), 200);
+      };
+    </script>
+    <script src="_framework/blazor.webassembly.js"></script>
+  </body>
+</html>

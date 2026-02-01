@@ -1,0 +1,180 @@
+@page "/driving/driving-privileges"
+<h2>Driving Privileges / CrimTraffic Helpers</h2>
+
+
+<EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+	<div>
+		<label>Defendant First Name</label>
+		<InputText @bind-Value="formModel.DefendantFirstName" />
+	</div>
+	<div>
+		<label>Defendant Last Name</label>
+		<InputText @bind-Value="formModel.DefendantLastName" />
+	</div>
+	<div>
+		<label>Case Number</label>
+		<InputText @bind-Value="formModel.CaseNumber" />
+	</div>
+	<div>
+		<label>Plea/Trial Date</label>
+		<InputDate @bind-Value="formModel.PleaTrialDate" />
+	</div>
+	<div>
+		<label>Appearance Reason</label>
+		<InputText @bind-Value="formModel.AppearanceReason" />
+	</div>
+	<div>
+		<label>Defense Counsel Name</label>
+		<InputText @bind-Value="formModel.DefenseCounselName" />
+	</div>
+	<div>
+		<label>Defense Counsel Type</label>
+		<InputText @bind-Value="formModel.DefenseCounselType" />
+	</div>
+	<div>
+		<label>Defense Counsel Waived</label>
+		<InputCheckbox @bind-Value="formModel.DefenseCounselWaived" />
+	</div>
+	<div>
+		<label>Offense</label>
+		<InputText @bind-Value="formModel.Offense" />
+	</div>
+	<div>
+		<label>Statute</label>
+		<InputText @bind-Value="formModel.Statute" />
+	</div>
+	<div>
+		<label>Degree</label>
+		<InputText @bind-Value="formModel.Degree" />
+	</div>
+	<div>
+		<label>Plea</label>
+		<InputText @bind-Value="formModel.Plea" />
+	</div>
+	<div>
+		<label>Finding</label>
+		<InputText @bind-Value="formModel.Finding" />
+	</div>
+	<div>
+		<label>Fines</label>
+		<InputNumber @bind-Value="formModel.Fines" />
+	</div>
+	<div>
+		<label>Fines Suspended</label>
+		<InputNumber @bind-Value="formModel.FinesSuspended" />
+	</div>
+	<div>
+		<label>Court Costs</label>
+		<InputText @bind-Value="formModel.CourtCosts" />
+	</div>
+	<div>
+		<label>Ability to Pay</label>
+		<InputText @bind-Value="formModel.AbilityToPay" />
+	</div>
+	<div>
+		<label>Balance Due Date</label>
+		<InputDate @bind-Value="formModel.BalanceDueDate" />
+	</div>
+	<div>
+		<label>Pay Today</label>
+		<InputNumber @bind-Value="formModel.PayToday" />
+	</div>
+	<div>
+		<label>Monthly Pay</label>
+		<InputNumber @bind-Value="formModel.MonthlyPay" />
+	</div>
+	<div>
+		<label>Credit for Jail</label>
+		<InputCheckbox @bind-Value="formModel.CreditForJail" />
+	</div>
+	<div>
+		<label>Jail Time Credit</label>
+		<InputNumber @bind-Value="formModel.JailTimeCredit" />
+	</div>
+	<div>
+		<label>License Suspension</label>
+		<InputCheckbox @bind-Value="formModel.LicenseSuspension" />
+	</div>
+	<div>
+		<label>Community Service</label>
+		<InputCheckbox @bind-Value="formModel.CommunityService" />
+	</div>
+	<div>
+		<label>Other Conditions</label>
+		<InputCheckbox @bind-Value="formModel.OtherConditions" />
+	</div>
+	<button type="submit" disabled="@isSubmitting">Generate DOCX</button>
+	@if (errorMessage != null)
+	{
+		<div class="alert alert-danger mt-2">@errorMessage</div>
+	}
+</EditForm>
+
+@code {
+	private FormModel formModel = new();
+	private bool isSubmitting = false;
+	private string? errorMessage;
+
+	private async Task HandleValidSubmit()
+	{
+		isSubmitting = true;
+		errorMessage = null;
+		try
+		{
+			var http = new HttpClient { BaseAddress = new Uri(NavigationManager.BaseUri) };
+			var response = await http.PostAsJsonAsync("api/fineonly", formModel);
+			if (response.IsSuccessStatusCode)
+			{
+				var content = await response.Content.ReadAsByteArrayAsync();
+				var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "FineOnly.docx";
+				await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
+			}
+			else
+			{
+				errorMessage = $"Error: {response.ReasonPhrase}";
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ex.Message;
+		}
+		finally
+		{
+			isSubmitting = false;
+		}
+	}
+
+	[Inject] NavigationManager NavigationManager { get; set; } = default!;
+	[Inject] IJSRuntime JS { get; set; } = default!;
+
+	public class FormModel
+	{
+		public string? DefendantFirstName { get; set; }
+		public string? DefendantLastName { get; set; }
+		public string? CaseNumber { get; set; }
+		public DateTime? PleaTrialDate { get; set; }
+		public string? AppearanceReason { get; set; }
+		public string? DefenseCounselName { get; set; }
+		public string? DefenseCounselType { get; set; }
+		public bool DefenseCounselWaived { get; set; }
+		public string? Offense { get; set; }
+		public string? Statute { get; set; }
+		public string? Degree { get; set; }
+		public string? Plea { get; set; }
+		public string? Finding { get; set; }
+		public decimal? Fines { get; set; }
+		public decimal? FinesSuspended { get; set; }
+		public string? CourtCosts { get; set; }
+		public string? AbilityToPay { get; set; }
+		public DateTime? BalanceDueDate { get; set; }
+		public decimal? PayToday { get; set; }
+		public decimal? MonthlyPay { get; set; }
+		public bool CreditForJail { get; set; }
+		public int? JailTimeCredit { get; set; }
+		public bool LicenseSuspension { get; set; }
+		public bool CommunityService { get; set; }
+		public bool OtherConditions { get; set; }
+	}
+}

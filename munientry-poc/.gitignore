@@ -1,0 +1,31 @@
+# .NET build artifacts
+bin/
+obj/
+TestResults/
+*.user
+*.suo
+*.vs/
+
+# Docker
+*.tar
+*.log
+docker-compose.override.yml
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node/npm (if ever used)
+node_modules/
+
+# Python (if ever used)
+__pycache__/
+*.pyc
+
+# Misc
+.env
+.env.*
+secrets.json
