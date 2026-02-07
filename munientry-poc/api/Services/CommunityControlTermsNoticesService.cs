@@ -1,5 +1,5 @@
 using System.Data.SqlClient;
-using Munientry.Api.Dtos;
+using Munientry.Poc.Api.Data;
 
 namespace Munientry.Api.Services
 {

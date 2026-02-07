@@ -23,7 +23,7 @@ if (app.Environment.IsDevelopment())
 }
 
 
-app.MapPost("/api/communitycontroltermsnotices", async (Munientry.Api.Dtos.CommunityControlTermsNoticesDto dto, Munientry.Api.Services.CommunityControlTermsNoticesService service) =>
+app.MapPost("/api/communitycontroltermsnotices", async (Munientry.Poc.Api.Data.CommunityControlTermsNoticesDto dto, Munientry.Api.Services.CommunityControlTermsNoticesService service) =>
 {
     service.InsertCommunityControlTermsNotices(dto);
     return Results.Ok();

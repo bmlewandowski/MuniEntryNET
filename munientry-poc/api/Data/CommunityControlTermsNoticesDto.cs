@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Munientry.Api.Dtos
+namespace Munientry.Poc.Api.Data
 {
     public class CommunityControlTermsNoticesDto
     {
