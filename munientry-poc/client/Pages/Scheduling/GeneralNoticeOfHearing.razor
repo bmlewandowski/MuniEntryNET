@@ -1,5 +1,61 @@
 @page "/scheduling/general-notice-of-hearing"
-<h2>Hemmeter/Rohrer General Notice of Hearing Dialog</h2>
+<h2>General Notice of Hearing Dialog</h2>
 <!-- Legacy: general_notice_of_hearing_dialog_ui.py -->
 
+@using Munientry.Client.Dtos
+
+<EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+	<div>
+		<label>Case Number</label>
+		<InputText @bind-Value="formModel.CaseNumber" />
+	</div>
+	<div>
+		<label>Entry Date</label>
+		<InputDate @bind-Value="formModel.EntryDate" />
+	</div>
+	<div>
+		<label>Defendant First Name</label>
+		<InputText @bind-Value="formModel.DefendantFirstName" />
+	</div>
+	<div>
+		<label>Defendant Last Name</label>
+		<InputText @bind-Value="formModel.DefendantLastName" />
+	</div>
+	<div>
+		<label>Hearing Date</label>
+		<InputDate @bind-Value="formModel.HearingDate" />
+	</div>
+	<div>
+		<label>Hearing Time</label>
+		<InputText @bind-Value="formModel.HearingTime" />
+	</div>
+	<div>
+		<label>Assigned Courtroom</label>
+		<InputText @bind-Value="formModel.AssignedCourtroom" />
+	</div>
+	<div>
+		<label>Defense Counsel Name</label>
+		<InputText @bind-Value="formModel.DefenseCounselName" />
+	</div>
+	<div>
+		<label>Interpreter Required</label>
+		<InputCheckbox @bind-Value="formModel.InterpreterRequired" />
+	</div>
+	<div>
+		<label>Language Required</label>
+		<InputText @bind-Value="formModel.LanguageRequired" />
+	</div>
+	<button type="submit">Submit</button>
+</EditForm>
+
+@code {
+	private GeneralNoticeOfHearingDto formModel = new();
+
+	private async Task HandleValidSubmit()
+	{
+		// TODO: Call API to save form data
+	}
+}
 <!-- TODO: Add form fields and logic for General Notice of Hearing -->

@@ -7,6 +7,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 builder.Services.AddScoped<Munientry.Poc.Api.Services.DrivingCaseService>();
 builder.Services.AddScoped<Munientry.Poc.Api.Services.TrialToCourtNoticeService>();
+builder.Services.AddScoped<Munientry.Poc.Api.Services.FinalJuryNoticeService>();
+builder.Services.AddScoped<Munientry.Poc.Api.Services.BondHearingService>();
+builder.Services.AddScoped<Munientry.Poc.Api.Services.ProbationViolationBondService>();
+builder.Services.AddScoped<Munientry.Poc.Api.Services.TimeToPayOrderService>();
+builder.Services.AddScoped<Munientry.Poc.Api.Services.JurorPaymentService>();
+builder.Services.AddScoped<Munientry.Api.Services.CommunityControlTermsNoticesService>();
 
 var app = builder.Build();
 app.UseCors();
@@ -16,7 +22,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.MapGet("/api/health", () => Results.Ok(new { status = "ok" }));
+
+app.MapPost("/api/communitycontroltermsnotices", async (Munientry.Api.Dtos.CommunityControlTermsNoticesDto dto, Munientry.Api.Services.CommunityControlTermsNoticesService service) =>
+{
+    service.InsertCommunityControlTermsNotices(dto);
+    return Results.Ok();
+});
 
 app.MapGet("/api/fineonly/{caseNumber}", (string caseNumber) =>
 {
@@ -104,7 +115,7 @@ app.MapPost("/api/trialtocourt", async (Munientry.Poc.Api.Data.TrialToCourtNotic
         doc.ReplaceText("{LanguageRequired}", dto.LanguageRequired ?? "");
         doc.ReplaceText("{DateConfirmedWithCounsel}", dto.DateConfirmedWithCounsel ? "Yes" : "No");
         doc.SaveAs(outputPath);
-        // --- DB Save Logic (commented out for now) ---
+        // --- DB Save Logic (commented out for isolated DOCX test) ---
         // await service.SaveToDatabaseAsync(dto);
         // --- End DB Save Logic ---
         var bytes = await File.ReadAllBytesAsync(outputPath);
@@ -115,6 +126,48 @@ app.MapPost("/api/trialtocourt", async (Munientry.Poc.Api.Data.TrialToCourtNotic
     {
         return Results.Problem($"DOCX generation failed: {ex.Message}");
     }
+});
+
+app.MapPost("/api/finaljury", async (Munientry.Poc.Api.Data.FinalJuryNoticeDto dto, Munientry.Poc.Api.Services.FinalJuryNoticeService service) =>
+{
+    if (dto == null) return Results.BadRequest();
+    await service.SaveToDatabaseAsync(dto);
+    return Results.Ok(new { status = "saved", dto });
+});
+
+app.MapPost("/api/bondhearing", async (Munientry.Poc.Api.Data.BondHearingDto dto, Munientry.Poc.Api.Services.BondHearingService service) =>
+{
+    if (dto == null) return Results.BadRequest();
+    await service.SaveToDatabaseAsync(dto);
+    return Results.Ok(new { status = "saved", dto });
+});
+
+app.MapPost("/api/probationviolationbond", async (Munientry.Poc.Api.Data.ProbationViolationBondDto dto, Munientry.Poc.Api.Services.ProbationViolationBondService service) =>
+{
+    if (dto == null) return Results.BadRequest();
+    await service.SaveToDatabaseAsync(dto);
+    return Results.Ok(new { status = "saved", dto });
+});
+
+app.MapPost("/api/timetopayorder", async (Munientry.Poc.Api.Data.TimeToPayOrderDto dto, Munientry.Poc.Api.Services.TimeToPayOrderService service) =>
+{
+    if (dto == null) return Results.BadRequest();
+    await service.SaveToDatabaseAsync(dto);
+    return Results.Ok(new { status = "saved", dto });
+});
+
+app.MapPost("/api/jurorpayment", async (Munientry.Poc.Api.Data.JurorPaymentDto dto, Munientry.Poc.Api.Services.JurorPaymentService service) =>
+{
+    if (dto == null) return Results.BadRequest();
+    await service.SaveToDatabaseAsync(dto);
+    return Results.Ok(new { status = "saved", dto });
+});
+
+app.MapPost("/api/generalnoticeofhearing", async (Munientry.Poc.Api.Data.GeneralNoticeOfHearingDto dto, Munientry.Poc.Api.Services.GeneralNoticeOfHearingService service) =>
+{
+    if (dto == null) return Results.BadRequest();
+    await service.SaveToDatabaseAsync(dto);
+    return Results.Ok(new { status = "saved", dto });
 });
 
 app.Run();

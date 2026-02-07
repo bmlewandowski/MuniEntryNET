@@ -1,3 +1,71 @@
 @page "/admin/juror-payment"
-<h2>Juror payment / jury</h2>
-<!-- Legacy: juror_payment_dialog_ui.py -->
+@using Munientry.Client.Dtos
+
+<h2>Juror Payment Dialog</h2>
+
+<EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+	<div>
+		<label>Case Number</label>
+		<InputText @bind-Value="formModel.CaseNumber" />
+	</div>
+	<div>
+		<label>Entry Date</label>
+		<InputDate @bind-Value="formModel.EntryDate" />
+	</div>
+	<div>
+		<label>Defendant First Name</label>
+		<InputText @bind-Value="formModel.DefendantFirstName" />
+	</div>
+	<div>
+		<label>Defendant Last Name</label>
+		<InputText @bind-Value="formModel.DefendantLastName" />
+	</div>
+	<div>
+		<label>Trial Date</label>
+		<InputDate @bind-Value="formModel.TrialDate" />
+	</div>
+	<div>
+		<label>Trial Length</label>
+		<InputSelect @bind-Value="formModel.TrialLength">
+			<option value="One Day">One Day</option>
+			<option value="Two Days">Two Days</option>
+			<option value="No Trial - Jury Not Seated">No Trial - Jury Not Seated</option>
+		</InputSelect>
+	</div>
+	<div>
+		<label>Jurors Reported</label>
+		<InputNumber @bind-Value="formModel.JurorsReported" />
+	</div>
+	<div>
+		<label>Jurors Seated</label>
+		<InputNumber @bind-Value="formModel.JurorsSeated" />
+	</div>
+	<div>
+		<label>Jurors Not Seated</label>
+		<InputNumber @bind-Value="formModel.JurorsNotSeated" />
+	</div>
+	<div>
+		<label>Jurors Pay Not Seated</label>
+		<InputNumber @bind-Value="formModel.JurorsPayNotSeated" />
+	</div>
+	<div>
+		<label>Jurors Pay Seated</label>
+		<InputNumber @bind-Value="formModel.JurorsPaySeated" />
+	</div>
+	<div>
+		<label>Jury Panel Total Pay</label>
+		<InputNumber @bind-Value="formModel.JuryPanelTotalPay" />
+	</div>
+	<button type="submit">Submit</button>
+</EditForm>
+
+@code {
+	private JurorPaymentDto formModel = new();
+
+	private async Task HandleValidSubmit()
+	{
+		// TODO: Call API to save form data
+	}
+}

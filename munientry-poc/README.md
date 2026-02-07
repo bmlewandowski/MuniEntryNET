@@ -15,11 +15,36 @@ This is a proof-of-concept rewrite of the MuniEntry application using modern tec
 
 ## Features
 - Sidebar navigation with categorized forms
-- Example implementation: Fine Only Plea form (end-to-end)
-- API endpoints for prefill and DOCX document generation
+- End-to-end implementations for multiple court forms
+- API endpoints for prefill, DOCX document generation, and direct SQL insert
 - All legacy DOCX templates available for mapping
 - Swagger/OpenAPI enabled for API testing at `/swagger`
 - Automated integration tests
+
+## Completed Forms (as of Feb 7, 2026)
+- Trial To Court Notice
+- Final Jury Notice
+- Bond Hearing
+- Probation Violation Bond
+- Time To Pay Order
+- Juror Payment
+- General Notice of Hearing
+- Terms of Community Control / Notice of Community Control Violation Hearing
+
+## API Endpoints
+- `/api/trialtocourt` (POST)
+- `/api/finaljurynotice` (POST)
+- `/api/bondhearing` (POST)
+- `/api/probationviolationbond` (POST)
+- `/api/timetopayorder` (POST)
+- `/api/jurorpayment` (POST)
+- `/api/generalnoticeofhearing` (POST)
+- `/api/communitycontroltermsnotices` (POST)
+
+## Progress
+- All completed forms have matching Blazor pages, DTOs, API endpoints, service/database logic, and automated tests.
+- Navigation links match implemented forms.
+- Test coverage is automated and up-to-date.
 
 ## Getting Started
 

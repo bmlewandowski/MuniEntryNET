@@ -1,5 +1,39 @@
 @page "/admin/time-to-pay-order"
-<h2>Time to Pay Order Dialog</h2>
-<!-- Legacy: time_to_pay_order_dialog_ui.py -->
+@using Munientry.Client.Dtos
 
-<!-- TODO: Add form fields and logic for Time to Pay Order -->
+<h2>Time to Pay Order Dialog</h2>
+
+<EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+	<div>
+		<label>Case Number</label>
+		<InputText @bind-Value="formModel.CaseNumber" />
+	</div>
+	<div>
+		<label>Entry Date</label>
+		<InputDate @bind-Value="formModel.EntryDate" />
+	</div>
+	<div>
+		<label>Defendant First Name</label>
+		<InputText @bind-Value="formModel.DefendantFirstName" />
+	</div>
+	<div>
+		<label>Defendant Last Name</label>
+		<InputText @bind-Value="formModel.DefendantLastName" />
+	</div>
+	<div>
+		<label>Appearance Date</label>
+		<InputDate @bind-Value="formModel.AppearanceDate" />
+	</div>
+	<button type="submit">Submit</button>
+</EditForm>
+
+@code {
+	private TimeToPayOrderDto formModel = new();
+
+	private async Task HandleValidSubmit()
+	{
+		// TODO: Call API to save form data
+	}
+}
