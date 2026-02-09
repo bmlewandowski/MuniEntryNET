@@ -1,0 +1,137 @@
+@page "/criminal/fineonlyplea"
+@using System.ComponentModel.DataAnnotations
+@using Munientry.Poc.Client.Shared.Models
+
+<h2>Plea of Guilty - Fine Only</h2>
+
+<EditForm Model="fineOnlyModel" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label>Defendant First Name</label>
+        <InputText @bind-Value="fineOnlyModel.DefendantFirstName" class="form-control" />
+        <ValidationMessage For="() => fineOnlyModel.DefendantFirstName" />
+    </div>
+    <div class="form-group">
+        <label>Defendant Last Name</label>
+        <InputText @bind-Value="fineOnlyModel.DefendantLastName" class="form-control" />
+        <ValidationMessage For="() => fineOnlyModel.DefendantLastName" />
+    </div>
+    <div class="form-group">
+        <label>Case Number</label>
+        <InputText @bind-Value="fineOnlyModel.CaseNumber" class="form-control" />
+        <ValidationMessage For="() => fineOnlyModel.CaseNumber" />
+    </div>
+    <div class="form-group">
+        <label>Date</label>
+        <InputDate @bind-Value="fineOnlyModel.Date" class="form-control" />
+        <ValidationMessage For="() => fineOnlyModel.Date" />
+    </div>
+    <div class="form-group">
+        <label>Defense Counsel Name</label>
+        <InputText @bind-Value="fineOnlyModel.DefenseCounselName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Defense Counsel Type</label>
+        <InputSelect @bind-Value="fineOnlyModel.DefenseCounselType" class="form-control">
+            <option value="">Select...</option>
+            <option>Public Defender</option>
+            <option>Private Counsel</option>
+        </InputSelect>
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="fineOnlyModel.DefenseCounselWaived" /> Defendant waived right to counsel
+    </div>
+    <div class="form-group">
+        <label>Appearance Reason</label>
+        <InputSelect @bind-Value="fineOnlyModel.AppearanceReason" class="form-control">
+            <option value="">Select...</option>
+            <option>arraignment</option>
+            <option>a change of plea</option>
+            <option>sentencing</option>
+        </InputSelect>
+    </div>
+    <!-- Charges grid would be a separate component or table, simplified here -->
+    <div class="form-group">
+        <label>Charges (Offense, Statute, Degree, Allied, Plea, Finding, Fines, Fines Suspended, Dismissed)</label>
+        <textarea @bind="fineOnlyModel.Charges" class="form-control" rows="3"></textarea>
+    </div>
+    <div class="form-group">
+        <label>Court Costs</label>
+        <InputSelect @bind-Value="fineOnlyModel.CourtCosts" class="form-control">
+            <option value="">Select...</option>
+            <option>Yes</option>
+            <option>Waived</option>
+            <option>Imposed in companion case</option>
+            <option>No</option>
+        </InputSelect>
+    </div>
+    <div class="form-group">
+        <label>Time to Pay</label>
+        <InputSelect @bind-Value="fineOnlyModel.TimeToPay" class="form-control">
+            <option value="">Select...</option>
+            <option>forthwith</option>
+            <option>monthly pay</option>
+            <option>partial forthwith then monthly pay</option>
+        </InputSelect>
+    </div>
+    <div class="form-group">
+        <label>Due Date</label>
+        <InputDate @bind-Value="fineOnlyModel.DueDate" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Pay Today</label>
+        <InputNumber @bind-Value="fineOnlyModel.PayToday" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Monthly Pay</label>
+        <InputNumber @bind-Value="fineOnlyModel.MonthlyPay" class="form-control" />
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="fineOnlyModel.CreditForJail" /> Credit $50/day in jail
+    </div>
+    <div class="form-group">
+        <label>Jail Time Credit Days</label>
+        <InputNumber @bind-Value="fineOnlyModel.JailTimeCreditDays" class="form-control" />
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="fineOnlyModel.LicenseSuspension" /> License Suspension
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="fineOnlyModel.CommunityService" /> Community Service
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="fineOnlyModel.OtherConditions" /> Other Conditions
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="fineOnlyModel.DistractedDriving" /> Add Distracted Driving Course Language
+    </div>
+    <div class="form-group">
+        <label>FRA shown in complaint</label>
+        <InputSelect @bind-Value="fineOnlyModel.FraInFile" class="form-control">
+            <option value="">Select...</option>
+            <option>N/A</option>
+            <option>Yes</option>
+            <option>No</option>
+        </InputSelect>
+    </div>
+    <div class="form-group">
+        <label>FRA shown in court</label>
+        <InputSelect @bind-Value="fineOnlyModel.FraInCourt" class="form-control">
+            <option value="">Select...</option>
+            <option>N/A</option>
+            <option>Yes</option>
+            <option>No</option>
+        </InputSelect>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</EditForm>
+
+@code {
+    private FineOnlyPleaDto fineOnlyModel = new();
+
+    private async Task HandleValidSubmit()
+    {
+        // TODO: Call API to submit form
+    }
+}

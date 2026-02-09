@@ -1,0 +1,43 @@
+@page "/notices/civil-freeform-entry"
+@using Munientry.Poc.Client.Shared.Models
+
+<h2>Civil Freeform Entry Dialog</h2>
+
+<EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div>
+        <label>Entry Date</label>
+        <InputDate @bind-Value="formModel.EntryDate" />
+    </div>
+    <div>
+        <label>Plaintiff</label>
+        <InputText @bind-Value="formModel.Plaintiff" />
+    </div>
+    <div>
+        <label>Defendant</label>
+        <InputText @bind-Value="formModel.Defendant" />
+    </div>
+    <div>
+        <label>Case Number</label>
+        <InputText @bind-Value="formModel.CaseNumber" />
+    </div>
+    <div>
+        <label>Appearance Reason</label>
+        <InputText @bind-Value="formModel.AppearanceReason" />
+    </div>
+    <div>
+        <label>Entry Content</label>
+        <InputTextArea @bind-Value="formModel.EntryContent" />
+    </div>
+    <button type="submit">Submit</button>
+</EditForm>
+
+@code {
+    private CivilFreeformEntryDto formModel = new();
+
+    private async Task HandleValidSubmit()
+    {
+        // TODO: Call API to save form data
+    }
+}

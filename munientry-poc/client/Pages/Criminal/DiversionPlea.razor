@@ -1,3 +1,106 @@
 @page "/criminal/diversion-plea"
+@using Munientry.Poc.Client.Dtos
+@inject HttpClient Http
+
 <h2>Diversion Dialog</h2>
-<!-- Legacy: diversion_plea_dialog_ui.py -->
+
+<EditForm Model="diversionPlea" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label>Defendant First Name</label>
+        <InputText @bind-Value="diversionPlea.DefendantFirstName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Defendant Last Name</label>
+        <InputText @bind-Value="diversionPlea.DefendantLastName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Case Number</label>
+        <InputText @bind-Value="diversionPlea.CaseNumber" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Date</label>
+        <InputDate @bind-Value="diversionPlea.Date" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Defense Counsel Name</label>
+        <InputText @bind-Value="diversionPlea.DefenseCounselName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Defense Counsel Type</label>
+        <InputText @bind-Value="diversionPlea.DefenseCounselType" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Defense Counsel Waived</label>
+        <InputCheckbox @bind-Value="diversionPlea.DefenseCounselWaived" />
+    </div>
+    <div class="form-group">
+        <label>Appearance Reason</label>
+        <InputText @bind-Value="diversionPlea.AppearanceReason" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Charges</label>
+        <InputText @bind-Value="diversionPlea.Charges" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Diversion Type</label>
+        <InputText @bind-Value="diversionPlea.DiversionType" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Diversion Completion Date</label>
+        <InputDate @bind-Value="diversionPlea.DiversionCompletionDate" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Diversion Fine Pay Date</label>
+        <InputDate @bind-Value="diversionPlea.DiversionFinePayDate" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Probation</label>
+        <InputCheckbox @bind-Value="diversionPlea.Probation" />
+    </div>
+    <div class="form-group">
+        <label>Pay Restitution</label>
+        <InputCheckbox @bind-Value="diversionPlea.PayRestitution" />
+    </div>
+    <div class="form-group">
+        <label>Pay Restitution To</label>
+        <InputText @bind-Value="diversionPlea.PayRestitutionTo" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Pay Restitution Amount</label>
+        <InputNumber @bind-Value="diversionPlea.PayRestitutionAmount" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Other Conditions</label>
+        <InputCheckbox @bind-Value="diversionPlea.OtherConditions" />
+    </div>
+    <div class="form-group">
+        <label>Other Conditions Text</label>
+        <InputText @bind-Value="diversionPlea.OtherConditionsText" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</EditForm>
+
+@if (submitResult != null)
+{
+    <div class="alert alert-success">@submitResult</div>
+}
+
+@code {
+    DiversionPleaDto diversionPlea = new();
+    string submitResult;
+
+    private async Task HandleValidSubmit()
+    {
+        var response = await Http.PostAsJsonAsync("/api/diversionplea", diversionPlea);
+        if (response.IsSuccessStatusCode)
+        {
+            submitResult = "Diversion Plea saved successfully.";
+        }
+        else
+        {
+            submitResult = "Error saving Diversion Plea.";
+        }
+    }
+}

@@ -1,0 +1,175 @@
+@page "/criminal/leap-sentencing"
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>LEAP Sentencing</PageTitle>
+
+<h3>LEAP Sentencing</h3>
+
+<EditForm Model="leapSentencingModel" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <fieldset>
+        <legend>Case/Defendant Information</legend>
+        <div class="form-row">
+            <label>Defendant First Name:</label>
+            <InputText @bind-Value="leapSentencingModel.DefendantFirstName" class="form-control" />
+        </div>
+        <div class="form-row">
+            <label>Defendant Last Name:</label>
+            <InputText @bind-Value="leapSentencingModel.DefendantLastName" class="form-control" />
+        </div>
+        <div class="form-row">
+            <label>Case Number:</label>
+            <InputText @bind-Value="leapSentencingModel.CaseNumber" class="form-control" />
+        </div>
+        <div class="form-row">
+            <label>Defense Counsel Name:</label>
+            <InputText @bind-Value="leapSentencingModel.DefenseCounselName" class="form-control" />
+        </div>
+        <div class="form-row">
+            <label>Defense Counsel Type:</label>
+            <InputSelect @bind-Value="leapSentencingModel.DefenseCounselType" class="form-control">
+                <option value="">Select...</option>
+                <option>Public Defender</option>
+                <option>Private Counsel</option>
+            </InputSelect>
+        </div>
+        <div class="form-row">
+            <label><InputCheckbox @bind-Value="leapSentencingModel.DefenseCounselWaived" /> Defendant waived right to counsel</label>
+        </div>
+        <div class="form-row">
+            <label>Appearance Reason:</label>
+            <InputSelect @bind-Value="leapSentencingModel.AppearanceReason" class="form-control">
+                <option>LEAP sentencing</option>
+            </InputSelect>
+        </div>
+        <div class="form-row">
+            <label>LEAP Plea Date:</label>
+            <InputDate @bind-Value="leapSentencingModel.LeapPleaDate" class="form-control" />
+        </div>
+        <div class="form-row">
+            <label>Plea/Trial Date:</label>
+            <InputDate @bind-Value="leapSentencingModel.PleaTrialDate" class="form-control" />
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>Charges</legend>
+        <!-- Charges grid would be a custom component or table, placeholder for now -->
+        <p>[Charges grid goes here]</p>
+        <button type="button" class="btn btn-primary">Add Charge</button>
+        <button type="button" class="btn btn-secondary">No Contest All</button>
+        <button type="button" class="btn btn-secondary">Guilty All</button>
+    </fieldset>
+    <fieldset>
+        <legend>Financial</legend>
+        <div class="form-row">
+            <label>Court Costs:</label>
+            <InputSelect @bind-Value="leapSentencingModel.CourtCosts" class="form-control">
+                <option>Yes</option>
+                <option>Waived</option>
+                <option>Imposed in companion case</option>
+                <option>No</option>
+            </InputSelect>
+        </div>
+        <div class="form-row">
+            <label>Ability to Pay:</label>
+            <InputSelect @bind-Value="leapSentencingModel.AbilityToPay" class="form-control">
+                <option>forthwith</option>
+                <option>monthly pay</option>
+                <option>partial forthwith then monthly pay</option>
+            </InputSelect>
+        </div>
+        <div class="form-row">
+            <label>Due Date:</label>
+            <InputDate @bind-Value="leapSentencingModel.BalanceDueDate" class="form-control" />
+        </div>
+        <div class="form-row">
+            <label>Pay Today:</label>
+            <InputText @bind-Value="leapSentencingModel.PayToday" class="form-control" />
+        </div>
+        <div class="form-row">
+            <label>Monthly Pay:</label>
+            <InputText @bind-Value="leapSentencingModel.MonthlyPay" class="form-control" />
+        </div>
+        <div class="form-row">
+            <label><InputCheckbox @bind-Value="leapSentencingModel.CreditForJail" /> Credit $50/day in jail</label>
+            <InputText @bind-Value="leapSentencingModel.JailTimeCreditDays" class="form-control" placeholder="Days in jail" />
+        </div>
+        <button type="button" class="btn btn-info">Show Costs/Fines</button>
+    </fieldset>
+    <fieldset>
+        <legend>FRA (Financial Responsibility Act)</legend>
+        <div class="form-row">
+            <label>FRA shown in complaint:</label>
+            <InputSelect @bind-Value="leapSentencingModel.FraInFile" class="form-control">
+                <option>N/A</option>
+                <option>Yes</option>
+                <option>No</option>
+            </InputSelect>
+        </div>
+        <div class="form-row">
+            <label>FRA shown in court:</label>
+            <InputSelect @bind-Value="leapSentencingModel.FraInCourt" class="form-control">
+                <option>N/A</option>
+                <option>Yes</option>
+                <option>No</option>
+            </InputSelect>
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>Additional Conditions</legend>
+        <div class="form-row">
+            <label><InputCheckbox @bind-Value="leapSentencingModel.LicenseSuspension" /> License Suspension</label>
+        </div>
+        <div class="form-row">
+            <label><InputCheckbox @bind-Value="leapSentencingModel.CommunityService" /> Community Service</label>
+        </div>
+        <div class="form-row">
+            <label><InputCheckbox @bind-Value="leapSentencingModel.OtherConditions" /> Other</label>
+        </div>
+        <button type="button" class="btn btn-primary">Add Conditions</button>
+    </fieldset>
+    <div class="form-row mt-3">
+        <button type="submit" class="btn btn-success">Open Entry</button>
+        <button type="button" class="btn btn-danger">Close Dialog</button>
+        <button type="button" class="btn btn-secondary">Cancel</button>
+        <button type="button" class="btn btn-warning">Clear Fields</button>
+    </div>
+</EditForm>
+
+@code {
+    private LeapSentencingModel leapSentencingModel = new();
+
+    private void HandleValidSubmit()
+    {
+        // TODO: Submit to API
+    }
+
+    public class LeapSentencingModel
+    {
+        [Required]
+        public string DefendantFirstName { get; set; }
+        [Required]
+        public string DefendantLastName { get; set; }
+        public string CaseNumber { get; set; }
+        public string DefenseCounselName { get; set; }
+        public string DefenseCounselType { get; set; }
+        public bool DefenseCounselWaived { get; set; }
+        public string AppearanceReason { get; set; } = "LEAP sentencing";
+        public DateTime? LeapPleaDate { get; set; }
+        public DateTime? PleaTrialDate { get; set; }
+        // Charges grid would be a list of charge models (not implemented here)
+        public string CourtCosts { get; set; }
+        public string AbilityToPay { get; set; }
+        public DateTime? BalanceDueDate { get; set; }
+        public string PayToday { get; set; }
+        public string MonthlyPay { get; set; }
+        public bool CreditForJail { get; set; }
+        public string JailTimeCreditDays { get; set; }
+        public string FraInFile { get; set; }
+        public string FraInCourt { get; set; }
+        public bool LicenseSuspension { get; set; }
+        public bool CommunityService { get; set; }
+        public bool OtherConditions { get; set; }
+    }
+}

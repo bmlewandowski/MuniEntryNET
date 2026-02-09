@@ -1,20 +1,23 @@
 using System.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using Munientry.Poc.Api.Data;
 
 namespace Munientry.Api.Services
 {
     public class CommunityControlTermsNoticesService
     {
-        private readonly string _connectionString;
+        private readonly string? _connectionString;
 
-        public CommunityControlTermsNoticesService(string connectionString)
+        public CommunityControlTermsNoticesService(IConfiguration configuration)
         {
-            _connectionString = connectionString;
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            if (string.IsNullOrEmpty(_connectionString))
+                throw new InvalidOperationException("Connection string 'DefaultConnection' is missing or null.");
         }
 
         public void InsertCommunityControlTermsNotices(CommunityControlTermsNoticesDto dto)
         {
-            using var connection = new SqlConnection(_connectionString);
+            using var connection = new SqlConnection(_connectionString!);
             connection.Open();
             var command = new SqlCommand(@"INSERT INTO CommunityControlTermsNotices
                 (CaseNumber, EntryDate, DefendantFirstName, DefendantLastName, HearingDate, HearingTime, AssignedCourtroom, DefenseCounselName, ViolationType, InterpreterRequired, LanguageRequired)

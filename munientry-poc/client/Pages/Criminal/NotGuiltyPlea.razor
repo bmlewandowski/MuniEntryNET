@@ -1,5 +1,173 @@
 @page "/criminal/not-guilty-plea"
-<h2>Not Guilty Plea Dialog</h2>
-<!-- Legacy: not_guilty_plea_dialog_ui.py -->
+@using Munientry.Poc.Client.Shared.Models
+@inject HttpClient Http
 
-<!-- TODO: Add form fields and logic for Not Guilty Plea -->
+<h2>Not Guilty Plea Dialog</h2>
+
+<EditForm Model="pleaForm" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label>Defendant First Name</label>
+        <InputText class="form-control" @bind-Value="pleaForm.DefendantFirstName" />
+        <ValidationMessage For="@(() => pleaForm.DefendantFirstName)" />
+    </div>
+    <div class="form-group">
+        <label>Defendant Last Name</label>
+        <InputText class="form-control" @bind-Value="pleaForm.DefendantLastName" />
+        <ValidationMessage For="@(() => pleaForm.DefendantLastName)" />
+    </div>
+    <div class="form-group">
+        <label>Case Number</label>
+        <InputText class="form-control" @bind-Value="pleaForm.CaseNumber" />
+        <ValidationMessage For="@(() => pleaForm.CaseNumber)" />
+    </div>
+    <div class="form-group">
+        <label>Defense Counsel Name</label>
+        <InputText class="form-control" @bind-Value="pleaForm.DefenseCounselName" />
+    </div>
+    <div class="form-group">
+        <label>Defense Counsel Type</label>
+        <InputText class="form-control" @bind-Value="pleaForm.DefenseCounselType" />
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="pleaForm.DefenseCounselWaived" />
+        <label>Defendant waived right to counsel</label>
+    </div>
+    <div class="form-group">
+        <label>Appearance Reason</label>
+        <InputText class="form-control" @bind-Value="pleaForm.AppearanceReason" />
+    </div>
+    <div class="form-group">
+        <label>Plea Date</label>
+        <InputDate class="form-control" @bind-Value="pleaForm.PleaDate" />
+    </div>
+    <div class="form-group">
+        <label>Charges</label>
+        <InputText class="form-control" @bind-Value="pleaForm.Charges" />
+    </div>
+    <div class="form-group">
+        <label>Court Costs</label>
+        <InputText class="form-control" @bind-Value="pleaForm.CourtCosts" />
+    </div>
+    <div class="form-group">
+        <label>Ability to Pay</label>
+        <InputText class="form-control" @bind-Value="pleaForm.AbilityToPay" />
+    </div>
+    <div class="form-group">
+        <label>Balance Due Date</label>
+        <InputDate class="form-control" @bind-Value="pleaForm.BalanceDueDate" />
+    </div>
+    <div class="form-group">
+        <label>Pay Today</label>
+        <InputText class="form-control" @bind-Value="pleaForm.PayToday" />
+    </div>
+    <div class="form-group">
+        <label>Monthly Pay</label>
+        <InputText class="form-control" @bind-Value="pleaForm.MonthlyPay" />
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="pleaForm.CreditForJail" />
+        <label>Credit for Jail</label>
+    </div>
+    <div class="form-group">
+        <label>Jail Time Credit Days</label>
+        <InputText class="form-control" @bind-Value="pleaForm.JailTimeCreditDays" />
+    </div>
+    <div class="form-group">
+        <label>FRA in File</label>
+        <InputText class="form-control" @bind-Value="pleaForm.FraInFile" />
+    </div>
+    <div class="form-group">
+        <label>FRA in Court</label>
+        <InputText class="form-control" @bind-Value="pleaForm.FraInCourt" />
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="pleaForm.LicenseSuspension" />
+        <label>License Suspension</label>
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="pleaForm.CommunityService" />
+        <label>Community Service</label>
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="pleaForm.OtherConditions" />
+        <label>Other Conditions</label>
+    </div>
+    <div class="form-group">
+        <label>Bond Type</label>
+        <InputText class="form-control" @bind-Value="pleaForm.BondType" />
+    </div>
+    <div class="form-group">
+        <label>Bond Amount</label>
+        <InputText class="form-control" @bind-Value="pleaForm.BondAmount" />
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="pleaForm.NoContact" />
+        <label>No Contact</label>
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="pleaForm.NoAlcoholDrugs" />
+        <label>No Alcohol/Drugs</label>
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="pleaForm.AlcoholDrugsAssessment" />
+        <label>Alcohol/Drugs Assessment</label>
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="pleaForm.MentalHealthAssessment" />
+        <label>Mental Health Assessment</label>
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="pleaForm.FingerprintInCourt" />
+        <label>Fingerprint in Court</label>
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="pleaForm.SpecializedDocket" />
+        <label>Specialized Docket</label>
+    </div>
+    <div class="form-group">
+        <label>Specialized Docket Type</label>
+        <InputText class="form-control" @bind-Value="pleaForm.SpecializedDocketType" />
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="pleaForm.Monitoring" />
+        <label>Monitoring</label>
+    </div>
+    <div class="form-group">
+        <label>Monitoring Type</label>
+        <InputText class="form-control" @bind-Value="pleaForm.MonitoringType" />
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="pleaForm.ComplyProtectionOrder" />
+        <label>Comply with Protection Order</label>
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="pleaForm.PublicSafetySuspension" />
+        <label>Public Safety Suspension</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</EditForm>
+
+@if (submitResult != null)
+{
+    <div class="alert alert-info">@submitResult</div>
+}
+
+@code {
+    private NotGuiltyPleaDto pleaForm = new();
+    private string? submitResult;
+
+    private async Task HandleValidSubmit()
+    {
+        var response = await Http.PostAsJsonAsync("/api/notguiltyplea", pleaForm);
+        if (response.IsSuccessStatusCode)
+        {
+            submitResult = "Entry saved successfully.";
+        }
+        else
+        {
+            submitResult = "Error saving entry.";
+        }
+    }
+}

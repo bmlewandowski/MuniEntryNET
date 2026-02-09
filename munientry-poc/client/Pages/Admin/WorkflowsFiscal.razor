@@ -1,0 +1,55 @@
+@page "/admin/workflows-fiscal"
+@using Munientry.Poc.Client.Shared.Models
+
+<h2>Fiscal Journal Entries Dialog</h2>
+
+<EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div>
+        <label>Account Number</label>
+        <InputText @bind-Value="formModel.AccountNumber" />
+    </div>
+    <div>
+        <label>Account Name</label>
+        <InputText @bind-Value="formModel.AccountName" />
+    </div>
+    <div>
+        <label>Subaccount Number</label>
+        <InputText @bind-Value="formModel.SubaccountNumber" />
+    </div>
+    <div>
+        <label>Subaccount Name</label>
+        <InputText @bind-Value="formModel.SubaccountName" />
+    </div>
+    <div>
+        <label>Disbursement Reason</label>
+        <InputText @bind-Value="formModel.DisbursementReason" />
+    </div>
+    <div>
+        <label>Disbursement Amount</label>
+        <InputNumber @bind-Value="formModel.DisbursementAmount" />
+    </div>
+    <div>
+        <label>Disbursement Vendor</label>
+        <InputText @bind-Value="formModel.DisbursementVendor" />
+    </div>
+    <div>
+        <label>Invoice Number</label>
+        <InputText @bind-Value="formModel.InvoiceNumber" />
+    </div>
+    <div>
+        <label>Judicial Officer</label>
+        <InputText @bind-Value="formModel.JudicialOfficer" />
+    </div>
+    <button type="submit">Submit</button>
+</EditForm>
+
+@code {
+    private FiscalJournalEntryDto formModel = new();
+
+    private async Task HandleValidSubmit()
+    {
+        // TODO: Call API to save form data
+    }
+}

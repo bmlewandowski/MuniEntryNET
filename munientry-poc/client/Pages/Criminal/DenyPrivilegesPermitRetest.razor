@@ -1,0 +1,72 @@
+@page "/criminal/deny-privileges-permit-retest"
+@using Munientry.Poc.Client.Shared.Models
+@using Munientry.Poc.Client.Shared
+@inject DenyPrivilegesPermitRetestService Service
+
+<h3>Deny Privileges / Permit Retest</h3>
+
+<EditForm Model="dto" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label>Defendant First Name</label>
+        <InputText @bind-Value="dto.DefendantFirstName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Defendant Last Name</label>
+        <InputText @bind-Value="dto.DefendantLastName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Case Number</label>
+        <InputText @bind-Value="dto.CaseNumber" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Entry Date</label>
+        <InputDate @bind-Value="dto.EntryDate" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Driving Privileges Entry Type</label>
+        <InputRadioGroup @bind-Value="dto.EntryType">
+            <InputRadio Value="EntryType.DenyDrivingPrivileges" /> Deny Driving Privileges
+            <InputRadio Value="EntryType.PermitTest" /> Permit Defendant to Test and/or Renew
+            <InputRadio Value="EntryType.PermitRenew" /> Permit Defendant to Renew upon Expiration
+            <InputRadio Value="EntryType.TerminatePrivileges" /> Terminate Privileges - Fail to Pay
+        </InputRadioGroup>
+    </div>
+    <div class="form-group">
+        <label>Eligibility/Status</label>
+        <div><InputCheckbox @bind-Value="dto.HardTimeNotPassed" /> Not Eligible - Hard Time has not passed</div>
+        <div><InputCheckbox @bind-Value="dto.PermanentIdCard" /> Defendant has permanent ID card</div>
+        <div><InputCheckbox @bind-Value="dto.OutOfStateLicense" /> Out of State License - Needs Certified Abstract</div>
+        <div><InputCheckbox @bind-Value="dto.PetitionIncomplete" /> Petition is Incomplete and/or Illegible</div>
+        <div><InputCheckbox @bind-Value="dto.NoInsurance" /> Failed to Provide Proof of Insurance</div>
+        <div><InputCheckbox @bind-Value="dto.NoEmployerInfo" /> Court could not verify employer information</div>
+        <div><InputCheckbox @bind-Value="dto.NoJurisdiction" /> License not subject to suspension for which this court may grant privileges</div>
+        <div><InputCheckbox @bind-Value="dto.NoPayPlan" /> Defendant not on or current with fines and costs pay plan</div>
+        <div><InputCheckbox @bind-Value="dto.ProhibitedActivities" /> Petition requests privileges for activities not permitted by this Court</div>
+    </div>
+    <div class="form-group">
+        <label>Defendant Driver License Expiration Date</label>
+        <InputDate @bind-Value="dto.LicenseExpirationDate" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Date Privileges were Granted on</label>
+        <InputDate @bind-Value="dto.PrivilegesGrantDate" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Notice of Unpaid Fines and Costs (NUFC) Letter Date</label>
+        <InputDate @bind-Value="dto.NufcDate" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</EditForm>
+
+@code {
+    private DenyPrivilegesPermitRetestDto dto = new DenyPrivilegesPermitRetestDto {
+        EntryType = EntryType.DenyDrivingPrivileges
+    };
+
+    private async Task HandleValidSubmit()
+    {
+        await Service.SubmitAsync(dto);
+    }
+}

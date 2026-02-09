@@ -1,3 +1,113 @@
 @page "/criminal/trial-sentencing"
-<h2>Sentencing Only - Already Plead Dialog</h2>
-<!-- Legacy: trial_sentencing_dialog_ui.py, trial_to_court_hearing_dialog_ui.py -->
+@using munientry_poc.client.Shared.Models
+@inject HttpClient Http
+
+<PageTitle>Sentencing Only - Already Plead Dialog</PageTitle>
+
+<h3>Sentencing Only - Already Plead Dialog</h3>
+
+<EditForm Model="notice" OnValidSubmit="HandleValidSubmit">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+	<div class="form-section">
+		<h4>Case Information</h4>
+		<div class="form-group">
+			<label>Defendant First Name</label>
+			<InputText @bind-Value="notice.DefendantFirstName" class="form-control" />
+		</div>
+		<div class="form-group">
+			<label>Defendant Last Name</label>
+			<InputText @bind-Value="notice.DefendantLastName" class="form-control" />
+		</div>
+		<div class="form-group">
+			<label>Case Number</label>
+			<InputText @bind-Value="notice.CaseNumber" class="form-control" />
+		</div>
+		<div class="form-group">
+			<label>Entry Date</label>
+			<InputDate @bind-Value="notice.EntryDate" class="form-control" />
+		</div>
+		<div class="form-group">
+			<label>Defense Counsel Name</label>
+			<InputText @bind-Value="notice.DefenseCounselName" class="form-control" />
+		</div>
+	</div>
+	<div class="form-section">
+		<h4>Speedy Trial Calculator</h4>
+		<div class="form-group">
+			<label>Arrest/Summons Date</label>
+			<InputDate @bind-Value="notice.ArrestSummonsDate" class="form-control" />
+		</div>
+		<div class="form-group">
+			<label>Highest Charge Degree of Offense</label>
+			<InputSelect @bind-Value="notice.HighestCharge" class="form-control">
+				<option value="">Select</option>
+				<option value="MM">MM</option>
+				<option value="UCM">UCM</option>
+			</InputSelect>
+		</div>
+		<div class="form-group">
+			<label>Days Spent in Jail</label>
+			<InputNumber @bind-Value="notice.DaysInJail" class="form-control" />
+		</div>
+		<div class="form-group">
+			<label>Continuance Days</label>
+			<InputNumber @bind-Value="notice.ContinuanceDays" class="form-control" />
+		</div>
+	</div>
+	<div class="form-section">
+		<h4>Hearing Scheduling</h4>
+		<div class="form-group">
+			<label>Trial To Court Date</label>
+			<InputDate @bind-Value="notice.TrialToCourtDate" class="form-control" />
+		</div>
+		<div class="form-group">
+			<label>Trial To Court Time</label>
+			<InputSelect @bind-Value="notice.TrialToCourtTime" class="form-control">
+				<option value="">Select</option>
+				<option value="9:30 AM">9:30 AM</option>
+				<option value="10:00 AM">10:00 AM</option>
+				<option value="10:30 AM">10:30 AM</option>
+				<option value="11:00 AM">11:00 AM</option>
+				<option value="11:30 AM">11:30 AM</option>
+				<option value="1:00 PM">1:00 PM</option>
+				<option value="1:30 PM">1:30 PM</option>
+				<option value="2:00 PM">2:00 PM</option>
+				<option value="2:30 PM">2:30 PM</option>
+				<option value="3:00 PM">3:00 PM</option>
+			</InputSelect>
+		</div>
+		<div class="form-group">
+			<label>Assigned Courtroom</label>
+			<InputSelect @bind-Value="notice.AssignedCourtroom" class="form-control">
+				<option value="">Select</option>
+				<option value="Courtroom C">Courtroom C</option>
+				<option value="Courtroom B">Courtroom B</option>
+				<option value="Courtroom A">Courtroom A</option>
+			</InputSelect>
+		</div>
+	</div>
+	<div class="form-section">
+		<h4>Additional Options</h4>
+		<div class="form-group">
+			<InputCheckbox @bind-Value="notice.InterpreterRequired" /> Interpreter Required
+		</div>
+		<div class="form-group">
+			<label>Language Required</label>
+			<InputText @bind-Value="notice.LanguageRequired" class="form-control" placeholder="Language Required" />
+		</div>
+		<div class="form-group">
+			<InputCheckbox @bind-Value="notice.DateConfirmedWithCounsel" /> Date Confirmed with Counsel
+		</div>
+	</div>
+	<button type="submit" class="btn btn-primary">Open Entry</button>
+</EditForm>
+
+@code {
+	private FinalJuryNoticeDto notice = new();
+
+	private async Task HandleValidSubmit()
+	{
+		// TODO: Call API to create final/jury notice entry
+	}
+}

@@ -14,6 +14,42 @@ This is a proof-of-concept rewrite of the MuniEntry application using modern tec
 - `docker-compose.yml` — Multi-container orchestration
 
 ## Features
+
+### Deny Privileges / Permit Retest Dialog (Criminal / Plea & Sentencing)
+
+- **API Endpoint:** `POST /api/denyprivilegespermitretest`
+- **DTO:** `DenyPrivilegesPermitRetestDto` (see api/Data/DenyPrivilegesPermitRetestDto.cs)
+- **Service:** `DenyPrivilegesPermitRetestService` (see api/Services/DenyPrivilegesPermitRetestService.cs)
+- **Blazor Form:** `client/Pages/Criminal/DenyPrivilegesPermitRetest.razor`
+- **Integration Test:** `api.Tests/DenyPrivilegesPermitRetestApiTests.cs`
+
+#### Example Request
+
+```json
+POST /api/denyprivilegespermitretest
+{
+   "DefendantFirstName": "Alex",
+   "DefendantLastName": "Smith",
+   "CaseNumber": "22TRC99999",
+   "EntryDate": "2026-02-07T00:00:00Z",
+   "EntryType": "DenyDrivingPrivileges",
+   "HardTimeNotPassed": true,
+   "PermanentIdCard": false,
+   "OutOfStateLicense": false,
+   "PetitionIncomplete": false,
+   "NoInsurance": true,
+   "NoEmployerInfo": false,
+   "NoJurisdiction": false,
+   "NoPayPlan": false,
+   "ProhibitedActivities": false,
+   "LicenseExpirationDate": "2027-02-07T00:00:00Z",
+   "PrivilegesGrantDate": "2026-01-08T00:00:00Z",
+   "NufcDate": "2026-01-28T00:00:00Z"
+}
+```
+
+#### Description
+Creates a new Deny Privileges / Permit Retest entry in the database. All fields are required unless otherwise noted. See the Blazor form for the full UI implementation and field mapping.
 - Sidebar navigation with categorized forms
 - End-to-end implementations for multiple court forms
 - API endpoints for prefill, DOCX document generation, and direct SQL insert
@@ -21,15 +57,54 @@ This is a proof-of-concept rewrite of the MuniEntry application using modern tec
 - Swagger/OpenAPI enabled for API testing at `/swagger`
 - Automated integration tests
 
-## Completed Forms (as of Feb 7, 2026)
-- Trial To Court Notice
-- Final Jury Notice
-- Bond Hearing
-- Probation Violation Bond
-- Time To Pay Order
-- Juror Payment
-- General Notice of Hearing
-- Terms of Community Control / Notice of Community Control Violation Hearing
+
+
+
+
+
+
+
+## Forms and Navigation Mapping (as of Feb 7, 2026)
+
+- Trial To Court Notice (Scheduling)
+- Final Jury Notice (Scheduling)
+- Bond Hearing (Criminal / Plea & Sentencing)
+- Probation Violation Bond (Probation / Community Control)
+- Time To Pay Order (Admin / Courtroom Operations)
+- Juror Payment (Admin / Courtroom Operations)
+- General Notice of Hearing (Scheduling)
+- Terms of Community Control / Notice of Community Control Violation Hearing (Probation / Community Control)
+- **Community Control Terms Dialog (Probation / Community Control) [NEW, IMPLEMENTED]**
+- **Scheduling Entry Dialog (Scheduling / Court Events) [NEW, IMPLEMENTED]**
+- **Arraignment Continuance Dialog (Criminal / Plea & Sentencing) [NEW, IMPLEMENTED]**
+- Notices & Freeform Civil (Notices / Freeform / Civil)
+- Driving Privileges / CrimTraffic Helpers (Driving / Traffic)
+- Fiscal Journal Entries Dialog (Admin / Courtroom Operations)
+- Civil Freeform Entry Dialog (Notices / Freeform / Civil)
+- **Fine Only Dialog (Criminal / Plea & Sentencing) [NEW, IMPLEMENTED]**
+- **LEAP Sentencing Dialog (Criminal / Plea & Sentencing) [NEW, IMPLEMENTED]**
+
+
+
+
+
+### Forms Yet to be Converted (from navigation)
+   - **Diversion Dialog fully implemented and tested as of Feb 7, 2026.**
+   - **Not Guilty Plea Dialog fully implemented and tested as of Feb 7, 2026.**
+   - **Plea Only - Future Sentencing Dialog fully implemented and tested as of Feb 7, 2026.**
+- Not Guilty Plea / Appear on Warrant / Bond Modification Special Bond Conditions Dialog (Criminal / Plea & Sentencing)
+- Appear on Warrant (No Plea) Dialog (Criminal / Plea & Sentencing)
+- Bond Modification/Revocation Dialog (Criminal / Plea & Sentencing)
+- Community Service, License Suspension, Fingerprinting & Victim Notification, Immobilize/Impound and other Conditions Secondary Dialogs (Criminal / Plea & Sentencing)
+- Arraignment / Failure to Appear / Bond Dialogs (Criminal / Plea & Sentencing)
+- Criminal Sealing / Deny Privileges Dialogs (Criminal / Plea & Sentencing)
+- Competency / Criminal Sealing / Juror Dialogs (Miscellaneous)
+- Main application window (Miscellaneous)
+
+### Navigation Forms Not Found in Legacy Python Dialogs
+- If any of the above navigation forms do not correspond to a legacy Python dialog, please review and confirm if they are new additions or require new implementation.
+
+
 
 ## API Endpoints
 - `/api/trialtocourt` (POST)
@@ -40,11 +115,26 @@ This is a proof-of-concept rewrite of the MuniEntry application using modern tec
 - `/api/jurorpayment` (POST)
 - `/api/generalnoticeofhearing` (POST)
 - `/api/communitycontroltermsnotices` (POST)
+- `/api/leapsentencing` (POST)
+- `/api/communitycontrolterms` (POST)  <!-- NEW -->
 
-## Progress
+
+
+
 - All completed forms have matching Blazor pages, DTOs, API endpoints, service/database logic, and automated tests.
 - Navigation links match implemented forms.
 - Test coverage is automated and up-to-date.
+- **LEAP Sentencing Dialog fully implemented and tested as of Feb 7, 2026.**
+- **LEAP Plea Admission Dialog fully implemented and tested as of [DATE].**
+- **Community Control Terms Dialog fully implemented and tested as of Feb 7, 2026.**
+- **LEAP Admission - Already Valid Dialog fully implemented and tested as of Feb 7, 2026.**
++- **Sentencing Only - Already Plead Dialog fully implemented and tested as of Feb 7, 2026.**
+- All completed forms have matching Blazor pages, DTOs, API endpoints, service/database logic, and automated tests.
+- Navigation links match implemented forms.
+- Test coverage is automated and up-to-date.
+- **LEAP Sentencing Dialog fully implemented and tested as of Feb 7, 2026.**
+- **LEAP Plea Admission Dialog fully implemented and tested as of [DATE].**
+- **Community Control Terms Dialog fully implemented and tested as of Feb 7, 2026.**
 
 ## Getting Started
 
@@ -101,3 +191,33 @@ Next steps to move to Kubernetes:
 - Use Kubernetes Secrets or an external secret provider for Entra credentials
 
 This scaffold is minimal by design — tell me if you want a Blazor client instead of the static client, or MSAL wiring included now.
+
+### Final Jury Notice of Hearing (Scheduling)
+
+- **API Endpoint:** `POST /api/finaljury`
+- **DTO:** `FinalJuryNoticeDto` (see api/Data/FinalJuryNoticeDto.cs)
+- **Service:** `FinalJuryNoticeService` (see api/Services/FinalJuryNoticeService.cs)
+- **Blazor Form:** `client/Pages/Scheduling/FinalJuryNoticeOfHearing.razor`
+- **Integration Test:** `api.Tests/FinalJuryNoticeApiTests.cs`
+
+#### Example Request
+
+```json
+POST /api/finaljury
+{
+   "CaseNumber": "22TRC54321",
+   "DefendantFirstName": "Jane",
+   "DefendantLastName": "Smith",
+   "EntryDate": "2024-06-01T00:00:00Z",
+   "DefenseCounselName": "Johnson",
+   "FinalJuryDate": "2024-06-15T00:00:00Z",
+   "FinalJuryTime": "2:00 PM",
+   "AssignedCourtroom": "B",
+   "InterpreterRequired": false,
+   "LanguageRequired": "",
+   "DateConfirmedWithCounsel": false
+}
+```
+
+#### Description
+Creates a new Final Jury Notice of Hearing entry in the database. All fields are required unless otherwise noted. See the Blazor form for the full UI implementation and field mapping.

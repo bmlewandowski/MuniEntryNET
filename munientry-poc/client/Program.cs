@@ -9,6 +9,7 @@ using Munientry.Poc.Client;
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.Services.AddScoped<ApiHelper>();
+builder.Services.AddScoped<DenyPrivilegesPermitRetestService>();
 
 // Load config for API base URL
 var config = new ConfigurationBuilder()

@@ -1,5 +1,78 @@
-@page "/criminal/bond-modification-revocation"
-<h2>Bond Modification/Revocation Dialog</h2>
-<!-- Legacy: bond_modification_revocation_dialog_ui.py -->
 
-<!-- TODO: Add form fields and logic for Bond Modification/Revocation -->
+@page "/criminal/bond-modification-revocation"
+@using Munientry.Poc.Client.Dtos
+@inject HttpClient Http
+
+<h2>Bond Modification/Revocation Dialog</h2>
+
+<EditForm Model="bondForm" OnValidSubmit="HandleValidSubmit">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+	<div class="form-group">
+		<label>Defendant First Name</label>
+		<InputText class="form-control" @bind-Value="bondForm.DefendantFirstName" />
+		<ValidationMessage For="@(() => bondForm.DefendantFirstName)" />
+	</div>
+	<div class="form-group">
+		<label>Defendant Last Name</label>
+		<InputText class="form-control" @bind-Value="bondForm.DefendantLastName" />
+		<ValidationMessage For="@(() => bondForm.DefendantLastName)" />
+	</div>
+	<div class="form-group">
+		<label>Case Number</label>
+		<InputText class="form-control" @bind-Value="bondForm.CaseNumber" />
+		<ValidationMessage For="@(() => bondForm.CaseNumber)" />
+	</div>
+	<div class="form-group">
+		<label>Entry Date</label>
+		<InputDate class="form-control" @bind-Value="bondForm.EntryDate" />
+		<ValidationMessage For="@(() => bondForm.EntryDate)" />
+	</div>
+	<div class="form-group">
+		<label>Decision on Bond</label>
+		<InputSelect class="form-control" @bind-Value="bondForm.DecisionOnBond">
+			<option value="">-- Select --</option>
+			<option value="request to modify bond is granted">Request to modify bond is granted</option>
+			<option value="request to modify bond is denied">Request to modify bond is denied</option>
+			<option value="request to revoke bond is granted">Request to revoke bond is granted</option>
+			<option value="request to revoke bond is denied">Request to revoke bond is denied</option>
+		</InputSelect>
+		<ValidationMessage For="@(() => bondForm.DecisionOnBond)" />
+	</div>
+	<div class="form-group">
+		<label>Bond Type</label>
+		<InputText class="form-control" @bind-Value="bondForm.BondType" />
+	</div>
+	<div class="form-group">
+		<label>Bond Amount</label>
+		<InputText class="form-control" @bind-Value="bondForm.BondAmount" />
+	</div>
+	<div class="form-group">
+		<label>Defense Counsel Name</label>
+		<InputText class="form-control" @bind-Value="bondForm.DefenseCounselName" />
+	</div>
+	<button type="submit" class="btn btn-primary">Submit</button>
+</EditForm>
+
+@if (submitResult != null)
+{
+	<div class="alert alert-info">@submitResult</div>
+}
+
+@code {
+	private BondModificationRevocationDto bondForm = new();
+	private string? submitResult;
+
+	private async Task HandleValidSubmit()
+	{
+		var response = await Http.PostAsJsonAsync("/api/bondmodificationrevocation", bondForm);
+		if (response.IsSuccessStatusCode)
+		{
+			submitResult = "Entry saved successfully.";
+		}
+		else
+		{
+			submitResult = "Error saving entry.";
+		}
+	}
+}

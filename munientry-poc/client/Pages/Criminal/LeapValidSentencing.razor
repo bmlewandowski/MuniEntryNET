@@ -1,3 +1,71 @@
+
 @page "/criminal/leap-valid-sentencing"
-<h2>LEAP Admission - Already Valid Dialog</h2>
-<!-- Legacy: leap_plea_valid_dialog_ui.py, leap_sentencing_dialog_ui.py -->
+@using System.ComponentModel.DataAnnotations
+@using Munientry.Poc.Client.Dtos
+
+<h2>LEAP Sentencing - Already Valid</h2>
+
+<EditForm Model="leapValidSentencingModel" OnValidSubmit="HandleValidSubmit">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+	<div class="form-group">
+		<label>Defendant First Name</label>
+		<InputText @bind-Value="leapValidSentencingModel.DefendantFirstName" class="form-control" />
+		<ValidationMessage For="() => leapValidSentencingModel.DefendantFirstName" />
+	</div>
+	<div class="form-group">
+		<label>Defendant Last Name</label>
+		<InputText @bind-Value="leapValidSentencingModel.DefendantLastName" class="form-control" />
+		<ValidationMessage For="() => leapValidSentencingModel.DefendantLastName" />
+	</div>
+	<div class="form-group">
+		<label>Case Number</label>
+		<InputText @bind-Value="leapValidSentencingModel.CaseNumber" class="form-control" />
+		<ValidationMessage For="() => leapValidSentencingModel.CaseNumber" />
+	</div>
+	<div class="form-group">
+		<label>Date</label>
+		<InputDate @bind-Value="leapValidSentencingModel.Date" class="form-control" />
+		<ValidationMessage For="() => leapValidSentencingModel.Date" />
+	</div>
+	<div class="form-group">
+		<label>Defense Counsel Name</label>
+		<InputText @bind-Value="leapValidSentencingModel.DefenseCounselName" class="form-control" />
+	</div>
+	<div class="form-group">
+		<label>Defense Counsel Type</label>
+		<InputSelect @bind-Value="leapValidSentencingModel.DefenseCounselType" class="form-control">
+			<option value="">Select...</option>
+			<option>Public Defender</option>
+			<option>Private Counsel</option>
+		</InputSelect>
+	</div>
+	<div class="form-group">
+		<InputCheckbox @bind-Value="leapValidSentencingModel.DefenseCounselWaived" /> Defendant waived right to counsel
+	</div>
+	<div class="form-group">
+		<label>Appearance Reason</label>
+		<InputSelect @bind-Value="leapValidSentencingModel.AppearanceReason" class="form-control">
+			<option value="">Select...</option>
+			<option>arraignment</option>
+			<option>change of plea</option>
+			<option>trial to court</option>
+			<option>jury trial</option>
+			<option>LEAP sentencing</option>
+		</InputSelect>
+	</div>
+	<div class="form-group">
+		<label>Charges (Offense, Statute, Degree, Plea, Dismissed)</label>
+		<textarea @bind="leapValidSentencingModel.Charges" class="form-control" rows="3"></textarea>
+	</div>
+	<button type="submit" class="btn btn-primary">Submit</button>
+</EditForm>
+
+@code {
+	private LeapValidSentencingDto leapValidSentencingModel = new();
+
+	private async Task HandleValidSubmit()
+	{
+		// TODO: Call API to submit form
+	}
+}

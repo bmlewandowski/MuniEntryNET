@@ -1,3 +1,82 @@
 @page "/criminal/arraignment-fta-bond"
+@using Microsoft.AspNetCore.Components.Forms
+@using System.ComponentModel.DataAnnotations
+
 <h2>Arraignment / Failure to Appear / Bond Dialogs</h2>
 <!-- Legacy: arraignment_continue_dialog_ui.py, failure_to_appear_dialog_ui.py, bond_hearing_dialog_ui.py, no_plea_bond_dialog_ui.py, not_guilty_bond_dialog_ui.py -->
+
+<EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+	<div>
+		<label>Defendant First Name</label>
+		<InputText @bind-Value="formModel.DefendantFirstName" />
+		<ValidationMessage For="@(() => formModel.DefendantFirstName)" />
+	</div>
+	<div>
+		<label>Defendant Last Name</label>
+		<InputText @bind-Value="formModel.DefendantLastName" />
+		<ValidationMessage For="@(() => formModel.DefendantLastName)" />
+	</div>
+	<div>
+		<label>Case Number</label>
+		<InputText @bind-Value="formModel.CaseNumber" />
+		<ValidationMessage For="@(() => formModel.CaseNumber)" />
+	</div>
+	<div>
+		<label>Entry Date</label>
+		<InputDate @bind-Value="formModel.EntryDate" />
+		<ValidationMessage For="@(() => formModel.EntryDate)" />
+	</div>
+	<div>
+		<label>Bond Type</label>
+		<InputText @bind-Value="formModel.BondType" />
+	</div>
+	<div>
+		<label>Bond Amount</label>
+		<InputText @bind-Value="formModel.BondAmount" />
+	</div>
+	<div>
+		<label>Defense Counsel Name</label>
+		<InputText @bind-Value="formModel.DefenseCounselName" />
+	</div>
+	<button type="submit" disabled="@isSubmitting">Submit</button>
+	@if (errorMessage != null)
+	{
+		<div class="alert alert-danger mt-2">@errorMessage</div>
+	}
+</EditForm>
+
+@code {
+	private FormModel formModel = new();
+	private bool isSubmitting = false;
+	private string? errorMessage;
+
+	private async Task HandleValidSubmit()
+	{
+		isSubmitting = true;
+		errorMessage = null;
+		// DOCX generation logic omitted for now
+		await Task.Delay(500); // Simulate processing
+		isSubmitting = false;
+	}
+
+	public class FormModel
+	{
+		[Required(ErrorMessage = "Defendant First Name is required")]
+		public string? DefendantFirstName { get; set; }
+
+		[Required(ErrorMessage = "Defendant Last Name is required")]
+		public string? DefendantLastName { get; set; }
+
+		[Required(ErrorMessage = "Case Number is required")]
+		public string? CaseNumber { get; set; }
+
+		[Required(ErrorMessage = "Entry Date is required")]
+		public DateTime? EntryDate { get; set; }
+
+		public string? BondType { get; set; }
+		public string? BondAmount { get; set; }
+		public string? DefenseCounselName { get; set; }
+	}
+}

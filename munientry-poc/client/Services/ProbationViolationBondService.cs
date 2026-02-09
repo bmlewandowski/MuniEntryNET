@@ -1,5 +1,5 @@
 using System.Net.Http.Json;
-using Munientry.Client.Dtos;
+using Munientry.Poc.Client.Shared.Models;
 
 namespace Munientry.Client.Services
 {
