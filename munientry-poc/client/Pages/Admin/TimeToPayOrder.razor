@@ -1,48 +1,52 @@
 @page "/admin/time-to-pay-order"
 @using System.ComponentModel.DataAnnotations
 
+<div class="form-page">
+<div class="form-card">
 <h2>Time to Pay Order Dialog</h2>
 <!-- Legacy: time_to_pay_dialog_ui.py -->
 
 <EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
-	<DataAnnotationsValidator />
-	<ValidationSummary />
-	<div>
-		<label>Case Number</label>
-		<InputText @bind-Value="formModel.CaseNumber" />
-		<ValidationMessage For="@(() => formModel.CaseNumber)" />
-	</div>
-	<div>
-		<label>Entry Date</label>
-		<InputDate @bind-Value="formModel.EntryDate" />
-		<ValidationMessage For="@(() => formModel.EntryDate)" />
-	</div>
-	<div>
-		<label>Defendant First Name</label>
-		<InputText @bind-Value="formModel.DefendantFirstName" />
-		<ValidationMessage For="@(() => formModel.DefendantFirstName)" />
-	</div>
-	<div>
-		<label>Defendant Last Name</label>
-		<InputText @bind-Value="formModel.DefendantLastName" />
-		<ValidationMessage For="@(() => formModel.DefendantLastName)" />
-	</div>
-	<div>
-		<label>Appearance Date</label>
-		<InputDate @bind-Value="formModel.AppearanceDate" />
-		<ValidationMessage For="@(() => formModel.AppearanceDate)" />
-	</div>
-	<div class="form-actions">
-		<button type="submit" class="btn btn-success" disabled="@isSubmitting">Generate DOCX</button>
-		<button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
-		<button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
-		<button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
-	</div>
-	@if (errorMessage != null)
-	{
-		<div class="alert alert-danger mt-2">@errorMessage</div>
-	}
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label>Case Number</label>
+        <InputText @bind-Value="formModel.CaseNumber" class="form-control" />
+        <ValidationMessage For="@(() => formModel.CaseNumber)" />
+    </div>
+    <div class="form-group">
+        <label>Entry Date</label>
+        <InputDate @bind-Value="formModel.EntryDate" class="form-control" />
+        <ValidationMessage For="@(() => formModel.EntryDate)" />
+    </div>
+    <div class="form-group">
+        <label>Defendant First Name</label>
+        <InputText @bind-Value="formModel.DefendantFirstName" class="form-control" />
+        <ValidationMessage For="@(() => formModel.DefendantFirstName)" />
+    </div>
+    <div class="form-group">
+        <label>Defendant Last Name</label>
+        <InputText @bind-Value="formModel.DefendantLastName" class="form-control" />
+        <ValidationMessage For="@(() => formModel.DefendantLastName)" />
+    </div>
+    <div class="form-group">
+        <label>Appearance Date</label>
+        <InputDate @bind-Value="formModel.AppearanceDate" class="form-control" />
+        <ValidationMessage For="@(() => formModel.AppearanceDate)" />
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-success" disabled="@isSubmitting">Generate DOCX</button>
+        <button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+        <button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+        <button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+    </div>
+    @if (errorMessage != null)
+    {
+        <div class="alert alert-danger mt-2">@errorMessage</div>
+    }
 </EditForm>
+</div>
+</div>
 
 @code {
 	private FormModel formModel = new();
