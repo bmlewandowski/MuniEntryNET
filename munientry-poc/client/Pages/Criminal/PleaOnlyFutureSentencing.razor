@@ -1,7 +1,9 @@
 @page "/criminal/plea-only-future-sentencing"
+@page "/criminal/plea-only-future-sentencing/{CaseNumber}"
 @using Munientry.Poc.Client.Shared.Models
 @inject HttpClient Http
 @inject NavigationManager Navigation
+@using Microsoft.AspNetCore.Components
 
 <div class="form-page">
 <div class="form-card">
@@ -118,6 +120,8 @@
 </div>
 
 @code {
+    [Parameter]
+    public string? CaseNumber { get; set; }
     private PleaOnlyFutureSentencingDto formModel = new();
     private string? submitResult;
 
@@ -136,4 +140,13 @@
 
     private void CloseOrCancel() => Navigation.NavigateTo("/");
     private void ClearFields() { formModel = new(); }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(CaseNumber))
+        {
+            // Comment out the next line to disable auto-load
+            //await LoadCaseDataAsync(CaseNumber);
+        }
+    }
 }

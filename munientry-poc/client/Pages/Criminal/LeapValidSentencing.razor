@@ -1,8 +1,10 @@
 
 @page "/criminal/leap-valid-sentencing"
+@page "/criminal/leap-valid-sentencing/{CaseNumber}"
 @using System.ComponentModel.DataAnnotations
 @using Munientry.Poc.Client.Dtos
 @inject NavigationManager Navigation
+@using Microsoft.AspNetCore.Components
 
 <div class="form-page">
 <div class="form-card">
@@ -73,6 +75,8 @@
 </div>
 
 @code {
+	[Parameter]
+	public string? CaseNumber { get; set; }
 	private LeapValidSentencingDto leapValidSentencingModel = new();
 
 	private async Task HandleValidSubmit()
@@ -82,4 +86,13 @@
 
 	private void CloseOrCancel() => Navigation.NavigateTo("/");
 	private void ClearFields() { leapValidSentencingModel = new(); }
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (!string.IsNullOrWhiteSpace(CaseNumber))
+		{
+			// Comment out the next line to disable auto-load
+			//await LoadCaseDataAsync(CaseNumber);
+		}
+	}
 }

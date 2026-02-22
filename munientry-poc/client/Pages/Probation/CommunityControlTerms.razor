@@ -1,3 +1,15 @@
+@page "/probation/community-control-terms/{CaseNumber}"
+@using Microsoft.AspNetCore.Components
+    [Parameter]
+    public string? CaseNumber { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(CaseNumber))
+        {
+            // Comment out the next line to disable auto-load
+            //await LoadCaseDataAsync(CaseNumber);
+        }
+    }
 @page "/probation/community-control-terms"
 @using System.ComponentModel.DataAnnotations
 @inject NavigationManager Navigation

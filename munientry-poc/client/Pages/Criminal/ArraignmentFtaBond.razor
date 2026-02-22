@@ -1,7 +1,9 @@
 @page "/criminal/arraignment-fta-bond"
+@page "/criminal/arraignment-fta-bond/{CaseNumber}"
 @using Microsoft.AspNetCore.Components.Forms
 @using System.ComponentModel.DataAnnotations
 @inject NavigationManager Navigation
+@using Microsoft.AspNetCore.Components
 
 <div class="form-page">
 <div class="form-card">
@@ -59,6 +61,8 @@
 </div>
 
 @code {
+	[Parameter]
+	public string? CaseNumber { get; set; }
 	private FormModel formModel = new();
 	private bool isSubmitting = false;
 	private string? errorMessage;
@@ -74,6 +78,15 @@
 
 	private void CloseOrCancel() => Navigation.NavigateTo("/");
 	private void ClearFields() { formModel = new(); errorMessage = null; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (!string.IsNullOrWhiteSpace(CaseNumber))
+		{
+			// Comment out the next line to disable auto-load
+			//await LoadCaseDataAsync(CaseNumber);
+		}
+	}
 
 	public class FormModel
 	{

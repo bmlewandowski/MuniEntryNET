@@ -1,8 +1,10 @@
 
 @page "/criminal/jail-cc-plea"
+@page "/criminal/jail-cc-plea/{CaseNumber}"
 @using System.ComponentModel.DataAnnotations
 @using Munientry.Poc.Client.Dtos
 @inject NavigationManager Navigation
+@using Microsoft.AspNetCore.Components
 
 <div class="form-page">
 <div class="form-card">
@@ -190,6 +192,8 @@
 </div>
 
 @code {
+	[Parameter]
+	public string? CaseNumber { get; set; }
 	private JailCcPleaDto jailCcModel = new();
 	private bool isSubmitting = false;
 	private string? submitResult;
@@ -228,6 +232,14 @@
 
 	private void CloseOrCancel() => Navigation.NavigateTo("/");
 	private void ClearFields() { jailCcModel = new(); }
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (!string.IsNullOrWhiteSpace(CaseNumber))
+		{
+			//await LoadCaseDataAsync(CaseNumber);
+		}
+	}
 
 	[Inject] IJSRuntime JS { get; set; } = default!;
 	[Inject] Munientry.Poc.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;

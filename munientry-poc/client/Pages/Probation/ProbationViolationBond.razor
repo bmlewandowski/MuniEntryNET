@@ -1,6 +1,8 @@
 @page "/probation/violation-bond"
+@page "/probation/violation-bond/{CaseNumber}"
 @using Munientry.Poc.Client.Shared.Models
 @inject NavigationManager Navigation
+@using Microsoft.AspNetCore.Components
 
 <div class="form-page">
 <div class="form-card">
@@ -108,6 +110,8 @@
 </div>
 
 @code {
+	[Parameter]
+	public string? CaseNumber { get; set; }
 	private ProbationViolationBondDto formModel = new();
 
 	private bool isSubmitting = false;
@@ -148,6 +152,14 @@
 
 	private void CloseOrCancel() => Navigation.NavigateTo("/");
 	private void ClearFields() { formModel = new(); }
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (!string.IsNullOrWhiteSpace(CaseNumber))
+		{
+			//await LoadCaseDataAsync(CaseNumber);
+		}
+	}
 
 	[Inject] Munientry.Poc.Client.Shared.ApiHelper? ApiHelper { get; set; }
 	[Inject] IJSRuntime JS { get; set; } = default!;

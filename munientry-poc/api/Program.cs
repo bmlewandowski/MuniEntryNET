@@ -257,6 +257,21 @@ app.MapPost("/api/fiscaljournalentry", async (Munientry.Poc.Api.Data.FiscalJourn
 });
 
 // Civil Freeform Entry  POST endpoint
+
+// GET endpoint to fetch CivilFreeformEntry by case number
+app.MapGet("/api/civilfreeformentry/{caseNumber}", (string caseNumber) =>
+{
+    // For demo: return mock data. Replace with DB fetch logic as needed.
+    return Results.Ok(new Munientry.Poc.Api.Data.CivilFreeformEntryDto {
+        EntryDate = DateTime.Today,
+        Plaintiff = "Sample Plaintiff",
+        Defendant = "Sample Defendant",
+        CaseNumber = caseNumber,
+        AppearanceReason = "Sample Reason",
+        EntryContent = "Sample entry content."
+    });
+});
+
 app.MapPost("/api/civilfreeformentry", async (Munientry.Poc.Api.Data.CivilFreeformEntryDto dto, Munientry.Api.Services.CivilFreeformEntryService service) =>
 {
     service.InsertCivilFreeformEntry(dto);

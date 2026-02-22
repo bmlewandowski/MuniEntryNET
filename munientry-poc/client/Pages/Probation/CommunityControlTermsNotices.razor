@@ -1,6 +1,8 @@
 @page "/probation/community-control-terms-notices"
+@page "/probation/community-control-terms-notices/{CaseNumber}"
 @using Munientry.Poc.Client.Shared.Models
 @inject NavigationManager Navigation
+@using Microsoft.AspNetCore.Components
 
 <div class="form-page">
 <div class="form-card">
@@ -65,6 +67,8 @@
 </div>
 
 @code {
+	[Parameter]
+	public string? CaseNumber { get; set; }
 	private CommunityControlTermsNoticesDto formModel = new();
 
 	private bool isSubmitting = false;
@@ -105,6 +109,15 @@
 
 	private void CloseOrCancel() => Navigation.NavigateTo("/");
 	private void ClearFields() { formModel = new(); }
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (!string.IsNullOrWhiteSpace(CaseNumber))
+		{
+			// Comment out the next line to disable auto-load
+			//await LoadCaseDataAsync(CaseNumber);
+		}
+	}
 
 	[Inject] Munientry.Poc.Client.Shared.ApiHelper? ApiHelper { get; set; }
 	[Inject] IJSRuntime JS { get; set; } = default!;

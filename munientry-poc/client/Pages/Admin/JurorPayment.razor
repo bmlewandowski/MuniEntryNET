@@ -1,5 +1,7 @@
 @page "/admin/juror-payment"
+@page "/admin/juror-payment/{CaseNumber}"
 @using Munientry.Poc.Client.Shared.Models
+@using Microsoft.AspNetCore.Components
 @inject NavigationManager Navigation
 
 <div class="form-page">
@@ -73,7 +75,18 @@
 </div>
 
 @code {
+	[Parameter]
+	public string? CaseNumber { get; set; }
 	private JurorPaymentDto formModel = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (!string.IsNullOrWhiteSpace(CaseNumber))
+		{
+			// Comment out the next line to disable auto-load
+			//await LoadCaseDataAsync(CaseNumber);
+		}
+	}
 
 	private async Task HandleValidSubmit()
 	{

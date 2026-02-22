@@ -1,4 +1,5 @@
 @page "/notices/civil-freeform-entry"
+@page "/notices/civil-freeform-entry/{CaseNumber}"
 @using Munientry.Poc.Client.Shared.Models
 
 <div class="form-page">
@@ -45,6 +46,42 @@
     private bool isSubmitting = false;
     private string? submitResult;
     private string? errorMessage;
+
+
+    [Parameter]
+    public string? CaseNumber { get; set; }
+
+    // Toggle this to enable/disable auto-load on open
+    private bool autoLoadOnOpen = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (autoLoadOnOpen && !string.IsNullOrWhiteSpace(CaseNumber))
+        {
+            // Comment out the next line to disable auto-load
+            //await LoadCaseDataAsync(CaseNumber);
+        }
+    }
+
+    private async Task LoadCaseDataAsync(string caseNumber)
+    {
+        try
+        {
+            var apiBase = ApiHelper.GetApiBaseUrl();
+            var http = new HttpClient { BaseAddress = new Uri(apiBase) };
+            var response = await http.GetAsync($"civilfreeformentry/{caseNumber}");
+            if (response.IsSuccessStatusCode)
+            {
+                var data = await response.Content.ReadFromJsonAsync<CivilFreeformEntryDto>();
+                if (data != null)
+                    formModel = data;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Failed to load case data: {ex.Message}";
+        }
+    }
 
     private async Task HandleValidSubmit()
     {

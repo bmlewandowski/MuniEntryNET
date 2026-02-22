@@ -1,7 +1,9 @@
 @page "/criminal/diversion-plea"
+@page "/criminal/diversion-plea/{CaseNumber}"
 @using Munientry.Poc.Client.Dtos
 @inject HttpClient Http
 @inject NavigationManager Navigation
+@using Microsoft.AspNetCore.Components
 
 <div class="form-page">
 <div class="form-card">
@@ -99,6 +101,8 @@
 </div>
 
 @code {
+    [Parameter]
+    public string? CaseNumber { get; set; }
     DiversionPleaDto diversionPlea = new();
     string submitResult;
     private bool isSubmitting = false;
@@ -137,6 +141,15 @@
 
     private void CloseOrCancel() => Navigation.NavigateTo("/");
     private void ClearFields() { diversionPlea = new(); }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(CaseNumber))
+        {
+            // Comment out the next line to disable auto-load
+            //await LoadCaseDataAsync(CaseNumber);
+        }
+    }
 
     [Inject] IJSRuntime JS { get; set; } = default!;
     [Inject] Munientry.Poc.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;

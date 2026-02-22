@@ -1,4 +1,6 @@
 @page "/driving/driving-privileges"
+@page "/driving/driving-privileges/{CaseNumber}"
+@using Microsoft.AspNetCore.Components
 <div class="form-page">
 <div class="form-card">
 <h2>Driving Privileges / CrimTraffic Helpers</h2>
@@ -120,6 +122,8 @@
 </div>
 
 @code {
+	[Parameter]
+	public string? CaseNumber { get; set; }
 	private FormModel formModel = new();
 	private bool isSubmitting = false;
 	private string? errorMessage;
@@ -157,6 +161,14 @@
 	[Inject] NavigationManager NavigationManager { get; set; } = default!;
 	[Inject] IJSRuntime JS { get; set; } = default!;
 	[Inject] Munientry.Poc.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (!string.IsNullOrWhiteSpace(CaseNumber))
+		{
+			//await LoadCaseDataAsync(CaseNumber);
+		}
+	}
 
 	public class FormModel
 	{

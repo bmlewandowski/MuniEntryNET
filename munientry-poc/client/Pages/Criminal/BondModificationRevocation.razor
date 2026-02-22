@@ -1,8 +1,10 @@
 
 @page "/criminal/bond-modification-revocation"
+@page "/criminal/bond-modification-revocation/{CaseNumber}"
 @using Munientry.Poc.Client.Dtos
 @inject HttpClient Http
 @inject NavigationManager Navigation
+@using Microsoft.AspNetCore.Components
 
 <div class="form-page">
 <div class="form-card">
@@ -69,6 +71,8 @@
 </div>
 </div>
 @code {
+	[Parameter]
+	public string? CaseNumber { get; set; }
 	private BondModificationRevocationDto bondForm = new();
 	private string? submitResult;
 
@@ -87,4 +91,13 @@
 
 	private void CloseOrCancel() => Navigation.NavigateTo("/");
 	private void ClearFields() { bondForm = new(); }
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (!string.IsNullOrWhiteSpace(CaseNumber))
+		{
+			// Comment out the next line to disable auto-load
+			//await LoadCaseDataAsync(CaseNumber);
+		}
+	}
 }
