@@ -2,7 +2,10 @@
 @page "/criminal/leap-valid-sentencing"
 @using System.ComponentModel.DataAnnotations
 @using Munientry.Poc.Client.Dtos
+@inject NavigationManager Navigation
 
+<div class="form-page">
+<div class="form-card">
 <h2>LEAP Sentencing - Already Valid</h2>
 
 <EditForm Model="leapValidSentencingModel" OnValidSubmit="HandleValidSubmit">
@@ -58,8 +61,16 @@
 		<label>Charges (Offense, Statute, Degree, Plea, Dismissed)</label>
 		<textarea @bind="leapValidSentencingModel.Charges" class="form-control" rows="3"></textarea>
 	</div>
-	<button type="submit" class="btn btn-primary">Submit</button>
+	<div class="form-actions">
+		<button type="submit" class="btn btn-success">Open Entry</button>
+		<button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+		<button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+		<button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+	</div>
 </EditForm>
+
+</div>
+</div>
 
 @code {
 	private LeapValidSentencingDto leapValidSentencingModel = new();
@@ -68,4 +79,7 @@
 	{
 		// TODO: Call API to submit form
 	}
+
+	private void CloseOrCancel() => Navigation.NavigateTo("/");
+	private void ClearFields() { leapValidSentencingModel = new(); }
 }

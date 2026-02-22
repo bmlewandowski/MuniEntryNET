@@ -1,7 +1,9 @@
 @page "/notices/notices-freeform-civil"
 @using Munientry.Poc.Client.Shared.Models
 
-<h2>Notices & Freeform Civil</h2>
+<div class="form-page">
+<div class="form-card">
+<h2>Notices &amp; Freeform Civil</h2>
 
 <EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
 	<DataAnnotationsValidator />
@@ -28,6 +30,9 @@
 	</div>
 	<button type="submit">Submit</button>
 </EditForm>
+
+</div>
+</div>
 
 @code {
 	private NoticesFreeformCivilDto formModel = new();

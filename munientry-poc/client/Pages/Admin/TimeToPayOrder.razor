@@ -1,7 +1,8 @@
 @page "/admin/time-to-pay-order"
-@using Munientry.Poc.Client.Shared.Models
+@using System.ComponentModel.DataAnnotations
 
 <h2>Time to Pay Order Dialog</h2>
+<!-- Legacy: time_to_pay_dialog_ui.py -->
 
 <EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
 	<DataAnnotationsValidator />
@@ -9,31 +10,97 @@
 	<div>
 		<label>Case Number</label>
 		<InputText @bind-Value="formModel.CaseNumber" />
+		<ValidationMessage For="@(() => formModel.CaseNumber)" />
 	</div>
 	<div>
 		<label>Entry Date</label>
 		<InputDate @bind-Value="formModel.EntryDate" />
+		<ValidationMessage For="@(() => formModel.EntryDate)" />
 	</div>
 	<div>
 		<label>Defendant First Name</label>
 		<InputText @bind-Value="formModel.DefendantFirstName" />
+		<ValidationMessage For="@(() => formModel.DefendantFirstName)" />
 	</div>
 	<div>
 		<label>Defendant Last Name</label>
 		<InputText @bind-Value="formModel.DefendantLastName" />
+		<ValidationMessage For="@(() => formModel.DefendantLastName)" />
 	</div>
 	<div>
 		<label>Appearance Date</label>
 		<InputDate @bind-Value="formModel.AppearanceDate" />
+		<ValidationMessage For="@(() => formModel.AppearanceDate)" />
 	</div>
-	<button type="submit">Submit</button>
+	<div class="form-actions">
+		<button type="submit" class="btn btn-success" disabled="@isSubmitting">Generate DOCX</button>
+		<button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+		<button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+		<button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+	</div>
+	@if (errorMessage != null)
+	{
+		<div class="alert alert-danger mt-2">@errorMessage</div>
+	}
 </EditForm>
 
 @code {
-	private TimeToPayOrderDto formModel = new();
+	private FormModel formModel = new();
+	private bool isSubmitting = false;
+	private string? errorMessage;
 
 	private async Task HandleValidSubmit()
 	{
-		// TODO: Call API to save form data
+		isSubmitting = true;
+		errorMessage = null;
+		try
+		{
+			var apiBase = ApiHelper.GetApiBaseUrl();
+			var http = new HttpClient { BaseAddress = new Uri(apiBase) };
+			var response = await http.PostAsJsonAsync("timetopayorder", formModel);
+			if (response.IsSuccessStatusCode)
+			{
+				var content = await response.Content.ReadAsByteArrayAsync();
+				var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "TimeToPay.docx";
+				await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
+			}
+			else
+			{
+				errorMessage = $"Error: {response.ReasonPhrase}";
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ex.Message;
+		}
+		finally
+		{
+			isSubmitting = false;
+		}
+	}
+
+	private void CloseOrCancel() => NavigationManager.NavigateTo("/");
+	private void ClearFields() { formModel = new(); }
+
+	[Inject] NavigationManager NavigationManager { get; set; } = default!;
+	[Inject] IJSRuntime JS { get; set; } = default!;
+	[Inject] Munientry.Poc.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;
+
+	public class FormModel
+	{
+		[Required(ErrorMessage = "Case Number is required")]
+		public string? CaseNumber { get; set; }
+
+		[Required(ErrorMessage = "Entry Date is required")]
+		public DateTime? EntryDate { get; set; }
+
+		[Required(ErrorMessage = "Defendant First Name is required")]
+		public string? DefendantFirstName { get; set; }
+
+		[Required(ErrorMessage = "Defendant Last Name is required")]
+		public string? DefendantLastName { get; set; }
+
+		[Required(ErrorMessage = "Appearance Date is required")]
+		public DateTime? AppearanceDate { get; set; }
 	}
 }

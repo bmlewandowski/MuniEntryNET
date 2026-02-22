@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
-using Xceed.Words.NET;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<Munientry.Api.Services.DrivingPrivilegesService>();
@@ -37,18 +38,11 @@ builder.Services.AddScoped<Munientry.Poc.Api.Services.JailCcPleaService>();
 builder.Services.AddScoped<Munientry.Poc.Api.Services.LeapValidSentencingService>();
 builder.Services.AddScoped<Munientry.Poc.Api.Services.SchedulingEntryService>();
 builder.Services.AddScoped<Munientry.Poc.Api.Services.DiversionPleaService>();
+builder.Services.AddScoped<Munientry.Poc.Api.Services.CaseSearchService>();
+builder.Services.AddScoped<Munientry.Poc.Api.Services.DailyListService>();
+builder.Services.AddScoped<Munientry.Poc.Api.Services.GeneralNoticeOfHearingService>();
 
 var app = builder.Build();
-app.MapPost("/api/drivingprivileges", async (Munientry.Poc.Api.Data.DrivingPrivilegesDto dto, Munientry.Api.Services.DrivingPrivilegesService service) =>
-{
-    service.InsertDrivingPrivileges(dto);
-    return Results.Ok();
-});
-app.MapPost("/api/noticesfreeformcivil", async (Munientry.Poc.Api.Data.NoticesFreeformCivilDto dto, Munientry.Api.Services.NoticesFreeformCivilService service) =>
-{
-    service.InsertNoticesFreeformCivil(dto);
-    return Results.Ok();
-});
 app.UseCors();
 if (app.Environment.IsDevelopment())
 {
@@ -56,17 +50,67 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
+app.MapPost("/api/drivingprivileges", async (Munientry.Poc.Api.Data.DrivingPrivilegesDto dto, Munientry.Api.Services.DrivingPrivilegesService service) =>
+{
+    if (dto == null) return Results.BadRequest();
+    var templatePath = Path.Combine("Templates", "Driving_Privileges_Template.docx");
+    var outputName = $"DrivingPrivileges_{dto.CaseNumber}_{DateTime.UtcNow:yyyyMMddHHmmss}.docx";
+    try
+    {
+        var bytes = GenerateDocxBytes(templatePath, new Dictionary<string, string>
+        {
+            ["{CaseNumber}"] = dto.CaseNumber ?? "",
+            ["{DefendantFirstName}"] = dto.DefendantFirstName ?? "",
+            ["{DefendantLastName}"] = dto.DefendantLastName ?? "",
+            // Fields below not yet in DTO — populated as empty for POC
+            ["{DefendantLicenseNumber}"] = "",
+            ["{DefendantBirthDate}"] = "",
+            ["{DefendantAddress}"] = "",
+            ["{DefendantCity}"] = "",
+            ["{DefendantState}"] = "",
+            ["{DefendantZipcode}"] = "",
+            ["{SuspensionType}"] = "",
+            ["{SuspensionStartDate}"] = "",
+            ["{SuspensionEndDate}"] = "",
+            ["{BmvCases}"] = "",
+            ["{RelatedTrafficCaseNumber}"] = "",
+            ["{EmployerPrivilegesType}"] = "",
+            ["{EmployerName}"] = "",
+            ["{EmployerAddress}"] = "",
+            ["{EmployerCity}"] = "",
+            ["{EmployerState}"] = "",
+            ["{EmployerZipcode}"] = "",
+            ["{EmployerDrivingDays}"] = "",
+            ["{EmployerDrivingHours}"] = "",
+            ["{EmployerOtherConditions}"] = "",
+            ["{AdditionalInformationText}"] = "",
+        });
+        // --- DB Save Logic (commented out for isolated DOCX test) ---
+        // service.InsertDrivingPrivileges(dto);
+        // --- End DB Save Logic ---
+        return Results.File(bytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", outputName);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"DOCX generation failed: {ex.Message}");
+    }
+});
+app.MapPost("/api/noticesfreeformcivil", async (Munientry.Poc.Api.Data.NoticesFreeformCivilDto dto, Munientry.Api.Services.NoticesFreeformCivilService service) =>
+{
+    service.InsertNoticesFreeformCivil(dto);
+    return Results.Ok();
+});
 app.MapPost("/api/communitycontroltermsnotices", async (Munientry.Poc.Api.Data.CommunityControlTermsNoticesDto dto, Munientry.Api.Services.CommunityControlTermsNoticesService service) =>
 {
     service.InsertCommunityControlTermsNotices(dto);
+    return Results.Ok();
+});
+
 app.MapPost("/api/denyprivilegespermitretest", async (Munientry.Poc.Api.Data.DenyPrivilegesPermitRetestDto dto, Munientry.Poc.Api.Services.DenyPrivilegesPermitRetestService service) =>
 {
-     if (dto == null) return Results.BadRequest();
-     await service.SaveToDatabaseAsync(dto);
-     return Results.Ok(new { status = "saved", dto });
-});
-    return Results.Ok();
+    if (dto == null) return Results.BadRequest();
+    await service.SaveToDatabaseAsync(dto);
+    return Results.Ok(new { status = "saved", dto });
 });
 
 app.MapGet("/api/fineonly/{caseNumber}", (string caseNumber) =>
@@ -85,17 +129,15 @@ app.MapPost("/api/fineonly", async (HttpRequest req) =>
     if (dto == null) return Results.BadRequest();
     var templatePath = Path.Combine("Templates", "Fine_Only_Plea_Final_Judgment_Template.docx");
     var outputName = $"FineOnly_{dto.CaseNumber}_{DateTime.UtcNow:yyyyMMddHHmmss}.docx";
-    var outputPath = Path.Combine(Path.GetTempPath(), outputName);
     try
     {
-        using var doc = Xceed.Words.NET.DocX.Load(templatePath);
-        doc.ReplaceText("{CaseNumber}", dto.CaseNumber ?? "");
-        doc.ReplaceText("{DefendantName}", dto.DefendantName ?? "");
-        doc.ReplaceText("{Charge}", dto.Charge ?? "");
-        doc.ReplaceText("{FineAmount}", dto.FineAmount?.ToString("F2") ?? "");
-        doc.SaveAs(outputPath);
-        var bytes = await File.ReadAllBytesAsync(outputPath);
-        File.Delete(outputPath);
+        var bytes = GenerateDocxBytes(templatePath, new Dictionary<string, string>
+        {
+            ["{CaseNumber}"] = dto.CaseNumber ?? "",
+            ["{DefendantName}"] = dto.DefendantName ?? "",
+            ["{Charge}"] = dto.Charge ?? "",
+            ["{FineAmount}"] = dto.FineAmount?.ToString("F2") ?? "",
+        });
         return Results.File(bytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", outputName);
     }
     catch (Exception ex)
@@ -138,6 +180,32 @@ app.MapPost("/api/diversion", async (HttpRequest req) =>
     return Results.Ok(body);
 });
 
+// Case Search endpoint — calls [reports].[DMCMuniEntryCaseSearch]
+// Returns all charges + defendant info for pre-populating criminal dialogs
+app.MapGet("/api/case/search/{caseNumber}", async (string caseNumber, Munientry.Poc.Api.Services.CaseSearchService service) =>
+{
+    var result = await service.SearchCaseAsync(caseNumber);
+    return result.Count > 0 ? Results.Ok(result) : Results.NotFound();
+});
+
+// Daily case list endpoint — calls one of the 6 scheduled-hearing stored procedures
+// listType: arraignments, slated, pleas, pcvh_fcvh, final_pretrial, trials_to_court
+// date format: yyyy-MM-dd
+app.MapGet("/api/dailylist/{listType}/{date}", async (string listType, string date, Munientry.Poc.Api.Services.DailyListService service) =>
+{
+    if (!DateTime.TryParse(date, out var reportDate))
+        return Results.BadRequest("Invalid date format. Use yyyy-MM-dd.");
+    try
+    {
+        var result = await service.GetDailyListAsync(listType, reportDate);
+        return Results.Ok(result);
+    }
+    catch (ArgumentException ex)
+    {
+        return Results.BadRequest(ex.Message);
+    }
+});
+
 app.MapGet("/api/drivingcase/{caseNumber}", async (string caseNumber, Munientry.Poc.Api.Services.DrivingCaseService service) =>
 {
     var result = await service.GetDrivingCaseInfoAsync(caseNumber);
@@ -149,28 +217,30 @@ app.MapPost("/api/trialtocourt", async (Munientry.Poc.Api.Data.TrialToCourtNotic
     if (dto == null) return Results.BadRequest();
     var templatePath = Path.Combine("Templates", "Trial_To_Court_Hearing_Notice_Template.docx");
     var outputName = $"TrialToCourtNotice_{dto.CaseNumber}_{DateTime.UtcNow:yyyyMMddHHmmss}.docx";
-    var outputPath = Path.Combine(Path.GetTempPath(), outputName);
     try
     {
-        using var doc = Xceed.Words.NET.DocX.Load(templatePath);
-        // Use obsolete ReplaceText overload for compatibility
-        doc.ReplaceText("{CaseNumber}", dto.CaseNumber ?? "");
-        doc.ReplaceText("{DefendantFirstName}", dto.DefendantFirstName ?? "");
-        doc.ReplaceText("{DefendantLastName}", dto.DefendantLastName ?? "");
-        doc.ReplaceText("{EntryDate}", dto.EntryDate?.ToString("MMMM dd, yyyy") ?? "");
-        doc.ReplaceText("{DefenseCounselName}", dto.DefenseCounselName ?? "");
-        doc.ReplaceText("{TrialToCourtDate}", dto.TrialToCourtDate?.ToString("MMMM dd, yyyy") ?? "");
-        doc.ReplaceText("{TrialToCourtTime}", dto.TrialToCourtTime ?? "");
-        doc.ReplaceText("{AssignedCourtroom}", dto.AssignedCourtroom ?? "");
-        doc.ReplaceText("{InterpreterRequired}", dto.InterpreterRequired ? "Yes" : "No");
-        doc.ReplaceText("{LanguageRequired}", dto.LanguageRequired ?? "");
-        doc.ReplaceText("{DateConfirmedWithCounsel}", dto.DateConfirmedWithCounsel ? "Yes" : "No");
-        doc.SaveAs(outputPath);
+        var bytes = GenerateDocxBytes(templatePath, new Dictionary<string, string>
+        {
+            ["{CaseNumber}"] = dto.CaseNumber ?? "",
+            ["{DefendantFirstName}"] = dto.DefendantFirstName ?? "",
+            ["{DefendantLastName}"] = dto.DefendantLastName ?? "",
+            ["{EntryDate}"] = dto.EntryDate?.ToString("MMMM dd, yyyy") ?? "",
+            ["{DefenseCounselName}"] = dto.DefenseCounselName ?? "",
+            ["{TrialToCourtDate}"] = dto.TrialToCourtDate?.ToString("MMMM dd, yyyy") ?? "",
+            ["{TrialToCourtTime}"] = dto.TrialToCourtTime ?? "",
+            ["{AssignedCourtroom}"] = dto.AssignedCourtroom ?? "",
+            ["{InterpreterRequired}"] = dto.InterpreterRequired ? "Yes" : "No",
+            ["{LanguageRequired}"] = dto.LanguageRequired ?? "",
+            ["{DateConfirmedWithCounsel}"] = dto.DateConfirmedWithCounsel ? "Yes" : "No",
+            // TODO: populate from authenticated judge context
+            ["{AssignedJudge}"] = "",
+            ["{JudicialOfficerFirstName}"] = "",
+            ["{JudicialOfficerLastName}"] = "",
+            ["{JudicialOfficerType}"] = "",
+        });
         // --- DB Save Logic (commented out for isolated DOCX test) ---
         // await service.SaveToDatabaseAsync(dto);
         // --- End DB Save Logic ---
-        var bytes = await File.ReadAllBytesAsync(outputPath);
-        File.Delete(outputPath);
         return Results.File(bytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", outputName);
     }
     catch (Exception ex)
@@ -237,8 +307,31 @@ app.MapPost("/api/probationviolationbond", async (Munientry.Poc.Api.Data.Probati
 app.MapPost("/api/timetopayorder", async (Munientry.Poc.Api.Data.TimeToPayOrderDto dto, Munientry.Poc.Api.Services.TimeToPayOrderService service) =>
 {
     if (dto == null) return Results.BadRequest();
-    await service.SaveToDatabaseAsync(dto);
-    return Results.Ok(new { status = "saved", dto });
+    var templatePath = Path.Combine("Templates", "Time_To_Pay_Template.docx");
+    var outputName = $"TimeToPay_{dto.CaseNumber}_{DateTime.UtcNow:yyyyMMddHHmmss}.docx";
+    try
+    {
+        var bytes = GenerateDocxBytes(templatePath, new Dictionary<string, string>
+        {
+            ["{CaseNumber}"] = dto.CaseNumber ?? "",
+            ["{EntryDate}"] = dto.EntryDate.ToString("MMMM dd, yyyy"),
+            ["{DefendantFirstName}"] = dto.DefendantFirstName ?? "",
+            ["{DefendantLastName}"] = dto.DefendantLastName ?? "",
+            ["{AppearanceDate}"] = dto.AppearanceDate.ToString("MMMM dd, yyyy"),
+            // TODO: populate from authenticated judge context
+            ["{JudicialOfficerFirstName}"] = "",
+            ["{JudicialOfficerLastName}"] = "",
+            ["{JudicialOfficerType}"] = "",
+        });
+        // --- DB Save Logic (commented out for isolated DOCX test) ---
+        // await service.SaveToDatabaseAsync(dto);
+        // --- End DB Save Logic ---
+        return Results.File(bytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", outputName);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"DOCX generation failed: {ex.Message}");
+    }
 });
 
 // Juror Payment POST endpoint
@@ -371,4 +464,21 @@ app.MapPost("/api/diversionplea", async (Munientry.Poc.Api.Data.DiversionPleaDto
 });
 
 app.Run();
+
+// Shared DOCX generation helper — no third-party dependencies, uses BCL ZipArchive via Open XML SDK
+static byte[] GenerateDocxBytes(string templatePath, Dictionary<string, string> replacements)
+{
+    var ms = new MemoryStream();
+    using (var fs = File.OpenRead(templatePath))
+        fs.CopyTo(ms);
+    using (var wordDoc = WordprocessingDocument.Open(ms, isEditable: true))
+    {
+        var body = wordDoc.MainDocumentPart!.Document.Body!;
+        foreach (var textEl in body.Descendants<Text>())
+            foreach (var (placeholder, value) in replacements)
+                textEl.Text = textEl.Text.Replace(placeholder, value);
+        wordDoc.MainDocumentPart.Document.Save();
+    }
+    return ms.ToArray();
+}
 

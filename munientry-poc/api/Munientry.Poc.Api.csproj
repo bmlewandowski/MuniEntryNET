@@ -4,12 +4,14 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
-  <PropertyGroup>
-    <NoWarn>CS0618</NoWarn>
-  </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
-    <PackageReference Include="Xceed.Words.NET" Version="5.2.25608.6677" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Templates\**\*" CopyToOutputDirectory="PreserveNewest" />
+    <Content Remove="Templates\source\**\*" />
+    <Content Remove="Templates\prepare_templates.py" />
   </ItemGroup>
 </Project>

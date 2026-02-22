@@ -1,9 +1,12 @@
 @page "/criminal/trial-sentencing"
 @using munientry_poc.client.Shared.Models
 @inject HttpClient Http
+@inject NavigationManager Navigation
 
 <PageTitle>Sentencing Only - Already Plead Dialog</PageTitle>
 
+<div class="form-page">
+<div class="form-card">
 <h3>Sentencing Only - Already Plead Dialog</h3>
 
 <EditForm Model="notice" OnValidSubmit="HandleValidSubmit">
@@ -100,8 +103,16 @@
 			<InputCheckbox @bind-Value="notice.DateConfirmedWithCounsel" /> Date Confirmed with Counsel
 		</div>
 	</div>
-	<button type="submit" class="btn btn-primary">Open Entry</button>
+	<div class="form-actions">
+		<button type="submit" class="btn btn-success">Open Entry</button>
+		<button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+		<button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+		<button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+	</div>
 </EditForm>
+
+</div>
+</div>
 
 @code {
 	private FinalJuryNoticeDto notice = new();
@@ -110,4 +121,7 @@
 	{
 		// TODO: Call API to create final/jury notice entry
 	}
+
+	private void CloseOrCancel() => Navigation.NavigateTo("/");
+	private void ClearFields() { notice = new(); }
 }

@@ -76,7 +76,12 @@
 				<label>Date Confirmed with Counsel</label>
 				<InputCheckbox @bind-Value="formModel.DateConfirmedWithCounsel" />
 			</div>
-			<button type="submit" disabled="@isSubmitting">Generate DOCX</button>
+			<div class="form-actions">
+				<button type="submit" class="btn btn-success" disabled="@isSubmitting">Generate DOCX</button>
+				<button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+				<button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+				<button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+			</div>
 			@if (errorMessage != null)
 			{
 				<div class="alert alert-danger mt-2">@errorMessage</div>
@@ -117,6 +122,9 @@
 						isSubmitting = false;
 					}
 				}
+
+				private void CloseOrCancel() => NavigationManager.NavigateTo("/");
+				private void ClearFields() { formModel = new(); }
 
 				[Inject] NavigationManager NavigationManager { get; set; } = default!;
 				[Inject] IJSRuntime JS { get; set; } = default!;

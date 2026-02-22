@@ -2,8 +2,11 @@
 @page "/criminal/community-service-secondary"
 @using Munientry.Poc.Client.Dtos
 @inject HttpClient Http
+@inject NavigationManager Navigation
 
-<h2>Community Service, License Suspension, Fingerprinting & Victim Notification, Immobilize/Impound and other Conditions Secondary Dialogs</h2>
+<div class="form-page">
+<div class="form-card">
+<h2>Community Service, License Suspension, Fingerprinting &amp; Victim Notification, Immobilize/Impound and other Conditions Secondary Dialogs</h2>
 
 <EditForm Model="secondaryForm" OnValidSubmit="HandleValidSubmit">
 	<DataAnnotationsValidator />
@@ -48,14 +51,20 @@
 		<label>Other Conditions</label>
 		<InputText class="form-control" @bind-Value="secondaryForm.OtherConditions" />
 	</div>
-	<button type="submit" class="btn btn-primary">Submit</button>
+	<div class="form-actions">
+		<button type="submit" class="btn btn-success">Open Entry</button>
+		<button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+		<button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+		<button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+	</div>
 </EditForm>
 
 @if (submitResult != null)
 {
 	<div class="alert alert-info">@submitResult</div>
 }
-
+</div>
+</div>
 @code {
 	private CommunityServiceSecondaryDto secondaryForm = new();
 	private string? submitResult;
@@ -72,4 +81,7 @@
 			submitResult = "Error saving entry.";
 		}
 	}
+
+	private void CloseOrCancel() => Navigation.NavigateTo("/");
+	private void ClearFields() { secondaryForm = new(); }
 }

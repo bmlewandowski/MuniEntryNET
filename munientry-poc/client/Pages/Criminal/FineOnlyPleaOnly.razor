@@ -3,6 +3,8 @@
 @using Microsoft.AspNetCore.Components.Forms
 @inject NavigationManager Navigation
 
+<div class="form-page">
+<div class="form-card">
 <h2>Fine Only Dialog</h2>
 <!-- Legacy: fine_only_plea_dialog_ui.py, plea_only_dialog_ui.py -->
 
@@ -25,11 +27,17 @@
 		<label>Fine Amount</label><br />
 		<InputNumber @bind-Value="model.FineAmount" TValue="decimal?" />
 	</div>
-	<div style="margin-top:1rem">
-		<button type="submit">Submit</button>
+	<div class="form-actions">
+		<button type="submit" class="btn btn-success">Open Entry</button>
+		<button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+		<button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+		<button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
 		<span style="margin-left:1rem">@_message</span>
 	</div>
 </EditForm>
+
+</div>
+</div>
 
 @code {
 	private FineOnlyDto model = new();
@@ -50,4 +58,7 @@
 			_message = ex.Message;
 		}
 	}
+
+	private void CloseOrCancel() => Navigation.NavigateTo("/");
+	private void ClearFields() { model = new(); _message = ""; }
 }

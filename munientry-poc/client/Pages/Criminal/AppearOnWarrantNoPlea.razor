@@ -2,7 +2,10 @@
 @page "/criminal/appear-on-warrant-no-plea"
 @using Munientry.Poc.Client.Shared.Models
 @inject HttpClient Http
+@inject NavigationManager Navigation
 
+<div class="form-page">
+<div class="form-card">
 <h2>Appear on Warrant (No Plea) Dialog</h2>
 
 <EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
@@ -95,14 +98,20 @@
 		<label>Surrender Weapons Date</label>
 		<InputText class="form-control" @bind-Value="formModel.SurrenderWeaponsDate" />
 	</div>
-	<button type="submit" class="btn btn-primary">Submit</button>
+	<div class="form-actions">
+		<button type="submit" class="btn btn-success">Open Entry</button>
+		<button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+		<button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+		<button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+	</div>
 </EditForm>
 
 @if (submitResult != null)
 {
 	<div class="alert alert-info">@submitResult</div>
 }
-
+</div>
+</div>
 @code {
 	private AppearOnWarrantNoPleaDto formModel = new();
 	private string? submitResult;
@@ -119,4 +128,7 @@
 			submitResult = "Error saving entry.";
 		}
 	}
+
+	private void CloseOrCancel() => Navigation.NavigateTo("/");
+	private void ClearFields() { formModel = new(); }
 }

@@ -3,6 +3,7 @@
 <!-- Legacy: general_notice_of_hearing_dialog_ui.py -->
 
 @using Munientry.Poc.Client.Shared.Models
+@inject NavigationManager Navigation
 
 <EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
 	<DataAnnotationsValidator />
@@ -47,7 +48,12 @@
 		<label>Language Required</label>
 		<InputText @bind-Value="formModel.LanguageRequired" />
 	</div>
-	<button type="submit">Submit</button>
+	<div class="form-actions">
+		<button type="submit" class="btn btn-success">Open Entry</button>
+		<button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+		<button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+		<button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+	</div>
 </EditForm>
 
 @code {
@@ -59,5 +65,8 @@
 		// Example: await Http.PostAsJsonAsync("/api/general-notice-of-hearing", formModel);
 		await Task.CompletedTask;
 	}
+
+	private void CloseOrCancel() => Navigation.NavigateTo("/");
+	private void ClearFields() { formModel = new(); }
 }
 <!-- TODO: Add form fields and logic for General Notice of Hearing -->

@@ -1,8 +1,11 @@
 @page "/probation/community-control-terms"
 @using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
 
 <PageTitle>Community Control Terms</PageTitle>
 
+<div class="form-page">
+<div class="form-card">
 <h3>Community Control Terms</h3>
 
 <EditForm Model="communityControlModel" OnValidSubmit="HandleValidSubmit">
@@ -135,11 +138,14 @@
     </fieldset>
     <div class="form-row mt-3">
         <button type="submit" class="btn btn-success">Open Entry</button>
-        <button type="button" class="btn btn-danger">Close Dialog</button>
-        <button type="button" class="btn btn-secondary">Cancel</button>
-        <button type="button" class="btn btn-warning">Clear Fields</button>
+        <button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+        <button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+        <button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
     </div>
 </EditForm>
+
+</div>
+</div>
 
 @code {
     private CommunityControlTermsModel communityControlModel = new();
@@ -148,6 +154,9 @@
     {
         // TODO: Submit to API
     }
+
+    private void CloseOrCancel() => Navigation.NavigateTo("/");
+    private void ClearFields() { communityControlModel = new(); }
 
     public class CommunityControlTermsModel
     {

@@ -1,8 +1,11 @@
 @page "/criminal/leap-sentencing"
 @using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
 
 <PageTitle>LEAP Sentencing</PageTitle>
 
+<div class="form-page">
+<div class="form-card">
 <h3>LEAP Sentencing</h3>
 
 <EditForm Model="leapSentencingModel" OnValidSubmit="HandleValidSubmit">
@@ -131,11 +134,14 @@
     </fieldset>
     <div class="form-row mt-3">
         <button type="submit" class="btn btn-success">Open Entry</button>
-        <button type="button" class="btn btn-danger">Close Dialog</button>
-        <button type="button" class="btn btn-secondary">Cancel</button>
-        <button type="button" class="btn btn-warning">Clear Fields</button>
+        <button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+        <button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+        <button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
     </div>
 </EditForm>
+
+</div>
+</div>
 
 @code {
     private LeapSentencingModel leapSentencingModel = new();
@@ -144,6 +150,9 @@
     {
         // TODO: Submit to API
     }
+
+    private void CloseOrCancel() => Navigation.NavigateTo("/");
+    private void ClearFields() { leapSentencingModel = new(); }
 
     public class LeapSentencingModel
     {

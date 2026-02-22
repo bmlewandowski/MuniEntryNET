@@ -2,7 +2,10 @@
 @page "/criminal/jail-cc-plea"
 @using System.ComponentModel.DataAnnotations
 @using Munientry.Poc.Client.Dtos
+@inject NavigationManager Navigation
 
+<div class="form-page">
+<div class="form-card">
 <h2>Plea of Guilty - Jail/CC Only</h2>
 
 <EditForm Model="jailCcModel" OnValidSubmit="HandleValidSubmit">
@@ -161,8 +164,16 @@
 	<div class="form-group">
 		<InputCheckbox @bind-Value="jailCcModel.DistractedDriving" /> Add Distracted Driving Course Language
 	</div>
-	<button type="submit" class="btn btn-primary">Submit</button>
+	<div class="form-actions">
+		<button type="submit" class="btn btn-success">Open Entry</button>
+		<button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+		<button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+		<button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+	</div>
 </EditForm>
+
+</div>
+</div>
 
 @code {
 	private JailCcPleaDto jailCcModel = new();
@@ -171,4 +182,7 @@
 	{
 		// TODO: Call API to submit form
 	}
+
+	private void CloseOrCancel() => Navigation.NavigateTo("/");
+	private void ClearFields() { jailCcModel = new(); }
 }

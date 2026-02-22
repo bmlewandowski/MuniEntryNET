@@ -1,9 +1,12 @@
 @page "/Criminal/ArraignmentContinuance"
 @using munientry_poc.client.Shared.Models
 @inject HttpClient Http
+@inject NavigationManager Navigation
 
 <PageTitle>Arraignment Continuance</PageTitle>
 
+<div class="form-page">
+<div class="form-card">
 <h3>Arraignment Continuance</h3>
 
 <EditForm Model="continuance" OnValidSubmit="HandleValidSubmit">
@@ -87,8 +90,16 @@
             </InputSelect>
         </div>
     </div>
-    <button type="submit" class="btn btn-primary">Open Entry</button>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-success">Open Entry</button>
+        <button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+        <button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+        <button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+    </div>
 </EditForm>
+
+</div>
+</div>
 
 @code {
     private ArraignmentContinuanceDto continuance = new();
@@ -97,4 +108,7 @@
     {
         // TODO: Call API to create arraignment continuance entry
     }
+
+    private void CloseOrCancel() => Navigation.NavigateTo("/");
+    private void ClearFields() { continuance = new(); }
 }

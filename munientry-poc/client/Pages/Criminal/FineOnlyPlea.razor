@@ -1,7 +1,10 @@
 @page "/criminal/fineonlyplea"
 @using System.ComponentModel.DataAnnotations
 @using Munientry.Poc.Client.Shared.Models
+@inject NavigationManager Navigation
 
+<div class="form-page">
+<div class="form-card">
 <h2>Plea of Guilty - Fine Only</h2>
 
 <EditForm Model="fineOnlyModel" OnValidSubmit="HandleValidSubmit">
@@ -124,8 +127,16 @@
             <option>No</option>
         </InputSelect>
     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-success">Open Entry</button>
+        <button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+        <button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+        <button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+    </div>
 </EditForm>
+
+</div>
+</div>
 
 @code {
     private FineOnlyPleaDto fineOnlyModel = new();
@@ -134,4 +145,7 @@
     {
         // TODO: Call API to submit form
     }
+
+    private void CloseOrCancel() => Navigation.NavigateTo("/");
+    private void ClearFields() { fineOnlyModel = new(); }
 }

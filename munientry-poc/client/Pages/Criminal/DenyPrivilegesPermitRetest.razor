@@ -1,72 +1,146 @@
 @page "/criminal/deny-privileges-permit-retest"
 @using Munientry.Poc.Client.Shared.Models
 @using Munientry.Poc.Client.Shared
-@inject DenyPrivilegesPermitRetestService Service
+@using System.ComponentModel.DataAnnotations
 
-<h3>Deny Privileges / Permit Retest</h3>
+<h2>Deny Privileges / Permit Retest</h2>
+<!-- Legacy: deny_privileges_permit_retest_dialog_ui.py -->
 
 <EditForm Model="dto" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <div class="form-group">
-        <label>Defendant First Name</label>
-        <InputText @bind-Value="dto.DefendantFirstName" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label>Defendant Last Name</label>
-        <InputText @bind-Value="dto.DefendantLastName" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label>Case Number</label>
-        <InputText @bind-Value="dto.CaseNumber" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label>Entry Date</label>
-        <InputDate @bind-Value="dto.EntryDate" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label>Driving Privileges Entry Type</label>
-        <InputRadioGroup @bind-Value="dto.EntryType">
-            <InputRadio Value="EntryType.DenyDrivingPrivileges" /> Deny Driving Privileges
-            <InputRadio Value="EntryType.PermitTest" /> Permit Defendant to Test and/or Renew
-            <InputRadio Value="EntryType.PermitRenew" /> Permit Defendant to Renew upon Expiration
-            <InputRadio Value="EntryType.TerminatePrivileges" /> Terminate Privileges - Fail to Pay
-        </InputRadioGroup>
-    </div>
-    <div class="form-group">
-        <label>Eligibility/Status</label>
-        <div><InputCheckbox @bind-Value="dto.HardTimeNotPassed" /> Not Eligible - Hard Time has not passed</div>
-        <div><InputCheckbox @bind-Value="dto.PermanentIdCard" /> Defendant has permanent ID card</div>
-        <div><InputCheckbox @bind-Value="dto.OutOfStateLicense" /> Out of State License - Needs Certified Abstract</div>
-        <div><InputCheckbox @bind-Value="dto.PetitionIncomplete" /> Petition is Incomplete and/or Illegible</div>
-        <div><InputCheckbox @bind-Value="dto.NoInsurance" /> Failed to Provide Proof of Insurance</div>
-        <div><InputCheckbox @bind-Value="dto.NoEmployerInfo" /> Court could not verify employer information</div>
-        <div><InputCheckbox @bind-Value="dto.NoJurisdiction" /> License not subject to suspension for which this court may grant privileges</div>
-        <div><InputCheckbox @bind-Value="dto.NoPayPlan" /> Defendant not on or current with fines and costs pay plan</div>
-        <div><InputCheckbox @bind-Value="dto.ProhibitedActivities" /> Petition requests privileges for activities not permitted by this Court</div>
-    </div>
-    <div class="form-group">
-        <label>Defendant Driver License Expiration Date</label>
-        <InputDate @bind-Value="dto.LicenseExpirationDate" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label>Date Privileges were Granted on</label>
-        <InputDate @bind-Value="dto.PrivilegesGrantDate" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label>Notice of Unpaid Fines and Costs (NUFC) Letter Date</label>
-        <InputDate @bind-Value="dto.NufcDate" class="form-control" />
-    </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-</EditForm>
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group mb-3">
+                <label>Defendant First Name</label>
+                <InputText @bind-Value="dto.DefendantFirstName" class="form-control" />
+            </div>
+            <div class="form-group mb-3">
+                <label>Defendant Last Name</label>
+                <InputText @bind-Value="dto.DefendantLastName" class="form-control" />
+            </div>
+            <div class="form-group mb-3">
+                <label>Case Number</label>
+                <InputText @bind-Value="dto.CaseNumber" class="form-control" />
+            </div>
+            <div class="form-group mb-3">
+                <label>Entry Date</label>
+                <InputDate @bind-Value="dto.EntryDate" class="form-control" />
+            </div>
+            <div class="form-group mb-3">
+                <label>Driving Privileges Entry Type</label>
+                <InputRadioGroup @bind-Value="dto.EntryType">
+                    <div class="form-check">
+                        <InputRadio Value="EntryType.DenyDrivingPrivileges" class="form-check-input" />
+                        <label class="form-check-label">Deny Driving Privileges</label>
+                    </div>
+                    <div class="form-check">
+                        <InputRadio Value="EntryType.PermitTest" class="form-check-input" />
+                        <label class="form-check-label">Permit Defendant to Test and/or Renew</label>
+                    </div>
+                    <div class="form-check">
+                        <InputRadio Value="EntryType.PermitRenew" class="form-check-input" />
+                        <label class="form-check-label">Permit Defendant to Renew upon Expiration</label>
+                    </div>
+                    <div class="form-check">
+                        <InputRadio Value="EntryType.TerminatePrivileges" class="form-check-input" />
+                        <label class="form-check-label">Terminate Privileges - Fail to Pay</label>
+                    </div>
+                </InputRadioGroup>
+            </div>
+            <div class="form-group mb-3">
+                <label>Eligibility/Status</label>
+                <div class="form-check">
+                    <InputCheckbox @bind-Value="dto.HardTimeNotPassed" class="form-check-input" />
+                    <label class="form-check-label">Not Eligible - Hard Time has not passed</label>
+                </div>
+                <div class="form-check">
+                    <InputCheckbox @bind-Value="dto.PermanentIdCard" class="form-check-input" />
+                    <label class="form-check-label">Defendant has permanent ID card</label>
+                </div>
+                <div class="form-check">
+                    <InputCheckbox @bind-Value="dto.OutOfStateLicense" class="form-check-input" />
+                    <label class="form-check-label">Out of State License - Needs Certified Abstract</label>
+                </div>
+                <div class="form-check">
+                    <InputCheckbox @bind-Value="dto.PetitionIncomplete" class="form-check-input" />
+                    <label class="form-check-label">Petition is Incomplete and/or Illegible</label>
+                </div>
+                <div class="form-check">
+                    <InputCheckbox @bind-Value="dto.NoInsurance" class="form-check-input" />
+                    <label class="form-check-label">Failed to Provide Proof of Insurance</label>
+                </div>
+                <div class="form-check">
+                    <InputCheckbox @bind-Value="dto.NoEmployerInfo" class="form-check-input" />
+                    <label class="form-check-label">Court could not verify employer information</label>
+                </div>
+                <div class="form-check">
+                    <InputCheckbox @bind-Value="dto.NoJurisdiction" class="form-check-input" />
+                    <label class="form-check-label">License not subject to suspension for which this court may grant privileges</label>
+                </div>
+                <div class="form-check">
+                    <InputCheckbox @bind-Value="dto.NoPayPlan" class="form-check-input" />
+                    <label class="form-check-label">Defendant not on or current with fines and costs pay plan</label>
+                </div>
+                <div class="form-check">
+                    <InputCheckbox @bind-Value="dto.ProhibitedActivities" class="form-check-input" />
+                    <label class="form-check-label">Petition requests privileges for activities not permitted by this Court</label>
+                </div>
+            </div>
+            <div class="form-group mb-3">
+                <label>Defendant Driver License Expiration Date</label>
+                <InputDate @bind-Value="dto.LicenseExpirationDate" class="form-control" />
+            </div>
+            <div class="form-group mb-3">
+                <label>Date Privileges were Granted on</label>
+                <InputDate @bind-Value="dto.PrivilegesGrantDate" class="form-control" />
+            </div>
+            <div class="form-group mb-3">
+                <label>Notice of Unpaid Fines and Costs (NUFC) Letter Date</label>
+                <InputDate @bind-Value="dto.NufcDate" class="form-control" />
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success" disabled="@isSubmitting">Open Entry</button>
+                <button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+                <button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+                <button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+            </div>
+            @if (errorMessage != null)
+            {
+                <div class="alert alert-danger mt-2">@errorMessage</div>
+            }
+        </EditForm>
 
 @code {
     private DenyPrivilegesPermitRetestDto dto = new DenyPrivilegesPermitRetestDto {
         EntryType = EntryType.DenyDrivingPrivileges
     };
+    private bool isSubmitting = false;
+    private string? errorMessage;
 
     private async Task HandleValidSubmit()
     {
-        await Service.SubmitAsync(dto);
+        isSubmitting = true;
+        errorMessage = null;
+        try
+        {
+            var apiBase = ApiHelper.GetApiBaseUrl();
+            var http = new HttpClient { BaseAddress = new Uri(apiBase) };
+            var response = await http.PostAsJsonAsync("denyprivilegespermitretest", dto);
+            if (!response.IsSuccessStatusCode)
+                errorMessage = $"Error: {response.ReasonPhrase}";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
     }
+
+    private void CloseOrCancel() => NavigationManager.NavigateTo("/");
+    private void ClearFields() { dto = new DenyPrivilegesPermitRetestDto { EntryType = EntryType.DenyDrivingPrivileges }; }
+
+    [Inject] NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] Munientry.Poc.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;
 }

@@ -1,7 +1,10 @@
 @page "/criminal/diversion-plea"
 @using Munientry.Poc.Client.Dtos
 @inject HttpClient Http
+@inject NavigationManager Navigation
 
+<div class="form-page">
+<div class="form-card">
 <h2>Diversion Dialog</h2>
 
 <EditForm Model="diversionPlea" OnValidSubmit="HandleValidSubmit">
@@ -79,13 +82,21 @@
         <label>Other Conditions Text</label>
         <InputText @bind-Value="diversionPlea.OtherConditionsText" class="form-control" />
     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-success">Open Entry</button>
+        <button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+        <button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+        <button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+    </div>
 </EditForm>
 
 @if (submitResult != null)
 {
     <div class="alert alert-success">@submitResult</div>
 }
+
+</div>
+</div>
 
 @code {
     DiversionPleaDto diversionPlea = new();
@@ -103,4 +114,7 @@
             submitResult = "Error saving Diversion Plea.";
         }
     }
+
+    private void CloseOrCancel() => Navigation.NavigateTo("/");
+    private void ClearFields() { diversionPlea = new(); }
 }

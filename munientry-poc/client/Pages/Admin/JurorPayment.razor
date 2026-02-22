@@ -1,6 +1,9 @@
 @page "/admin/juror-payment"
 @using Munientry.Poc.Client.Shared.Models
+@inject NavigationManager Navigation
 
+<div class="form-page">
+<div class="form-card">
 <h2>Juror Payment Dialog</h2>
 
 <EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
@@ -58,8 +61,16 @@
 		<label>Jury Panel Total Pay</label>
 		<InputNumber @bind-Value="formModel.JuryPanelTotalPay" />
 	</div>
-	<button type="submit">Submit</button>
+	<div class="form-actions">
+		<button type="submit" class="btn btn-success">Open Entry</button>
+		<button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+		<button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+		<button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+	</div>
 </EditForm>
+
+</div>
+</div>
 
 @code {
 	private JurorPaymentDto formModel = new();
@@ -68,4 +79,7 @@
 	{
 		// TODO: Call API to save form data
 	}
+
+	private void CloseOrCancel() => Navigation.NavigateTo("/");
+	private void ClearFields() { formModel = new(); }
 }

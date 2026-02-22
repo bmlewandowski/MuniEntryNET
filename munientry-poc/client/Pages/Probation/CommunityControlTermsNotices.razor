@@ -1,57 +1,68 @@
 @page "/probation/community-control-terms-notices"
 @using Munientry.Poc.Client.Shared.Models
+@inject NavigationManager Navigation
 
+<div class="form-page">
+<div class="form-card">
 <h2>Terms of Community Control / Notice of Community Control Violation Hearing Dialog</h2>
 
 <EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
 	<DataAnnotationsValidator />
 	<ValidationSummary />
-	<div>
-		<label>Case Number</label>
-		<InputText @bind-Value="formModel.CaseNumber" />
+	   <div class="form-group">
+		   <label>Case Number</label>
+		   <InputText class="form-control" @bind-Value="formModel.CaseNumber" />
+	   </div>
+	   <div class="form-group">
+		   <label>Entry Date</label>
+		   <InputDate class="form-control" @bind-Value="formModel.EntryDate" />
+	   </div>
+	   <div class="form-group">
+		   <label>Defendant First Name</label>
+		   <InputText class="form-control" @bind-Value="formModel.DefendantFirstName" />
+	   </div>
+	   <div class="form-group">
+		   <label>Defendant Last Name</label>
+		   <InputText class="form-control" @bind-Value="formModel.DefendantLastName" />
+	   </div>
+	   <div class="form-group">
+		   <label>Hearing Date</label>
+		   <InputDate class="form-control" @bind-Value="formModel.HearingDate" />
+	   </div>
+	   <div class="form-group">
+		   <label>Hearing Time</label>
+		   <InputText class="form-control" @bind-Value="formModel.HearingTime" />
+	   </div>
+	   <div class="form-group">
+		   <label>Assigned Courtroom</label>
+		   <InputText class="form-control" @bind-Value="formModel.AssignedCourtroom" />
+	   </div>
+	   <div class="form-group">
+		   <label>Defense Counsel Name</label>
+		   <InputText class="form-control" @bind-Value="formModel.DefenseCounselName" />
+	   </div>
+	   <div class="form-group">
+		   <label>Violation Type</label>
+		   <InputText class="form-control" @bind-Value="formModel.ViolationType" />
+	   </div>
+	   <div class="form-group">
+		   <label>Interpreter Required</label>
+		   <InputCheckbox class="form-check-input" @bind-Value="formModel.InterpreterRequired" />
+	   </div>
+	   <div class="form-group">
+		   <label>Language Required</label>
+		   <InputText class="form-control" @bind-Value="formModel.LanguageRequired" />
+	   </div>
+	<div class="form-actions">
+		<button type="submit" class="btn btn-success">Open Entry</button>
+		<button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+		<button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+		<button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
 	</div>
-	<div>
-		<label>Entry Date</label>
-		<InputDate @bind-Value="formModel.EntryDate" />
-	</div>
-	<div>
-		<label>Defendant First Name</label>
-		<InputText @bind-Value="formModel.DefendantFirstName" />
-	</div>
-	<div>
-		<label>Defendant Last Name</label>
-		<InputText @bind-Value="formModel.DefendantLastName" />
-	</div>
-	<div>
-		<label>Hearing Date</label>
-		<InputDate @bind-Value="formModel.HearingDate" />
-	</div>
-	<div>
-		<label>Hearing Time</label>
-		<InputText @bind-Value="formModel.HearingTime" />
-	</div>
-	<div>
-		<label>Assigned Courtroom</label>
-		<InputText @bind-Value="formModel.AssignedCourtroom" />
-	</div>
-	<div>
-		<label>Defense Counsel Name</label>
-		<InputText @bind-Value="formModel.DefenseCounselName" />
-	</div>
-	<div>
-		<label>Violation Type</label>
-		<InputText @bind-Value="formModel.ViolationType" />
-	</div>
-	<div>
-		<label>Interpreter Required</label>
-		<InputCheckbox @bind-Value="formModel.InterpreterRequired" />
-	</div>
-	<div>
-		<label>Language Required</label>
-		<InputText @bind-Value="formModel.LanguageRequired" />
-	</div>
-	<button type="submit">Submit</button>
 </EditForm>
+
+</div>
+</div>
 
 @code {
 	private CommunityControlTermsNoticesDto formModel = new();
@@ -60,4 +71,7 @@
 	{
 		// TODO: Call API to save form data
 	}
+
+	private void CloseOrCancel() => Navigation.NavigateTo("/");
+	private void ClearFields() { formModel = new(); }
 }

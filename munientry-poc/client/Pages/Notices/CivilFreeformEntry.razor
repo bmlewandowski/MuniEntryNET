@@ -1,6 +1,8 @@
 @page "/notices/civil-freeform-entry"
 @using Munientry.Poc.Client.Shared.Models
 
+<div class="form-page">
+<div class="form-card">
 <h2>Civil Freeform Entry Dialog</h2>
 
 <EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
@@ -32,6 +34,9 @@
     </div>
     <button type="submit">Submit</button>
 </EditForm>
+
+</div>
+</div>
 
 @code {
     private CivilFreeformEntryDto formModel = new();

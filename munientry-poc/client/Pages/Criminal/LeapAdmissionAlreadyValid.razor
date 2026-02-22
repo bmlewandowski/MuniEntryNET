@@ -1,121 +1,184 @@
 @page "/criminal/leap-admission-already-valid"
 @using Munientry.Poc.Client.Shared.Models
-@inject HttpClient Http
+@using Munientry.Poc.Client.Shared
+@using System.ComponentModel.DataAnnotations
 
 <h2>LEAP Admission - Already Valid Dialog</h2>
+<!-- Legacy: leap_plea_valid_dialog_ui.py -->
 
 <EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <div class="form-group">
-        <label>Defendant First Name</label>
-        <InputText class="form-control" @bind-Value="formModel.DefendantFirstName" />
-        <ValidationMessage For="@(() => formModel.DefendantFirstName)" />
-    </div>
-    <div class="form-group">
-        <label>Defendant Last Name</label>
-        <InputText class="form-control" @bind-Value="formModel.DefendantLastName" />
-        <ValidationMessage For="@(() => formModel.DefendantLastName)" />
-    </div>
-    <div class="form-group">
-        <label>Case Number</label>
-        <InputText class="form-control" @bind-Value="formModel.CaseNumber" />
-        <ValidationMessage For="@(() => formModel.CaseNumber)" />
-    </div>
-    <div class="form-group">
-        <label>Defense Counsel Name</label>
-        <InputText class="form-control" @bind-Value="formModel.DefenseCounselName" />
-    </div>
-    <div class="form-group">
-        <label>Defense Counsel Type</label>
-        <InputText class="form-control" @bind-Value="formModel.DefenseCounselType" />
-    </div>
-    <div class="form-group">
-        <InputCheckbox @bind-Value="formModel.DefenseCounselWaived" />
-        <label>Defendant waived right to counsel</label>
-    </div>
-    <div class="form-group">
-        <label>Appearance Reason</label>
-        <InputText class="form-control" @bind-Value="formModel.AppearanceReason" />
-    </div>
-    <div class="form-group">
-        <label>Admission Date</label>
-        <InputDate class="form-control" @bind-Value="formModel.AdmissionDate" />
-    </div>
-    <div class="form-group">
-        <label>Charges</label>
-        <InputText class="form-control" @bind-Value="formModel.Charges" />
-    </div>
-    <div class="form-group">
-        <label>Court Costs</label>
-        <InputText class="form-control" @bind-Value="formModel.CourtCosts" />
-    </div>
-    <div class="form-group">
-        <label>Ability to Pay</label>
-        <InputText class="form-control" @bind-Value="formModel.AbilityToPay" />
-    </div>
-    <div class="form-group">
-        <label>Balance Due Date</label>
-        <InputDate class="form-control" @bind-Value="formModel.BalanceDueDate" />
-    </div>
-    <div class="form-group">
-        <label>Pay Today</label>
-        <InputText class="form-control" @bind-Value="formModel.PayToday" />
-    </div>
-    <div class="form-group">
-        <label>Monthly Pay</label>
-        <InputText class="form-control" @bind-Value="formModel.MonthlyPay" />
-    </div>
-    <div class="form-group">
-        <InputCheckbox @bind-Value="formModel.CreditForJail" />
-        <label>Credit for Jail</label>
-    </div>
-    <div class="form-group">
-        <label>Jail Time Credit Days</label>
-        <InputText class="form-control" @bind-Value="formModel.JailTimeCreditDays" />
-    </div>
-    <div class="form-group">
-        <label>FRA in File</label>
-        <InputText class="form-control" @bind-Value="formModel.FraInFile" />
-    </div>
-    <div class="form-group">
-        <label>FRA in Court</label>
-        <InputText class="form-control" @bind-Value="formModel.FraInCourt" />
-    </div>
-    <div class="form-group">
-        <InputCheckbox @bind-Value="formModel.LicenseSuspension" />
-        <label>License Suspension</label>
-    </div>
-    <div class="form-group">
-        <InputCheckbox @bind-Value="formModel.CommunityService" />
-        <label>Community Service</label>
-    </div>
-    <div class="form-group">
-        <InputCheckbox @bind-Value="formModel.OtherConditions" />
-        <label>Other Conditions</label>
-    </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-</EditForm>
-
-@if (submitResult != null)
-{
-    <div class="alert alert-info">@submitResult</div>
-}
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <label>Defendant First Name</label>
+                <InputText class="form-control" @bind-Value="formModel.DefendantFirstName" />
+                <ValidationMessage For="@(() => formModel.DefendantFirstName)" />
+            </div>
+            <div class="form-group">
+                <label>Defendant Last Name</label>
+                <InputText class="form-control" @bind-Value="formModel.DefendantLastName" />
+                <ValidationMessage For="@(() => formModel.DefendantLastName)" />
+            </div>
+            <div class="form-group">
+                <label>Case Number</label>
+                <InputText class="form-control" @bind-Value="formModel.CaseNumber" />
+                <ValidationMessage For="@(() => formModel.CaseNumber)" />
+            </div>
+            <div class="form-group">
+                <label>Defense Counsel Name</label>
+                <InputText class="form-control" @bind-Value="formModel.DefenseCounselName" />
+            </div>
+            <div class="form-group">
+                <CheckboxInline Value="formModel.DefenseCounselWaived" ValueChanged="@(v => formModel.DefenseCounselWaived = v)" Label="Defendant waived right to counsel" />
+            </div>
+            <div class="form-group">
+                <label>Appearance Reason</label>
+                <InputText class="form-control" @bind-Value="formModel.AppearanceReason" />
+            </div>
+            <div class="form-group">
+                <label>Admission Date</label>
+                <InputDate class="form-control" @bind-Value="formModel.AdmissionDate" />
+            </div>
+            <div class="form-group" style="max-width:100%;">
+                <label>Charges</label>
+                <table class="table table-bordered table-sm">
+                    <thead>
+                        <tr>
+                            <th>Offense</th>
+                            <th>Statute</th>
+                            <th>Degree</th>
+                            <th>Plea</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var charge in Charges)
+                        {
+                            <tr>
+                                <td>@charge.Offense</td>
+                                <td>@charge.Statute</td>
+                                <td>@charge.Degree</td>
+                                <td>@charge.Plea</td>
+                                <td>
+                                    <button type="button" class="btn btn-warning btn-sm me-1" @onclick="() => AmendCharge(charge)">Amend</button>
+                                    <button type="button" class="btn btn-danger btn-sm me-1" @onclick="() => DeleteCharge(charge)">Delete</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <button type="button" class="btn btn-info btn-sm me-2" @onclick="AddCharge">Add Charge</button>
+                <button type="button" class="btn btn-secondary btn-sm me-2" @onclick="GuiltyAll">Guilty All</button>
+            </div>
+            <div class="form-group">
+                <label>Court Costs</label>
+                <InputText class="form-control" @bind-Value="formModel.CourtCosts" />
+            </div>
+            <div class="form-group">
+                <label>Ability to Pay</label>
+                <InputText class="form-control" @bind-Value="formModel.AbilityToPay" />
+            </div>
+            <div class="form-group">
+                <label>Balance Due Date</label>
+                <InputDate class="form-control" @bind-Value="formModel.BalanceDueDate" />
+            </div>
+            <div class="form-group">
+                <CheckboxInline @bind-Value="formModel.CreditForJail" Label="Credit for Jail" />
+            </div>
+            <div class="form-group">
+                <label>Monthly Pay</label>
+                <InputText class="form-control" @bind-Value="formModel.MonthlyPay" />
+            </div>
+            <div class="form-group">
+                <label>Jail Time Credit Days</label>
+                <InputText class="form-control" @bind-Value="formModel.JailTimeCreditDays" />
+            </div>
+            <div class="form-group">
+                <CheckboxInline @bind-Value="formModel.LicenseSuspension" Label="License Suspension" />
+            </div>
+            <div class="form-group">
+                <CheckboxInline @bind-Value="formModel.CommunityService" Label="Community Service" />
+            </div>
+            <div class="form-group">
+                <CheckboxInline @bind-Value="formModel.OtherConditions" Label="Other Conditions" />
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success me-2" disabled="@isSubmitting">Open Entry</button>
+                <button type="button" class="btn btn-danger me-2" @onclick="CloseOrCancel">Close Dialog</button>
+                <button type="button" class="btn btn-secondary me-2" @onclick="CloseOrCancel">Cancel</button>
+                <button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+            </div>
+            @if (errorMessage != null)
+            {
+                <div class="alert alert-danger mt-2">@errorMessage</div>
+            }
+        </EditForm>
 
 @code {
     private LeapAdmissionAlreadyValidDto formModel = new();
-    private string? submitResult;
+    private bool isSubmitting = false;
+    private string? errorMessage;
+
+    // Example charge model for the grid
+    private List<ChargeDto> Charges { get; set; } = new();
 
     private async Task HandleValidSubmit()
     {
-        var response = await Http.PostAsJsonAsync("/api/leapadmissionalreadyvalid", formModel);
-        if (response.IsSuccessStatusCode)
+        isSubmitting = true;
+        errorMessage = null;
+        try
         {
-            submitResult = "Entry saved successfully.";
+            var apiBase = ApiHelper.GetApiBaseUrl();
+            var http = new HttpClient { BaseAddress = new Uri(apiBase) };
+            var response = await http.PostAsJsonAsync("leapadmissionalreadyvalid", formModel);
+            if (!response.IsSuccessStatusCode)
+                errorMessage = $"Error: {response.ReasonPhrase}";
         }
-        else
+        catch (Exception ex)
         {
-            submitResult = "Error saving entry.";
+            errorMessage = ex.Message;
         }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void AddCharge()
+    {
+        Charges.Add(new ChargeDto());
+    }
+
+    private void AmendCharge(ChargeDto charge)
+    {
+        // Open amend dialog or inline edit logic here
+    }
+
+    private void DeleteCharge(ChargeDto charge)
+    {
+        Charges.Remove(charge);
+    }
+
+    private void GuiltyAll()
+    {
+        foreach (var charge in Charges)
+        {
+            charge.Plea = "Guilty";
+        }
+    }
+
+    private void CloseOrCancel() => NavigationManager.NavigateTo("/");
+    private void ClearFields() { formModel = new(); }
+
+    [Inject] NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] Munientry.Poc.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;
+
+    // Example DTO for charges
+    public class ChargeDto
+    {
+        public string Offense { get; set; } = string.Empty;
+        public string Statute { get; set; } = string.Empty;
+        public string Degree { get; set; } = string.Empty;
+        public string Plea { get; set; } = string.Empty;
     }
 }
