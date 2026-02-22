@@ -3,10 +3,11 @@
 @using Munientry.Poc.Client.Shared
 @using System.ComponentModel.DataAnnotations
 
-<h2>LEAP Admission - Already Valid Dialog</h2>
-<!-- Legacy: leap_plea_valid_dialog_ui.py -->
-
-<EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
+<div class="form-page">
+    <div class="form-card">
+        <h2>LEAP Admission - Already Valid Dialog</h2>
+        <!-- Legacy: leap_plea_valid_dialog_ui.py -->
+        <EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
             <DataAnnotationsValidator />
             <ValidationSummary />
             <div class="form-group">
@@ -29,7 +30,7 @@
                 <InputText class="form-control" @bind-Value="formModel.DefenseCounselName" />
             </div>
             <div class="form-group">
-                <CheckboxInline Value="formModel.DefenseCounselWaived" ValueChanged="@(v => formModel.DefenseCounselWaived = v)" Label="Defendant waived right to counsel" />
+                <CheckboxInline Value="formModel.DefenseCounselWaived" ValueChanged="@(v => formModel.DefenseCounselWaived = v)" ValueExpression="@(() => formModel.DefenseCounselWaived)" Label="Defendant waived right to counsel" />
             </div>
             <div class="form-group">
                 <label>Appearance Reason</label>
@@ -55,12 +56,31 @@
                         @foreach (var charge in Charges)
                         {
                             <tr>
-                                <td>@charge.Offense</td>
-                                <td>@charge.Statute</td>
-                                <td>@charge.Degree</td>
-                                <td>@charge.Plea</td>
                                 <td>
-                                    <button type="button" class="btn btn-warning btn-sm me-1" @onclick="() => AmendCharge(charge)">Amend</button>
+                                    <InputText class="form-control form-control-sm" @bind-Value="charge.Offense" />
+                                </td>
+                                <td>
+                                    <InputText class="form-control form-control-sm" @bind-Value="charge.Statute" />
+                                </td>
+                                <td>
+                                    <InputSelect class="form-select form-select-sm" @bind-Value="charge.Degree">
+                                        <option value="">Select Degree</option>
+                                        <option value="Misdemeanor">Misdemeanor</option>
+                                        <option value="Felony">Felony</option>
+                                        <option value="Infraction">Infraction</option>
+                                        <option value="Other">Other</option>
+                                    </InputSelect>
+                                </td>
+                                <td>
+                                    <InputSelect class="form-select form-select-sm" @bind-Value="charge.Plea">
+                                        <option value="">Select Plea</option>
+                                        <option value="Guilty">Guilty</option>
+                                        <option value="No Contest">No Contest</option>
+                                        <option value="Not Guilty">Not Guilty</option>
+                                        <option value="Other">Other</option>
+                                    </InputSelect>
+                                </td>
+                                <td>
                                     <button type="button" class="btn btn-danger btn-sm me-1" @onclick="() => DeleteCharge(charge)">Delete</button>
                                 </td>
                             </tr>
@@ -103,7 +123,7 @@
                 <CheckboxInline @bind-Value="formModel.OtherConditions" Label="Other Conditions" />
             </div>
             <div class="form-actions">
-                <button type="submit" class="btn btn-success me-2" disabled="@isSubmitting">Open Entry</button>
+                <button type="submit" class="btn btn-success me-2" disabled="@isSubmitting">Generate DOCX</button>
                 <button type="button" class="btn btn-danger me-2" @onclick="CloseOrCancel">Close Dialog</button>
                 <button type="button" class="btn btn-secondary me-2" @onclick="CloseOrCancel">Cancel</button>
                 <button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
@@ -113,6 +133,8 @@
                 <div class="alert alert-danger mt-2">@errorMessage</div>
             }
         </EditForm>
+    </div>
+</div>
 
 @code {
     private LeapAdmissionAlreadyValidDto formModel = new();
@@ -131,8 +153,17 @@
             var apiBase = ApiHelper.GetApiBaseUrl();
             var http = new HttpClient { BaseAddress = new Uri(apiBase) };
             var response = await http.PostAsJsonAsync("leapadmissionalreadyvalid", formModel);
-            if (!response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsByteArrayAsync();
+                var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "LeapAdmissionAlreadyValid.docx";
+                await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
+                errorMessage = null;
+            }
+            else
+            {
                 errorMessage = $"Error: {response.ReasonPhrase}";
+            }
         }
         catch (Exception ex)
         {
@@ -172,6 +203,7 @@
 
     [Inject] NavigationManager NavigationManager { get; set; } = default!;
     [Inject] Munientry.Poc.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;
+    [Inject] IJSRuntime JS { get; set; } = default!;
 
     // Example DTO for charges
     public class ChargeDto

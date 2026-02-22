@@ -86,32 +86,46 @@
 	<div class="form-group">
 		<InputCheckbox @bind-Value="jailCcModel.AdditionalConditions" /> Add Additional Conditions
 	</div>
-	<div class="form-group">
-		<label>Jail Credit and Reporting</label>
-		<InputNumber @bind-Value="jailCcModel.JailTimeCreditDays" class="form-control" placeholder="Days in jail" />
-		<label>Apply JTC to:</label>
-		<InputSelect @bind-Value="jailCcModel.JailTimeCreditApply" class="form-control">
-			<option value="">Select...</option>
-			<option>Costs and Fines</option>
-			<option>Sentence</option>
-		</InputSelect>
-		<label>Currently In Jail:</label>
-		<InputSelect @bind-Value="jailCcModel.InJail" class="form-control">
-			<option value="">Select...</option>
-			<option>Yes</option>
-			<option>No</option>
-		</InputSelect>
-		<label>Companion Cases</label>
-		<InputText @bind-Value="jailCcModel.CompanionCases" class="form-control" />
-		<label>Companion Case Jail Time Served:</label>
-		<InputSelect @bind-Value="jailCcModel.CompanionCasesSentence" class="form-control">
-			<option value="">Select...</option>
-			<option>consecutively</option>
-			<option>concurrently</option>
-		</InputSelect>
-		<InputCheckbox @bind-Value="jailCcModel.JailReportingTerms" /> Set Jail Reporting Terms
-		<InputCheckbox @bind-Value="jailCcModel.AddJailReportDate" /> Add Jail Report Date
-	</div>
+	   <div class="form-group">
+		   <label>Jail Credit and Reporting</label>
+	   </div>
+	   <div class="form-group">
+		   <InputNumber @bind-Value="jailCcModel.JailTimeCreditDays" class="form-control" placeholder="Days in jail" />
+	   </div>
+	   <div class="form-group">
+		   <label>Apply JTC to:</label>
+		   <InputSelect @bind-Value="jailCcModel.JailTimeCreditApply" class="form-control">
+			   <option value="">Select...</option>
+			   <option>Costs and Fines</option>
+			   <option>Sentence</option>
+		   </InputSelect>
+	   </div>
+	   <div class="form-group">
+		   <label>Currently In Jail:</label>
+		   <InputSelect @bind-Value="jailCcModel.InJail" class="form-control">
+			   <option value="">Select...</option>
+			   <option>Yes</option>
+			   <option>No</option>
+		   </InputSelect>
+	   </div>
+	   <div class="form-group">
+		   <label>Companion Cases</label>
+		   <InputText @bind-Value="jailCcModel.CompanionCases" class="form-control" />
+	   </div>
+	   <div class="form-group">
+		   <label>Companion Case Jail Time Served:</label>
+		   <InputSelect @bind-Value="jailCcModel.CompanionCasesSentence" class="form-control">
+			   <option value="">Select...</option>
+			   <option>consecutively</option>
+			   <option>concurrently</option>
+		   </InputSelect>
+	   </div>
+	   <div class="form-group">
+		   <InputCheckbox @bind-Value="jailCcModel.JailReportingTerms" /> Set Jail Reporting Terms
+	   </div>
+	   <div class="form-group">
+		   <InputCheckbox @bind-Value="jailCcModel.AddJailReportDate" /> Add Jail Report Date
+	   </div>
 	<div class="form-group">
 		<label>Pay Today</label>
 		<InputNumber @bind-Value="jailCcModel.PayToday" class="form-control" />
@@ -165,7 +179,7 @@
 		<InputCheckbox @bind-Value="jailCcModel.DistractedDriving" /> Add Distracted Driving Course Language
 	</div>
 	<div class="form-actions">
-		<button type="submit" class="btn btn-success">Open Entry</button>
+		<button type="submit" class="btn btn-success" disabled="@isSubmitting">Generate DOCX</button>
 		<button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
 		<button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
 		<button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
@@ -177,12 +191,44 @@
 
 @code {
 	private JailCcPleaDto jailCcModel = new();
+	private bool isSubmitting = false;
+	private string? submitResult;
+	private string? errorMessage;
 
 	private async Task HandleValidSubmit()
 	{
-		// TODO: Call API to submit form
+		isSubmitting = true;
+		errorMessage = null;
+		try
+		{
+			var apiBase = ApiHelper.GetApiBaseUrl();
+			var http = new HttpClient { BaseAddress = new Uri(apiBase) };
+			var response = await http.PostAsJsonAsync("jailccplea", jailCcModel);
+			if (response.IsSuccessStatusCode)
+			{
+				var content = await response.Content.ReadAsByteArrayAsync();
+				var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "JailCcPlea.docx";
+				await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
+				submitResult = "Jail CC Plea DOCX generated.";
+			}
+			else
+			{
+				errorMessage = $"Error: {response.ReasonPhrase}";
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ex.Message;
+		}
+		finally
+		{
+			isSubmitting = false;
+		}
 	}
 
 	private void CloseOrCancel() => Navigation.NavigateTo("/");
 	private void ClearFields() { jailCcModel = new(); }
+
+	[Inject] IJSRuntime JS { get; set; } = default!;
+	[Inject] Munientry.Poc.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;
 }

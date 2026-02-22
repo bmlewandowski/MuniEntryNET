@@ -8,31 +8,33 @@
 <EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
-    <div>
+    <div class="form-group">
         <label>Entry Date</label>
-        <InputDate @bind-Value="formModel.EntryDate" />
+        <InputDate class="form-control" @bind-Value="formModel.EntryDate" />
     </div>
-    <div>
+    <div class="form-group">
         <label>Plaintiff</label>
-        <InputText @bind-Value="formModel.Plaintiff" />
+        <InputText class="form-control" @bind-Value="formModel.Plaintiff" />
     </div>
-    <div>
+    <div class="form-group">
         <label>Defendant</label>
-        <InputText @bind-Value="formModel.Defendant" />
+        <InputText class="form-control" @bind-Value="formModel.Defendant" />
     </div>
-    <div>
+    <div class="form-group">
         <label>Case Number</label>
-        <InputText @bind-Value="formModel.CaseNumber" />
+        <InputText class="form-control" @bind-Value="formModel.CaseNumber" />
     </div>
-    <div>
+    <div class="form-group">
         <label>Appearance Reason</label>
-        <InputText @bind-Value="formModel.AppearanceReason" />
+        <InputText class="form-control" @bind-Value="formModel.AppearanceReason" />
     </div>
-    <div>
+    <div class="form-group">
         <label>Entry Content</label>
-        <InputTextArea @bind-Value="formModel.EntryContent" />
+        <InputTextArea class="form-control" @bind-Value="formModel.EntryContent" />
     </div>
-    <button type="submit">Submit</button>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-success" disabled="@isSubmitting">Generate DOCX</button>
+    </div>
 </EditForm>
 
 </div>
@@ -40,9 +42,41 @@
 
 @code {
     private CivilFreeformEntryDto formModel = new();
+    private bool isSubmitting = false;
+    private string? submitResult;
+    private string? errorMessage;
 
     private async Task HandleValidSubmit()
     {
-        // TODO: Call API to save form data
+        isSubmitting = true;
+        errorMessage = null;
+        try
+        {
+            var apiBase = ApiHelper.GetApiBaseUrl();
+            var http = new HttpClient { BaseAddress = new Uri(apiBase) };
+            var response = await http.PostAsJsonAsync("civilfreeformentry", formModel);
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsByteArrayAsync();
+                var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "CivilFreeformEntry.docx";
+                await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
+                submitResult = "Civil Freeform Entry DOCX generated.";
+            }
+            else
+            {
+                errorMessage = $"Error: {response.ReasonPhrase}";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
     }
+
+    [Inject] IJSRuntime JS { get; set; } = default!;
+    [Inject] Munientry.Poc.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;
 }

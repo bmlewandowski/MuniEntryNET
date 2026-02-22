@@ -9,41 +9,41 @@
 <EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
-    <div>
+    <div class="form-group">
         <label>Account Number</label>
-        <InputText @bind-Value="formModel.AccountNumber" />
+        <InputText class="form-control" @bind-Value="formModel.AccountNumber" />
     </div>
-    <div>
+    <div class="form-group">
         <label>Account Name</label>
-        <InputText @bind-Value="formModel.AccountName" />
+        <InputText class="form-control" @bind-Value="formModel.AccountName" />
     </div>
-    <div>
+    <div class="form-group">
         <label>Subaccount Number</label>
-        <InputText @bind-Value="formModel.SubaccountNumber" />
+        <InputText class="form-control" @bind-Value="formModel.SubaccountNumber" />
     </div>
-    <div>
+    <div class="form-group">
         <label>Subaccount Name</label>
-        <InputText @bind-Value="formModel.SubaccountName" />
+        <InputText class="form-control" @bind-Value="formModel.SubaccountName" />
     </div>
-    <div>
+    <div class="form-group">
         <label>Disbursement Reason</label>
-        <InputText @bind-Value="formModel.DisbursementReason" />
+        <InputText class="form-control" @bind-Value="formModel.DisbursementReason" />
     </div>
-    <div>
+    <div class="form-group">
         <label>Disbursement Amount</label>
-        <InputNumber @bind-Value="formModel.DisbursementAmount" />
+        <InputNumber class="form-control" @bind-Value="formModel.DisbursementAmount" />
     </div>
-    <div>
+    <div class="form-group">
         <label>Disbursement Vendor</label>
-        <InputText @bind-Value="formModel.DisbursementVendor" />
+        <InputText class="form-control" @bind-Value="formModel.DisbursementVendor" />
     </div>
-    <div>
+    <div class="form-group">
         <label>Invoice Number</label>
-        <InputText @bind-Value="formModel.InvoiceNumber" />
+        <InputText class="form-control" @bind-Value="formModel.InvoiceNumber" />
     </div>
-    <div>
+    <div class="form-group">
         <label>Judicial Officer</label>
-        <InputText @bind-Value="formModel.JudicialOfficer" />
+        <InputText class="form-control" @bind-Value="formModel.JudicialOfficer" />
     </div>
     <div class="form-actions">
         <button type="submit" class="btn btn-success">Open Entry</button>

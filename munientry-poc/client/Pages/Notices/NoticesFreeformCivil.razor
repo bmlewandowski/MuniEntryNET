@@ -8,27 +8,29 @@
 <EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
 	<DataAnnotationsValidator />
 	<ValidationSummary />
-	<div>
+	<div class="form-group">
 		<label>Case Number</label>
-		<InputText @bind-Value="formModel.CaseNumber" />
+		<InputText class="form-control" @bind-Value="formModel.CaseNumber" />
 	</div>
-	<div>
+	<div class="form-group">
 		<label>Entry Date</label>
-		<InputDate @bind-Value="formModel.EntryDate" />
+		<InputDate class="form-control" @bind-Value="formModel.EntryDate" />
 	</div>
-	<div>
+	<div class="form-group">
 		<label>Defendant First Name</label>
-		<InputText @bind-Value="formModel.DefendantFirstName" />
+		<InputText class="form-control" @bind-Value="formModel.DefendantFirstName" />
 	</div>
-	<div>
+	<div class="form-group">
 		<label>Defendant Last Name</label>
-		<InputText @bind-Value="formModel.DefendantLastName" />
+		<InputText class="form-control" @bind-Value="formModel.DefendantLastName" />
 	</div>
-	<div>
+	<div class="form-group">
 		<label>Notice Text</label>
-		<InputTextArea @bind-Value="formModel.NoticeText" />
+		<InputTextArea class="form-control" @bind-Value="formModel.NoticeText" />
 	</div>
-	<button type="submit">Submit</button>
+	<div class="form-actions">
+		<button type="submit" class="btn btn-success">Generate DOCX</button>
+	</div>
 </EditForm>
 
 </div>
@@ -37,8 +39,41 @@
 @code {
 	private NoticesFreeformCivilDto formModel = new();
 
+	private bool isSubmitting = false;
+	private string? errorMessage;
+
 	private async Task HandleValidSubmit()
 	{
-		// TODO: Call API to save form data
+		isSubmitting = true;
+		errorMessage = null;
+		try
+		{
+			var apiBase = "";
+			if (ApiHelper != null)
+				apiBase = ApiHelper.GetApiBaseUrl();
+			var http = new HttpClient { BaseAddress = new Uri(apiBase) };
+			var response = await http.PostAsJsonAsync("noticesfreeformcivil", formModel);
+			if (response.IsSuccessStatusCode)
+			{
+				var content = await response.Content.ReadAsByteArrayAsync();
+				var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "NoticesFreeformCivil.docx";
+				await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
+				errorMessage = null;
+			}
+			else
+			{
+				errorMessage = $"Error: {response.ReasonPhrase}";
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ex.Message;
+		}
+		finally
+		{
+			isSubmitting = false;
+		}
 	}
+	[Inject] Munientry.Poc.Client.Shared.ApiHelper? ApiHelper { get; set; }
+	[Inject] IJSRuntime JS { get; set; } = default!;
 }

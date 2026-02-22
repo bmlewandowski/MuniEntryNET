@@ -13,45 +13,45 @@
     <ValidationSummary />
     <fieldset>
         <legend>Case/Defendant Information</legend>
-        <div class="form-row">
-            <label>Defendant First Name:</label>
+        <div class="form-group">
+            <label>Defendant First Name</label>
             <InputText @bind-Value="leapSentencingModel.DefendantFirstName" class="form-control" />
         </div>
-        <div class="form-row">
-            <label>Defendant Last Name:</label>
+        <div class="form-group">
+            <label>Defendant Last Name</label>
             <InputText @bind-Value="leapSentencingModel.DefendantLastName" class="form-control" />
         </div>
-        <div class="form-row">
-            <label>Case Number:</label>
+        <div class="form-group">
+            <label>Case Number</label>
             <InputText @bind-Value="leapSentencingModel.CaseNumber" class="form-control" />
         </div>
-        <div class="form-row">
-            <label>Defense Counsel Name:</label>
+        <div class="form-group">
+            <label>Defense Counsel Name</label>
             <InputText @bind-Value="leapSentencingModel.DefenseCounselName" class="form-control" />
         </div>
-        <div class="form-row">
-            <label>Defense Counsel Type:</label>
+        <div class="form-group">
+            <label>Defense Counsel Type</label>
             <InputSelect @bind-Value="leapSentencingModel.DefenseCounselType" class="form-control">
                 <option value="">Select...</option>
                 <option>Public Defender</option>
                 <option>Private Counsel</option>
             </InputSelect>
         </div>
-        <div class="form-row">
+        <div class="form-group">
             <label><InputCheckbox @bind-Value="leapSentencingModel.DefenseCounselWaived" /> Defendant waived right to counsel</label>
         </div>
-        <div class="form-row">
-            <label>Appearance Reason:</label>
+        <div class="form-group">
+            <label>Appearance Reason</label>
             <InputSelect @bind-Value="leapSentencingModel.AppearanceReason" class="form-control">
                 <option>LEAP sentencing</option>
             </InputSelect>
         </div>
-        <div class="form-row">
-            <label>LEAP Plea Date:</label>
+        <div class="form-group">
+            <label>LEAP Plea Date</label>
             <InputDate @bind-Value="leapSentencingModel.LeapPleaDate" class="form-control" />
         </div>
-        <div class="form-row">
-            <label>Plea/Trial Date:</label>
+        <div class="form-group">
+            <label>Plea/Trial Date</label>
             <InputDate @bind-Value="leapSentencingModel.PleaTrialDate" class="form-control" />
         </div>
     </fieldset>
@@ -65,8 +65,8 @@
     </fieldset>
     <fieldset>
         <legend>Financial</legend>
-        <div class="form-row">
-            <label>Court Costs:</label>
+        <div class="form-group">
+            <label>Court Costs</label>
             <InputSelect @bind-Value="leapSentencingModel.CourtCosts" class="form-control">
                 <option>Yes</option>
                 <option>Waived</option>
@@ -74,27 +74,27 @@
                 <option>No</option>
             </InputSelect>
         </div>
-        <div class="form-row">
-            <label>Ability to Pay:</label>
+        <div class="form-group">
+            <label>Ability to Pay</label>
             <InputSelect @bind-Value="leapSentencingModel.AbilityToPay" class="form-control">
                 <option>forthwith</option>
                 <option>monthly pay</option>
                 <option>partial forthwith then monthly pay</option>
             </InputSelect>
         </div>
-        <div class="form-row">
-            <label>Due Date:</label>
+        <div class="form-group">
+            <label>Due Date</label>
             <InputDate @bind-Value="leapSentencingModel.BalanceDueDate" class="form-control" />
         </div>
-        <div class="form-row">
-            <label>Pay Today:</label>
+        <div class="form-group">
+            <label>Pay Today</label>
             <InputText @bind-Value="leapSentencingModel.PayToday" class="form-control" />
         </div>
-        <div class="form-row">
-            <label>Monthly Pay:</label>
+        <div class="form-group">
+            <label>Monthly Pay</label>
             <InputText @bind-Value="leapSentencingModel.MonthlyPay" class="form-control" />
         </div>
-        <div class="form-row">
+        <div class="form-group">
             <label><InputCheckbox @bind-Value="leapSentencingModel.CreditForJail" /> Credit $50/day in jail</label>
             <InputText @bind-Value="leapSentencingModel.JailTimeCreditDays" class="form-control" placeholder="Days in jail" />
         </div>
@@ -102,16 +102,16 @@
     </fieldset>
     <fieldset>
         <legend>FRA (Financial Responsibility Act)</legend>
-        <div class="form-row">
-            <label>FRA shown in complaint:</label>
+        <div class="form-group">
+            <label>FRA shown in complaint</label>
             <InputSelect @bind-Value="leapSentencingModel.FraInFile" class="form-control">
                 <option>N/A</option>
                 <option>Yes</option>
                 <option>No</option>
             </InputSelect>
         </div>
-        <div class="form-row">
-            <label>FRA shown in court:</label>
+        <div class="form-group">
+            <label>FRA shown in court</label>
             <InputSelect @bind-Value="leapSentencingModel.FraInCourt" class="form-control">
                 <option>N/A</option>
                 <option>Yes</option>
@@ -132,7 +132,7 @@
         </div>
         <button type="button" class="btn btn-primary">Add Conditions</button>
     </fieldset>
-    <div class="form-row mt-3">
+    <div class="form-group mt-3">
         <button type="submit" class="btn btn-success">Open Entry</button>
         <button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
         <button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>

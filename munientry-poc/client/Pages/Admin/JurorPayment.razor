@@ -9,57 +9,57 @@
 <EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
 	<DataAnnotationsValidator />
 	<ValidationSummary />
-	<div>
+	<div class="form-group">
 		<label>Case Number</label>
-		<InputText @bind-Value="formModel.CaseNumber" />
+		<InputText class="form-control" @bind-Value="formModel.CaseNumber" />
 	</div>
-	<div>
+	<div class="form-group">
 		<label>Entry Date</label>
-		<InputDate @bind-Value="formModel.EntryDate" />
+		<InputDate class="form-control" @bind-Value="formModel.EntryDate" />
 	</div>
-	<div>
+	<div class="form-group">
 		<label>Defendant First Name</label>
-		<InputText @bind-Value="formModel.DefendantFirstName" />
+		<InputText class="form-control" @bind-Value="formModel.DefendantFirstName" />
 	</div>
-	<div>
+	<div class="form-group">
 		<label>Defendant Last Name</label>
-		<InputText @bind-Value="formModel.DefendantLastName" />
+		<InputText class="form-control" @bind-Value="formModel.DefendantLastName" />
 	</div>
-	<div>
+	<div class="form-group">
 		<label>Trial Date</label>
-		<InputDate @bind-Value="formModel.TrialDate" />
+		<InputDate class="form-control" @bind-Value="formModel.TrialDate" />
 	</div>
-	<div>
+	<div class="form-group">
 		<label>Trial Length</label>
-		<InputSelect @bind-Value="formModel.TrialLength">
+		<InputSelect class="form-control" @bind-Value="formModel.TrialLength">
 			<option value="One Day">One Day</option>
 			<option value="Two Days">Two Days</option>
 			<option value="No Trial - Jury Not Seated">No Trial - Jury Not Seated</option>
 		</InputSelect>
 	</div>
-	<div>
+	<div class="form-group">
 		<label>Jurors Reported</label>
-		<InputNumber @bind-Value="formModel.JurorsReported" />
+		<InputNumber class="form-control" @bind-Value="formModel.JurorsReported" />
 	</div>
-	<div>
+	<div class="form-group">
 		<label>Jurors Seated</label>
-		<InputNumber @bind-Value="formModel.JurorsSeated" />
+		<InputNumber class="form-control" @bind-Value="formModel.JurorsSeated" />
 	</div>
-	<div>
+	<div class="form-group">
 		<label>Jurors Not Seated</label>
-		<InputNumber @bind-Value="formModel.JurorsNotSeated" />
+		<InputNumber class="form-control" @bind-Value="formModel.JurorsNotSeated" />
 	</div>
-	<div>
+	<div class="form-group">
 		<label>Jurors Pay Not Seated</label>
-		<InputNumber @bind-Value="formModel.JurorsPayNotSeated" />
+		<InputNumber class="form-control" @bind-Value="formModel.JurorsPayNotSeated" />
 	</div>
-	<div>
+	<div class="form-group">
 		<label>Jurors Pay Seated</label>
-		<InputNumber @bind-Value="formModel.JurorsPaySeated" />
+		<InputNumber class="form-control" @bind-Value="formModel.JurorsPaySeated" />
 	</div>
-	<div>
+	<div class="form-group">
 		<label>Jury Panel Total Pay</label>
-		<InputNumber @bind-Value="formModel.JuryPanelTotalPay" />
+		<InputNumber class="form-control" @bind-Value="formModel.JuryPanelTotalPay" />
 	</div>
 	<div class="form-actions">
 		<button type="submit" class="btn btn-success">Open Entry</button>

@@ -1,3 +1,4 @@
+
 /* =============================================
    Modern Collapsible Sidebar Navigation
    ============================================= */
@@ -116,7 +117,7 @@
 
     --font-body:    Arial, Helvetica, sans-serif;
     --font-heading: Georgia, 'Times New Roman', Times, serif;
-    --form-max-width: 660px;
+    --form-max-width: 960px;
     --field-max-width: 400px;
 }
 
@@ -171,12 +172,13 @@ body {
     display: inline-block;
     width: 1.5em;
     height: 1.5em;
-    background: url('data:image/svg+xml;utf8,<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2.5" y="3.5" width="15" height="13" rx="2" fill="%23f5ecd7" stroke="%234a3728" stroke-width="1.5"/><rect x="5.5" y="6.5" width="9" height="1.5" rx="0.75" fill="%23d3c1a3"/><rect x="5.5" y="9.5" width="6" height="1.5" rx="0.75" fill="%23d3c1a3"/></svg>') no-repeat center center;
+    background: url('data:image/svg+xml;utf8,<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="12" height="14" rx="2" fill="%23f5ecd7" stroke="%234a3728" stroke-width="1.5"/><rect x="7" y="2" width="6" height="4" rx="1" fill="%23d3c1a3" stroke="%234a3728" stroke-width="1"/></svg>') no-repeat center center;
     background-size: 1.5em 1.5em;
     flex-shrink: 0;
     margin-top: 0.1em;
     pointer-events: none;
 }
+
 /* =============================================
    Labels
    ============================================= */

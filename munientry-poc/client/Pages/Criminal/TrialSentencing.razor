@@ -104,7 +104,7 @@
 		</div>
 	</div>
 	<div class="form-actions">
-		<button type="submit" class="btn btn-success">Open Entry</button>
+		<button type="submit" class="btn btn-success">Generate DOCX</button>
 		<button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
 		<button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
 		<button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
@@ -117,10 +117,43 @@
 @code {
 	private FinalJuryNoticeDto notice = new();
 
+	private bool isSubmitting = false;
+	private string? errorMessage;
+
 	private async Task HandleValidSubmit()
 	{
-		// TODO: Call API to create final/jury notice entry
+		isSubmitting = true;
+		errorMessage = null;
+		try
+		{
+			var apiBase = "";
+			if (ApiHelper != null)
+				apiBase = ApiHelper.GetApiBaseUrl();
+			var http = new HttpClient { BaseAddress = new Uri(apiBase) };
+			var response = await http.PostAsJsonAsync("trialsentencing", notice);
+			if (response.IsSuccessStatusCode)
+			{
+				var content = await response.Content.ReadAsByteArrayAsync();
+				var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "TrialSentencing.docx";
+				await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
+				errorMessage = null;
+			}
+			else
+			{
+				errorMessage = $"Error: {response.ReasonPhrase}";
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ex.Message;
+		}
+		finally
+		{
+			isSubmitting = false;
+		}
 	}
+	[Inject] Munientry.Poc.Client.Shared.ApiHelper? ApiHelper { get; set; }
+	[Inject] IJSRuntime JS { get; set; } = default!;
 
 	private void CloseOrCancel() => Navigation.NavigateTo("/");
 	private void ClearFields() { notice = new(); }

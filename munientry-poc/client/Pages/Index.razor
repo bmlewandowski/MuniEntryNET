@@ -1,28 +1,5 @@
 @page "/"
 
-<h1>MuniEntry POC - Blazor</h1>
-<p>This is a minimal Blazor WebAssembly client calling the API.</p>
-
-<button @onclick="GetHealth">Check API health</button>
-<pre>@_result</pre>
-
-@code {
-    private string _result = "";
-
-    private async Task GetHealth()
-    {
-        try
-        {
-            var client = new HttpClient { BaseAddress = new Uri(NavigationManager.BaseUri.Replace(":3000", ":5000")) };
-            var res = await client.GetFromJsonAsync<object>("api/health");
-            _result = System.Text.Json.JsonSerializer.Serialize(res);
-        }
-        catch (Exception ex)
-        {
-            _result = ex.Message;
-        }
-    }
-
-    [Inject]
-    public NavigationManager NavigationManager { get; set; } = default!;
-}
+<h1>MuniEntry - Blazor Pages (.NET)</h1>
+<p>Conversion of Legacy Python Forms for the City of Delaware, OH.</p>
+<p>Read-only from database and enable Microsoft Word docx export of values into predefined templates </p>

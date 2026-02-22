@@ -83,7 +83,7 @@
         <InputText @bind-Value="diversionPlea.OtherConditionsText" class="form-control" />
     </div>
     <div class="form-actions">
-        <button type="submit" class="btn btn-success">Open Entry</button>
+        <button type="submit" class="btn btn-success" disabled="@isSubmitting">Generate DOCX</button>
         <button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
         <button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
         <button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
@@ -101,20 +101,43 @@
 @code {
     DiversionPleaDto diversionPlea = new();
     string submitResult;
+    private bool isSubmitting = false;
+    private string? errorMessage;
 
     private async Task HandleValidSubmit()
     {
-        var response = await Http.PostAsJsonAsync("/api/diversionplea", diversionPlea);
-        if (response.IsSuccessStatusCode)
+        isSubmitting = true;
+        errorMessage = null;
+        try
         {
-            submitResult = "Diversion Plea saved successfully.";
+            var apiBase = ApiHelper.GetApiBaseUrl();
+            var http = new HttpClient { BaseAddress = new Uri(apiBase) };
+            var response = await http.PostAsJsonAsync("diversionplea", diversionPlea);
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsByteArrayAsync();
+                var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "DiversionPlea.docx";
+                await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
+                submitResult = "Diversion Plea DOCX generated.";
+            }
+            else
+            {
+                errorMessage = $"Error: {response.ReasonPhrase}";
+            }
         }
-        else
+        catch (Exception ex)
         {
-            submitResult = "Error saving Diversion Plea.";
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isSubmitting = false;
         }
     }
 
     private void CloseOrCancel() => Navigation.NavigateTo("/");
     private void ClearFields() { diversionPlea = new(); }
+
+    [Inject] IJSRuntime JS { get; set; } = default!;
+    [Inject] Munientry.Poc.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;
 }
