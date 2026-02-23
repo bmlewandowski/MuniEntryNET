@@ -56,11 +56,6 @@
             <option>sentencing</option>
         </InputSelect>
     </div>
-    <!-- Charges grid would be a separate component or table, simplified here -->
-    <div class="form-group">
-        <label>Charges (Offense, Statute, Degree, Allied, Plea, Finding, Fines, Fines Suspended, Dismissed)</label>
-        <textarea @bind="fineOnlyModel.Charges" class="form-control" rows="3"></textarea>
-    </div>
     <div class="form-group">
         <label>Court Costs</label>
         <InputSelect @bind-Value="fineOnlyModel.CourtCosts" class="form-control">
@@ -91,6 +86,10 @@
     <div class="form-group">
         <label>Monthly Pay</label>
         <InputNumber @bind-Value="fineOnlyModel.MonthlyPay" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Charges (Offense, Statute, Degree, Allied, Plea, Finding, Fines, Fines Suspended, Dismissed)</label>
+        <textarea @bind="fineOnlyModel.Charges" class="form-control" rows="3"></textarea>
     </div>
     <div class="form-group">
         <InputCheckbox @bind-Value="fineOnlyModel.CreditForJail" /> Credit $50/day in jail
