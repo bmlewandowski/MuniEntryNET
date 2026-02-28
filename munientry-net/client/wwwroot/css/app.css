@@ -26,7 +26,7 @@
 
     --font-body:    Arial, Helvetica, sans-serif;
     --font-heading: Georgia, 'Times New Roman', Times, serif;
-    --form-max-width: 960px;
+    --form-max-width: 1200px;
     --field-max-width: 400px;
 }
 
@@ -40,7 +40,7 @@ body {
     margin: 0;
 }
 
-.main { max-width: 900px; margin: 0 auto; }
+.main { max-width: 1200px; margin: 0 auto; }
 
 /* =============================================
    Form Page Wrapper
@@ -425,4 +425,186 @@ body {
     margin: 1.25rem 0 0.5rem;
     border-bottom: 1px solid var(--divider-color);
     padding-bottom: 0.25rem;
+}
+
+/* =============================================
+   Daily Case Lists — Index Page
+   ============================================= */
+
+/* Widen the card so the 3-column grid is comfortable */
+.daily-list-card {
+    max-width: 1200px !important;
+}
+
+.daily-list-subtitle {
+    color: var(--label-color);
+    font-size: 0.92rem;
+    margin: -0.75rem 0 1.25rem;
+}
+
+/* Date picker + Reload button row */
+.daily-list-toolbar {
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.daily-list-toolbar .form-group {
+    margin-bottom: 0;
+    min-width: 160px;
+}
+
+/* 3-column grid of panels; collapses on smaller screens */
+.daily-list-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.875rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 1000px) {
+    .daily-list-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+    .daily-list-grid { grid-template-columns: 1fr; }
+}
+
+/* Individual panel */
+.daily-list-panel {
+    border: 1px solid var(--form-border);
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: var(--input-bg);
+    transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+.daily-list-panel--active {
+    border-color: var(--btn-primary-bg);
+    box-shadow: 0 0 0 2px rgba(61, 107, 153, 0.18);
+}
+
+/* Panel header — acts as the list-type label / click target */
+.daily-list-panel-header {
+    background: #e2d4be;
+    color: var(--heading-color);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 0.45rem 0.75rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    transition: background 0.12s;
+}
+
+.daily-list-panel-header:hover {
+    background: #d3c4a8;
+}
+
+.daily-list-panel--active .daily-list-panel-header {
+    background: var(--btn-primary-bg);
+    color: #fff;
+}
+
+.daily-list-panel--active .daily-list-panel-header:hover {
+    background: var(--btn-primary-hover);
+}
+
+/* Case count badge */
+.daily-list-count {
+    background: rgba(0, 0, 0, 0.12);
+    border-radius: 10px;
+    padding: 0 0.5em;
+    font-size: 0.78em;
+    font-weight: 700;
+    min-width: 1.6em;
+    text-align: center;
+}
+
+/* The <select size="N"> listbox inside each panel */
+.daily-case-select {
+    flex: 1;
+    width: 100%;
+    border: none;
+    background: var(--input-bg);
+    color: var(--input-color);
+    font-size: 0.83rem;
+    padding: 0.2rem 0.25rem;
+    outline: none;
+    cursor: pointer;
+    font-family: var(--font-body);
+    /* Remove default browser chrome */
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.daily-case-select:focus {
+    outline: none;
+}
+
+.daily-case-select option {
+    padding: 0.25rem 0.5rem;
+}
+
+.daily-case-select option:hover,
+.daily-case-select option:checked {
+    background: rgba(61, 107, 153, 0.12);
+}
+
+/* Selected-case banner */
+.daily-list-selected-bar {
+    margin-top: 0.5rem;
+    padding: 0.875rem 1rem;
+    background: #eaf1f8;
+    border: 1px solid var(--btn-primary-bg);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.daily-list-selected-info {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    font-size: 0.92rem;
+    color: var(--input-color);
+}
+
+.daily-list-case-tag {
+    background: var(--btn-primary-bg);
+    color: #fff;
+    border-radius: 4px;
+    padding: 0.1em 0.55em;
+    font-size: 0.85em;
+    font-family: monospace;
+    letter-spacing: 0.05em;
+}
+
+.daily-list-clear-btn {
+    margin-left: auto;
+    font-size: 0.78rem;
+    padding: 0.15rem 0.6rem;
+}
+
+/* Flex row of action buttons */
+.daily-list-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.daily-list-actions .btn-sm {
+    font-size: 0.82rem;
+    padding: 0.25rem 0.7rem;
 }

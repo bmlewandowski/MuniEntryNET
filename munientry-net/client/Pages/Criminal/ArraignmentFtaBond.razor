@@ -1,11 +1,8 @@
 @page "/criminal/arraignment-fta-bond"
 @page "/criminal/arraignment-fta-bond/{CaseNumber}"
-@using Microsoft.AspNetCore.Components.Forms
-@using System.ComponentModel.DataAnnotations
 @inject NavigationManager Navigation
 @inject HttpClient Http
 @inject IJSRuntime JS
-@using Microsoft.AspNetCore.Components
 
 <div class="form-page">
 <div class="form-card">
@@ -65,7 +62,7 @@
 @code {
 	[Parameter]
 	public string? CaseNumber { get; set; }
-	private FormModel formModel = new();
+	private BondHearingDto formModel = new();
 	private bool isSubmitting = false;
 	private string? errorMessage;
 
@@ -75,15 +72,7 @@
 		errorMessage = null;
 		try
 		{
-			var response = await Http.PostAsJsonAsync("/api/bondhearing", new {
-				formModel.CaseNumber,
-				formModel.DefendantFirstName,
-				formModel.DefendantLastName,
-				formModel.DefenseCounselName,
-				formModel.BondType,
-				formModel.BondAmount,
-				EntryDate = formModel.EntryDate
-			});
+		var response = await Http.PostAsJsonAsync("/api/bondhearing", formModel);
 			if (response.IsSuccessStatusCode)
 			{
 				var content = await response.Content.ReadAsByteArrayAsync();
@@ -117,22 +106,4 @@
 		}
 	}
 
-	public class FormModel
-	{
-		[Required(ErrorMessage = "Defendant First Name is required")]
-		public string? DefendantFirstName { get; set; }
-
-		[Required(ErrorMessage = "Defendant Last Name is required")]
-		public string? DefendantLastName { get; set; }
-
-		[Required(ErrorMessage = "Case Number is required")]
-		public string? CaseNumber { get; set; }
-
-		[Required(ErrorMessage = "Entry Date is required")]
-		public DateTime? EntryDate { get; set; }
-
-		public string? BondType { get; set; }
-		public string? BondAmount { get; set; }
-		public string? DefenseCounselName { get; set; }
-	}
 }

@@ -14,6 +14,7 @@ builder.RootComponents.Add<App>("#app");
 builder.Services.AddScoped<ApiHelper>();
 builder.Services.AddScoped<DenyPrivilegesPermitRetestService>();
 builder.Services.AddScoped<CaseSearchService>();
+builder.Services.AddScoped<DailyListService>();
 
 // Load config for API base URL
 var config = new ConfigurationBuilder()

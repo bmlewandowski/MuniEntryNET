@@ -15,10 +15,7 @@ This folder contains all Data Transfer Objects (DTOs) used by the Blazor client 
 - Remove obsolete DTOs when forms are retired or replaced.
 
 ## `client/Dtos` folder
-The legacy `client/Dtos/` folder (namespace `Munientry.Poc.Client.Dtos`) still exists and contains 14 older DTOs.
-Five forms still reference DTOs from that folder: `BondModificationRevocation`, `CommunityServiceSecondary`, `DiversionPlea`, `JailCcPlea`, and `LeapValidSentencing`.
-All new form DTOs should be placed in `client/Shared/Models/` instead. The `client/Dtos/` folder can be
-removed once those five forms' DTOs are migrated.
+The `client/Dtos/` folder has been removed. All DTOs now live in `client/Shared/Models/`.
 
 ## Base Class and Typed Client Infrastructure
 
@@ -40,19 +37,15 @@ implemented by `CriminalFormApiClient` (`client/Shared/CriminalFormApiClient.cs`
 AppearOnWarrantNoPleaDto.cs
 ArraignmentContinuanceDto.cs
 BondHearingDto.cs
+BondModificationRevocationDto.cs
 CaseSearchResultDto.cs          ← API response DTO for /api/case/search; not a form submission DTO
-CivilComplaintDto.cs
 CivilFreeformEntryDto.cs
-CivilProtectionOrderDto.cs
-CivilSummonsDto.cs
 CommunityControlTermsDto.cs
 CommunityControlTermsNoticesDto.cs
 CommunityServiceSecondaryDto.cs
-CriminalComplaintDto.cs
-CriminalSummonsDto.cs
 DenyPrivilegesPermitRetestDto.cs
 DiversionDialogDto.cs
-DiversionDto.cs
+DiversionPleaDto.cs
 DrivingCaseInfoDto.cs
 DrivingPrivilegesDto.cs
 EntryType.cs                    ← Enum (not a DTO); used by DenyPrivilegesPermitRetestDto
@@ -61,26 +54,21 @@ FineOnlyDto.cs
 FineOnlyPleaDto.cs
 FiscalJournalEntryDto.cs
 GeneralNoticeOfHearingDto.cs
+JailCcPleaDto.cs
 JurorPaymentDto.cs
-JuryDemandDto.cs
 LeapAdmissionAlreadyValidDto.cs
 LeapAdmissionPleaDto.cs
 LeapSentencingDto.cs
+LeapValidSentencingDto.cs
 NotGuiltyAppearBondSpecialDto.cs
 NotGuiltyPleaDto.cs
 NoticesFreeformCivilDto.cs
 PleaOnlyFutureSentencingDto.cs
-ProbationExtensionDto.cs
-ProbationNoticeDto.cs
-ProbationOrderDto.cs
-ProbationTerminationDto.cs
 ProbationViolationBondDto.cs
-ProbationViolationDto.cs
 SchedulingEntryDto.cs
 SentencingOnlyAlreadyPleadDto.cs
 TimeToPayOrderDto.cs
 TrialToCourtNoticeDto.cs
-WarrantRequestDto.cs
 ```
 
 All files above are located in: `client/Shared/Models/`

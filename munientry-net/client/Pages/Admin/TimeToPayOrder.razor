@@ -1,8 +1,5 @@
 @page "/admin/time-to-pay-order"
 @page "/admin/time-to-pay-order/{CaseNumber}"
-@using System.ComponentModel.DataAnnotations
-@using Microsoft.AspNetCore.Components
-
 <div class="form-page">
 <div class="form-card">
 <h2>Time to Pay Order Dialog</h2>
@@ -53,7 +50,7 @@
 @code {
 	[Parameter]
 	public string? CaseNumber { get; set; }
-	private FormModel formModel = new();
+	private TimeToPayOrderDto formModel = new();
 	private bool isSubmitting = false;
 	private string? errorMessage;
 
@@ -103,21 +100,4 @@
 	[Inject] IJSRuntime JS { get; set; } = default!;
 	[Inject] Munientry.Poc.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;
 
-	public class FormModel
-	{
-		[Required(ErrorMessage = "Case Number is required")]
-		public string? CaseNumber { get; set; }
-
-		[Required(ErrorMessage = "Entry Date is required")]
-		public DateTime? EntryDate { get; set; }
-
-		[Required(ErrorMessage = "Defendant First Name is required")]
-		public string? DefendantFirstName { get; set; }
-
-		[Required(ErrorMessage = "Defendant Last Name is required")]
-		public string? DefendantLastName { get; set; }
-
-		[Required(ErrorMessage = "Appearance Date is required")]
-		public DateTime? AppearanceDate { get; set; }
-	}
 }

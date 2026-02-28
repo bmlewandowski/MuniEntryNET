@@ -1,5 +1,242 @@
 @page "/"
+@using Munientry.Poc.Client.Shared.Models
+@inject DailyListService DailyListSvc
+@inject NavigationManager Navigation
 
-<h1>MuniEntry - Blazor Pages (.NET)</h1>
-<p>Conversion of Legacy Python Forms for the City of Delaware, OH.</p>
-<p>Read-only from database and enable Microsoft Word docx export of values into predefined templates </p>
+<PageTitle>MuniEntry — Daily Case Lists</PageTitle>
+
+<div class="form-page">
+    <div class="form-card daily-list-card">
+        <h2>Daily Case Lists</h2>
+        <p class="daily-list-subtitle">
+            Select a date and pick a case from any list, then choose an entry form below.
+        </p>
+
+        <!-- Date + Reload toolbar -->
+        <div class="daily-list-toolbar">
+            <div class="form-group">
+                <label>Report Date</label>
+                <input type="date"
+                       class="form-control"
+                       value="@ReportDate.ToString("yyyy-MM-dd")"
+                       @onchange="OnDateChanged" />
+            </div>
+            <button class="btn btn-secondary" @onclick="LoadAllListsAsync" disabled="@IsLoading">
+                @(IsLoading ? "Loading…" : "⟳  Reload")
+            </button>
+        </div>
+
+        @if (ErrorMessage is not null)
+        {
+            <div class="alert alert-danger">@ErrorMessage</div>
+        }
+
+        <!-- 3 × 2 grid of case list panels -->
+        <div class="daily-list-grid">
+            @foreach (var list in _lists)
+            {
+                var isActive = ActiveListKey == list.Key;
+                <div class="daily-list-panel @(isActive ? "daily-list-panel--active" : "")">
+                    <div class="daily-list-panel-header" @onclick="() => SetActive(list.Key)">
+                        <span>@list.Label</span>
+                        <span class="daily-list-count">@list.Cases.Count</span>
+                    </div>
+                    <select class="daily-case-select"
+                            size="9"
+                            @onchange="e => OnCaseSelected(list.Key, e.Value?.ToString())">
+                        <option value="">— select a case —</option>
+                        @foreach (var c in list.Cases)
+                        {
+                            <option value="@c.CaseNumber">@FormatCaseLabel(c)</option>
+                        }
+                    </select>
+                </div>
+            }
+        </div>
+
+        <!-- Selected-case action bar – appears once a case is chosen -->
+        @if (SelectedCaseNumber is not null)
+        {
+            <div class="daily-list-selected-bar">
+                <div class="daily-list-selected-info">
+                    <strong>Selected:</strong>&nbsp;@SelectedCaseName&nbsp;
+                    <span class="daily-list-case-tag">@SelectedCaseNumber</span>
+                    <button class="btn btn-sm btn-secondary daily-list-clear-btn"
+                            @onclick="ClearSelection">✕ Clear</button>
+                </div>
+                <div class="daily-list-actions">
+                    @foreach (var link in GetFormLinks())
+                    {
+                        <a class="btn btn-sm btn-primary" href="@link.Url">@link.Label</a>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+
+    // ── State ─────────────────────────────────────────────────────────────────
+
+    private DateOnly ReportDate = DateOnly.FromDateTime(DateTime.Today);
+    private bool IsLoading;
+    private string? ErrorMessage;
+    private string? ActiveListKey;
+    private string? SelectedCaseNumber;
+    private string? SelectedCaseName;
+
+    // ── List configuration ───────────────────────────────────────────────────
+
+    private sealed class ListState
+    {
+        public required string Key   { get; init; }
+        public required string Label { get; init; }
+        public List<DailyListResultDto> Cases { get; } = new();
+    }
+
+    private readonly List<ListState> _lists = new()
+    {
+        new() { Key = "arraignments",    Label = "Arraignments"                  },
+        new() { Key = "slated",          Label = "Slated"                        },
+        new() { Key = "pleas",           Label = "Pleas & Motion / Oral Hearings" },
+        new() { Key = "pcvh_fcvh",       Label = "PCVH / FCVH"                  },
+        new() { Key = "final_pretrial",  Label = "Final Pre-Trials"              },
+        new() { Key = "trials_to_court", Label = "Trials to Court"              },
+    };
+
+    // ── Lifecycle ────────────────────────────────────────────────────────────
+
+    protected override async Task OnInitializedAsync() => await LoadAllListsAsync();
+
+    // ── Event handlers ───────────────────────────────────────────────────────
+
+    private async Task OnDateChanged(ChangeEventArgs e)
+    {
+        if (DateOnly.TryParse(e.Value?.ToString(), out var d))
+        {
+            ReportDate = d;
+            await LoadAllListsAsync();
+        }
+    }
+
+    private async Task LoadAllListsAsync()
+    {
+        IsLoading = true;
+        ErrorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            var tasks = _lists.Select(l => DailyListSvc.GetDailyListAsync(l.Key, ReportDate)).ToList();
+            var results = await Task.WhenAll(tasks);
+            for (var i = 0; i < _lists.Count; i++)
+            {
+                _lists[i].Cases.Clear();
+                _lists[i].Cases.AddRange(results[i]);
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error loading case lists: {ex.Message}";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private void SetActive(string key) => ActiveListKey = key;
+
+    private void OnCaseSelected(string listKey, string? caseNumber)
+    {
+        if (string.IsNullOrEmpty(caseNumber)) return;
+        ActiveListKey = listKey;
+        SelectedCaseNumber = caseNumber;
+        var row = _lists.First(l => l.Key == listKey).Cases
+                        .FirstOrDefault(c => c.CaseNumber == caseNumber);
+        SelectedCaseName = row?.DefFullName ?? caseNumber;
+    }
+
+    private void ClearSelection()
+    {
+        SelectedCaseNumber = null;
+        SelectedCaseName = null;
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Formats a case as "LastName - CaseNumber  |  HH:MM" —
+    /// matching the Python "LastName - CaseNumber" ComboBox pattern.
+    /// </summary>
+    private static string FormatCaseLabel(DailyListResultDto c)
+    {
+        var lastName = c.DefFullName?.Split(' ', StringSplitOptions.RemoveEmptyEntries).LastOrDefault()
+                       ?? c.DefFullName ?? "";
+        var time     = string.IsNullOrWhiteSpace(c.Time) ? "" : $"  |  {c.Time}";
+        return $"{lastName} — {c.CaseNumber}{time}";
+    }
+
+    // ── Form links per list type ─────────────────────────────────────────────
+
+    private record FormLink(string Label, string Url);
+
+    private static readonly IReadOnlyDictionary<string, FormLink[]> _formLinks =
+        new Dictionary<string, FormLink[]>
+        {
+            ["arraignments"] = new FormLink[]
+            {
+                new("Arraignment Continuance",      "/criminal/arraignmentcontinuance"),
+                new("Not Guilty Plea",              $"/criminal/not-guilty-plea/{{cn}}"),
+                new("Fine Only Plea",               $"/criminal/fineonlyplea/{{cn}}"),
+                new("Arraignment / FTA / Bond",     $"/criminal/arraignment-fta-bond/{{cn}}"),
+                new("Appear on Warrant (No Plea)",  $"/criminal/appear-on-warrant-no-plea/{{cn}}"),
+                new("Bond Modification",            $"/criminal/bond-modification-revocation/{{cn}}"),
+            },
+            ["slated"] = new FormLink[]
+            {
+                new("Not Guilty Plea",              $"/criminal/not-guilty-plea/{{cn}}"),
+                new("Fine Only Plea",               $"/criminal/fineonlyplea/{{cn}}"),
+                new("Arraignment / FTA / Bond",     $"/criminal/arraignment-fta-bond/{{cn}}"),
+                new("Bond Modification",            $"/criminal/bond-modification-revocation/{{cn}}"),
+            },
+            ["pleas"] = new FormLink[]
+            {
+                new("Jail / CC Plea",               $"/criminal/jail-cc-plea/{{cn}}"),
+                new("Fine Only Plea",               $"/criminal/fineonlyplea/{{cn}}"),
+                new("Diversion Plea",               $"/criminal/diversion-plea/{{cn}}"),
+                new("LEAP Admission / Plea",        $"/criminal/leap-admission-plea/{{cn}}"),
+                new("Not Guilty Plea",              $"/criminal/not-guilty-plea/{{cn}}"),
+            },
+            ["pcvh_fcvh"] = new FormLink[]
+            {
+                new("Probation Violation Bond",     $"/probation/violation-bond/{{cn}}"),
+                new("Community Control Terms",      $"/probation/community-control-terms/{{cn}}"),
+                new("CC Terms & Violation Notice",  $"/probation/community-control-terms-notices/{{cn}}"),
+            },
+            ["final_pretrial"] = new FormLink[]
+            {
+                new("Jail / CC Plea",               $"/criminal/jail-cc-plea/{{cn}}"),
+                new("Fine Only Plea",               $"/criminal/fineonlyplea/{{cn}}"),
+                new("Diversion Plea",               $"/criminal/diversion-plea/{{cn}}"),
+                new("LEAP Admission / Plea",        $"/criminal/leap-admission-plea/{{cn}}"),
+            },
+            ["trials_to_court"] = new FormLink[]
+            {
+                new("Sentencing Only (Already Plead)", $"/criminal/sentencing-only-already-plead/{{cn}}"),
+                new("Plea Only - Future Sentencing",   $"/criminal/plea-only-future-sentencing/{{cn}}"),
+                new("Trial to Court Notice",           "/scheduling/trial-to-court-notice-of-hearing"),
+            },
+        };
+
+    private IEnumerable<FormLink> GetFormLinks()
+    {
+        var key = ActiveListKey ?? "";
+        if (!_formLinks.TryGetValue(key, out var links))
+            yield break;
+        var cn = SelectedCaseNumber ?? "";
+        foreach (var l in links)
+            yield return l with { Url = l.Url.Replace("{cn}", cn) };
+    }
+}

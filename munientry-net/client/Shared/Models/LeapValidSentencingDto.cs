@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Munientry.Poc.Client.Dtos
+namespace Munientry.Poc.Client.Shared.Models
 {
     public class LeapValidSentencingDto
     {

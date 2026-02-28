@@ -1,6 +1,4 @@
 @page "/scheduling/trial-to-court-notice-of-hearing"
-@using Microsoft.AspNetCore.Components.Forms
-@using System.ComponentModel.DataAnnotations
 
 <div class="form-page">
 <div class="form-card">
@@ -93,7 +91,7 @@
 </div>
 
 			@code {
-				private FormModel formModel = new();
+				private TrialToCourtNoticeDto formModel = new();
 				private bool isSubmitting = false;
 				private string? errorMessage;
 
@@ -133,36 +131,4 @@
 				[Inject] NavigationManager NavigationManager { get; set; } = default!;
 				[Inject] IJSRuntime JS { get; set; } = default!;
 				[Inject] Munientry.Poc.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;
-
-				public class FormModel
-				{
-					[Required(ErrorMessage = "Defendant First Name is required")]
-					public string? DefendantFirstName { get; set; }
-
-					[Required(ErrorMessage = "Defendant Last Name is required")]
-					public string? DefendantLastName { get; set; }
-
-					[Required(ErrorMessage = "Case Number is required")]
-					public string? CaseNumber { get; set; }
-
-					[Required(ErrorMessage = "Entry Date is required")]
-					public DateTime? EntryDate { get; set; }
-
-					public string? DefenseCounselName { get; set; }
-
-					[Required(ErrorMessage = "Trial To Court Date is required")]
-					public DateTime? TrialToCourtDate { get; set; }
-
-					[Required(ErrorMessage = "Trial To Court Time is required")]
-					public string? TrialToCourtTime { get; set; }
-
-					[Required(ErrorMessage = "Assigned Courtroom is required")]
-					public string? AssignedCourtroom { get; set; }
-
-					public bool InterpreterRequired { get; set; }
-
-					public string? LanguageRequired { get; set; }
-
-					public bool DateConfirmedWithCounsel { get; set; }
-				}
 			}
