@@ -1,15 +1,17 @@
 @page "/probation/violation-bond"
 @page "/probation/violation-bond/{CaseNumber}"
-@using Munientry.Poc.Client.Shared.Models
-@inject NavigationManager Navigation
-@using Microsoft.AspNetCore.Components
+@inherits FormPageBase<ProbationViolationBondDto>
 
 <div class="form-page">
 <div class="form-card">
 <h2>Preliminary Probation Violation and Bond Dialog</h2>
 
 <EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
-	<DataAnnotationsValidator />
+<DataAnnotationsValidator />
+@if (IsLoadingCase)
+{
+<div class="alert alert-info">Loading case data...</div>
+}
 	<ValidationSummary />
 	<div class="form-group">
 		<label>Defendant First Name</label>
@@ -99,7 +101,7 @@
 		<InputCheckbox @bind-Value="formModel.OtherConditions" />
 	</div>
 	<div class="form-actions">
-		<button type="submit" class="btn btn-success">Generate DOCX</button>
+		<button type="submit" class="btn btn-success" disabled="@(IsSubmitting || IsLoadingCase)">Generate DOCX</button>
 		<button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
 		<button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
 		<button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
@@ -110,57 +112,18 @@
 </div>
 
 @code {
-	[Parameter]
-	public string? CaseNumber { get; set; }
-	private ProbationViolationBondDto formModel = new();
+	private ProbationViolationBondDto formModel => Model;
 
-	private bool isSubmitting = false;
-	private string? errorMessage;
+	protected override string ApiEndpoint => "probationviolationbond";
 
-	private async Task HandleValidSubmit()
+	protected override Task PopulateFromCaseAsync(List<CaseSearchResultDto> results)
 	{
-		isSubmitting = true;
-		errorMessage = null;
-		try
-		{
-			var apiBase = "";
-			if (ApiHelper != null)
-				apiBase = ApiHelper.GetApiBaseUrl();
-			var http = new HttpClient { BaseAddress = new Uri(apiBase) };
-			var response = await http.PostAsJsonAsync("probationviolationbond", formModel);
-			if (response.IsSuccessStatusCode)
-			{
-				var content = await response.Content.ReadAsByteArrayAsync();
-				var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "ProbationViolationBond.docx";
-				await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
-				errorMessage = null;
-			}
-			else
-			{
-				errorMessage = $"Error: {response.ReasonPhrase}";
-			}
-		}
-		catch (Exception ex)
-		{
-			errorMessage = ex.Message;
-		}
-		finally
-		{
-			isSubmitting = false;
-		}
+		var first = results[0];
+		Model.CaseNumber = CaseNumber;
+		Model.DefendantFirstName = first.DefFirstName;
+		Model.DefendantLastName = first.DefLastName;
+		Model.DefenseCounselName = first.DefenseCounsel;
+		Model.DefenseCounselType = first.PubDef ? "Public Defender" : "Private Counsel";
+		return Task.CompletedTask;
 	}
-
-	private void CloseOrCancel() => Navigation.NavigateTo("/");
-	private void ClearFields() { formModel = new(); }
-
-	protected override async Task OnInitializedAsync()
-	{
-		if (!string.IsNullOrWhiteSpace(CaseNumber))
-		{
-			//await LoadCaseDataAsync(CaseNumber);
-		}
-	}
-
-	[Inject] Munientry.Poc.Client.Shared.ApiHelper? ApiHelper { get; set; }
-	[Inject] IJSRuntime JS { get; set; } = default!;
 }

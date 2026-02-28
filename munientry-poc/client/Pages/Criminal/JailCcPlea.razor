@@ -1,17 +1,18 @@
-
 @page "/criminal/jail-cc-plea"
 @page "/criminal/jail-cc-plea/{CaseNumber}"
-@using System.ComponentModel.DataAnnotations
 @using Munientry.Poc.Client.Dtos
-@inject NavigationManager Navigation
-@using Microsoft.AspNetCore.Components
+@inherits FormPageBase<JailCcPleaDto>
 
 <div class="form-page">
 <div class="form-card">
 <h2>Plea of Guilty - Jail/CC Only</h2>
 
 <EditForm Model="jailCcModel" OnValidSubmit="HandleValidSubmit">
-	<DataAnnotationsValidator />
+<DataAnnotationsValidator />
+@if (IsLoadingCase)
+{
+<div class="alert alert-info">Loading case data...</div>
+}
 	<ValidationSummary />
 	<div class="form-group">
 		<label>Defendant First Name</label>
@@ -181,7 +182,7 @@
 		<InputCheckbox @bind-Value="jailCcModel.DistractedDriving" /> Add Distracted Driving Course Language
 	</div>
 	<div class="form-actions">
-		<button type="submit" class="btn btn-success" disabled="@isSubmitting">Generate DOCX</button>
+		<button type="submit" class="btn btn-success" disabled="@(IsSubmitting || IsLoadingCase)">Generate DOCX</button>
 		<button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
 		<button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
 		<button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
@@ -192,55 +193,22 @@
 </div>
 
 @code {
-	[Parameter]
-	public string? CaseNumber { get; set; }
-	private JailCcPleaDto jailCcModel = new();
-	private bool isSubmitting = false;
-	private string? submitResult;
-	private string? errorMessage;
+	private JailCcPleaDto jailCcModel => Model;
 
-	private async Task HandleValidSubmit()
+	protected override string ApiEndpoint => "jailccplea";
+
+	protected override Task PopulateFromCaseAsync(List<CaseSearchResultDto> results)
 	{
-		isSubmitting = true;
-		errorMessage = null;
-		try
-		{
-			var apiBase = ApiHelper.GetApiBaseUrl();
-			var http = new HttpClient { BaseAddress = new Uri(apiBase) };
-			var response = await http.PostAsJsonAsync("jailccplea", jailCcModel);
-			if (response.IsSuccessStatusCode)
-			{
-				var content = await response.Content.ReadAsByteArrayAsync();
-				var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "JailCcPlea.docx";
-				await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
-				submitResult = "Jail CC Plea DOCX generated.";
-			}
-			else
-			{
-				errorMessage = $"Error: {response.ReasonPhrase}";
-			}
-		}
-		catch (Exception ex)
-		{
-			errorMessage = ex.Message;
-		}
-		finally
-		{
-			isSubmitting = false;
-		}
+		var first = results[0];
+		Model.CaseNumber = CaseNumber;
+		Model.DefendantFirstName = first.DefFirstName;
+		Model.DefendantLastName = first.DefLastName;
+		Model.DefenseCounselName = first.DefenseCounsel;
+		Model.DefenseCounselType = first.PubDef ? "Public Defender" : "Private Counsel";
+		Model.FraInFile = first.FraInFile;
+		Model.Charges = string.Join("; ", results
+			.Where(r => r.Charge != null)
+			.Select(r => $"{r.Charge} ({r.Statute}) - {r.DegreeCode}"));
+		return Task.CompletedTask;
 	}
-
-	private void CloseOrCancel() => Navigation.NavigateTo("/");
-	private void ClearFields() { jailCcModel = new(); }
-
-	protected override async Task OnInitializedAsync()
-	{
-		if (!string.IsNullOrWhiteSpace(CaseNumber))
-		{
-			//await LoadCaseDataAsync(CaseNumber);
-		}
-	}
-
-	[Inject] IJSRuntime JS { get; set; } = default!;
-	[Inject] Munientry.Poc.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;
 }

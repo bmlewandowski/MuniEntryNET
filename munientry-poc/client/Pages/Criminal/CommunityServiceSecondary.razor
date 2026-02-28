@@ -3,6 +3,7 @@
 @using Munientry.Poc.Client.Dtos
 @inject HttpClient Http
 @inject NavigationManager Navigation
+@inject IJSRuntime JS
 
 <div class="form-page">
 <div class="form-card">
@@ -74,11 +75,9 @@
 		var response = await Http.PostAsJsonAsync("/api/communityservicesecondary", secondaryForm);
 		if (response.IsSuccessStatusCode)
 		{
-			submitResult = "Entry saved successfully.";
-		}
-		else
-		{
-			submitResult = "Error saving entry.";
+                        var content = await response.Content.ReadAsByteArrayAsync();
+                        var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "CommunityServiceSecondary.docx";
+                        await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
 		}
 	}
 

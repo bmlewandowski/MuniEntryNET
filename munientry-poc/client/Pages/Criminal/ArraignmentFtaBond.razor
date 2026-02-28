@@ -3,6 +3,8 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using System.ComponentModel.DataAnnotations
 @inject NavigationManager Navigation
+@inject HttpClient Http
+@inject IJSRuntime JS
 @using Microsoft.AspNetCore.Components
 
 <div class="form-page">
@@ -71,9 +73,36 @@
 	{
 		isSubmitting = true;
 		errorMessage = null;
-		// DOCX generation logic omitted for now
-		await Task.Delay(500); // Simulate processing
-		isSubmitting = false;
+		try
+		{
+			var response = await Http.PostAsJsonAsync("/api/bondhearing", new {
+				formModel.CaseNumber,
+				formModel.DefendantFirstName,
+				formModel.DefendantLastName,
+				formModel.DefenseCounselName,
+				formModel.BondType,
+				formModel.BondAmount,
+				EntryDate = formModel.EntryDate
+			});
+			if (response.IsSuccessStatusCode)
+			{
+				var content = await response.Content.ReadAsByteArrayAsync();
+				var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "BondHearing.docx";
+				await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
+			}
+			else
+			{
+				errorMessage = $"Error: {response.ReasonPhrase}";
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ex.Message;
+		}
+		finally
+		{
+			isSubmitting = false;
+		}
 	}
 
 	private void CloseOrCancel() => Navigation.NavigateTo("/");

@@ -26,5 +26,13 @@ namespace Munientry.Poc.Api.Data
         public bool InterpreterRequired { get; set; }
         public string? LanguageRequired { get; set; }
         public bool DateConfirmedWithCounsel { get; set; }
+
+        // Fields used by TrialSentencing form
+        public DateTime? ArrestSummonsDate { get; set; }
+        public string? HighestCharge { get; set; }
+        public int? DaysInJail { get; set; }
+        public int? ContinuanceDays { get; set; }
+        public DateTime? TrialToCourtDate { get; set; }
+        public string? TrialToCourtTime { get; set; }
     }
 }

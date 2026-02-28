@@ -143,6 +143,20 @@ GET /api/dailylist/pleas/2026-02-22
 
 ---
 
+## Client-Side Integration
+
+All criminal/probation/driving entry forms inherit from `FormPageBase<TDto>` in
+`client/Shared/FormPageBase.cs`. When a case number is provided (via the `[Parameter] CaseNumber`
+property), the base class automatically calls `CaseSearchService.SearchCaseAsync(caseNumber)`,
+which hits `GET /api/case/search/{caseNumber}` and returns the results. Each form then overrides
+`PopulateFromCaseAsync(results)` to map the SP result rows onto its `Model` properties.
+
+`DrivingPrivileges` overrides `LoadCaseDataAsync` entirely to call `GET /api/drivingcase/{caseNumber}`
+via a direct `HttpClient` call using `ApiHelper.GetApiBaseUrl()`, since it uses a different SP and
+returns a different result shape (`DrivingCaseInfoDto`).
+
+---
+
 ## Adding a New Stored Procedure
 
 1. Create a DTO in `Data/` mapping the SP result columns.
@@ -161,11 +175,13 @@ on the server but are not yet wired into the API:
 
 | Legacy function | Equivalent stored procedure |
 |---|---|
-| `driving_case_search_query` | `[reports].[DMCMuniEntryDrivingCaseSearch]` *(already implemented in `DrivingCaseService.cs`)* |
 | `event_type_report_query` | TBD — check `reports` schema on server |
 | `get_case_docket_query` | TBD — check `reports` schema on server |
 | `batch_fta_query` | TBD — check `reports` schema on server |
 | `not_guilty_report_query` | TBD — check `reports` schema on server |
+
+> `driving_case_search_query` has been implemented — see `DrivingCaseService.cs` and the
+> `GET /api/drivingcase/{caseNumber}` endpoint below.
 
 To find the matching SP, open the stored procedure in SSMS with **Modify** and compare the SQL to the hard-coded query — the client confirmed they should match almost identically.
 
@@ -221,3 +237,7 @@ These forms load a list of scheduled cases for a given hearing type and date, us
 | `Notices/NoticesFreeformCivil.razor` | Civil freeform, no criminal SP |
 | `Notices/CivilFreeformEntry.razor` | Civil freeform, no criminal SP |
 | `Misc/CompetencyCivilSealingJuror.razor` | Civil/misc, no criminal SP |
+
+---
+
+_Last updated: February 27, 2026_

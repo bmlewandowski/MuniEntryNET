@@ -1,18 +1,6 @@
 @page "/probation/community-control-terms/{CaseNumber}"
-@using Microsoft.AspNetCore.Components
-    [Parameter]
-    public string? CaseNumber { get; set; }
-    protected override async Task OnInitializedAsync()
-    {
-        if (!string.IsNullOrWhiteSpace(CaseNumber))
-        {
-            // Comment out the next line to disable auto-load
-            //await LoadCaseDataAsync(CaseNumber);
-        }
-    }
 @page "/probation/community-control-terms"
-@using System.ComponentModel.DataAnnotations
-@inject NavigationManager Navigation
+@inherits FormPageBase<CommunityControlTermsDto>
 
 <PageTitle>Community Control Terms</PageTitle>
 
@@ -22,6 +10,22 @@
 
 <EditForm Model="communityControlModel" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
+    @if (IsLoadingCase)
+    {
+        <div class="alert alert-info">Loading case data...</div>
+    }
+    @if (IsLoadingCase)
+    {
+        <div class="alert alert-info">Loading case data...</div>
+    }
+    @if (IsLoadingCase)
+    {
+        <div class="alert alert-info">Loading case data...</div>
+    }
+    @if (IsLoadingCase)
+    {
+        <div class="alert alert-info">Loading case data...</div>
+    }
     <ValidationSummary />
     <fieldset>
         <legend>Case/Defendant Information</legend>
@@ -149,7 +153,7 @@
         </div>
     </fieldset>
     <div class="form-row mt-3">
-        <button type="submit" class="btn btn-success">Open Entry</button>
+        <button type="submit" class="btn btn-success" disabled="@(IsSubmitting || IsLoadingCase)">Open Entry</button>
         <button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
         <button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
         <button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
@@ -160,47 +164,17 @@
 </div>
 
 @code {
-    private CommunityControlTermsModel communityControlModel = new();
+    private CommunityControlTermsDto communityControlModel => Model;
 
-    private void HandleValidSubmit()
+    // ApiEndpoint empty — submit not yet implemented
+    protected override string ApiEndpoint => "communitycontrolterms";
+
+    protected override Task PopulateFromCaseAsync(List<CaseSearchResultDto> results)
     {
-        // TODO: Submit to API
-    }
-
-    private void CloseOrCancel() => Navigation.NavigateTo("/");
-    private void ClearFields() { communityControlModel = new(); }
-
-    public class CommunityControlTermsModel
-    {
-        [Required]
-        public string DefendantFirstName { get; set; }
-        [Required]
-        public string DefendantLastName { get; set; }
-        public string CaseNumber { get; set; }
-        public DateTime? EntryDate { get; set; }
-        public string TermOfControl { get; set; }
-        public string ReportFrequency { get; set; }
-        public bool ReportToJail { get; set; }
-        public DateTime? JailReportDate { get; set; }
-        public string JailReportTime { get; set; }
-        public string JailDaysToServe { get; set; }
-        public bool InterlockVehicles { get; set; }
-        public bool NoAlcoholOrdered { get; set; }
-        public bool GpsExclusion { get; set; }
-        public bool ScramOrdered { get; set; }
-        public string ScramDays { get; set; }
-        public bool NoContact { get; set; }
-        public string NoContactWith { get; set; }
-        public bool Antitheft { get; set; }
-        public bool AlcoholTreatment { get; set; }
-        public bool DomesticViolenceProgram { get; set; }
-        public bool AngerManagement { get; set; }
-        public bool MentalHealthTreatment { get; set; }
-        public bool DriverInterventionProgram { get; set; }
-        public bool CommunityService { get; set; }
-        public string CommunityServiceHours { get; set; }
-        public bool PayRestitution { get; set; }
-        public bool SpecializedDocket { get; set; }
-        public string SpecializedDocketType { get; set; }
+        var first = results[0];
+        Model.CaseNumber = CaseNumber;
+        Model.DefendantFirstName = first.DefFirstName;
+        Model.DefendantLastName = first.DefLastName;
+        return Task.CompletedTask;
     }
 }

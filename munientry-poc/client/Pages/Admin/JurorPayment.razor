@@ -3,6 +3,8 @@
 @using Munientry.Poc.Client.Shared.Models
 @using Microsoft.AspNetCore.Components
 @inject NavigationManager Navigation
+@inject HttpClient Http
+@inject IJSRuntime JS
 
 <div class="form-page">
 <div class="form-card">
@@ -90,7 +92,13 @@
 
 	private async Task HandleValidSubmit()
 	{
-		// TODO: Call API to save form data
+		var response = await Http.PostAsJsonAsync("/api/jurorpayment", formModel);
+		if (response.IsSuccessStatusCode)
+		{
+			var content = await response.Content.ReadAsByteArrayAsync();
+			var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "JurorPayment.docx";
+			await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
+		}
 	}
 
 	private void CloseOrCancel() => Navigation.NavigateTo("/");

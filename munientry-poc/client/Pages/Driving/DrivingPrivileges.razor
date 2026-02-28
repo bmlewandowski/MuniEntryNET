@@ -1,6 +1,6 @@
 @page "/driving/driving-privileges"
 @page "/driving/driving-privileges/{CaseNumber}"
-@using Microsoft.AspNetCore.Components
+@inherits FormPageBase<DrivingPrivilegesDto>
 <div class="form-page">
 <div class="form-card">
 <h2>Driving Privileges / CrimTraffic Helpers</h2>
@@ -8,6 +8,10 @@
 
 <EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
 	<DataAnnotationsValidator />
+	@if (IsLoadingCase)
+	{
+		<div class="alert alert-info">Loading case data...</div>
+	}
 	<ValidationSummary />
 	<div class="form-group">
 		<label>Defendant First Name</label>
@@ -110,11 +114,15 @@
 		<InputCheckbox @bind-Value="formModel.OtherConditions" />
 	</div>
 	<div class="form-actions">
-		<button type="submit" class="btn btn-success" disabled="@isSubmitting">Generate DOCX</button>
+		<button type="submit" class="btn btn-success" disabled="@(IsSubmitting || IsLoadingCase)">Generate DOCX</button>
 	</div>
-	@if (errorMessage != null)
+	@if (ErrorMessage != null)
 	{
-		<div class="alert alert-danger mt-2">@errorMessage</div>
+		<div class="alert alert-danger mt-2">@ErrorMessage</div>
+	}
+	@if (SubmitResult != null)
+	{
+		<div class="alert alert-success mt-2">@SubmitResult</div>
 	}
 </EditForm>
 
@@ -122,80 +130,34 @@
 </div>
 
 @code {
-	[Parameter]
-	public string? CaseNumber { get; set; }
-	private FormModel formModel = new();
-	private bool isSubmitting = false;
-	private string? errorMessage;
+	private DrivingPrivilegesDto formModel => Model;
 
-	private async Task HandleValidSubmit()
+	protected override string ApiEndpoint => "drivingprivileges";
+
+	/// <summary>
+	/// Overrides base to use the dedicated /api/drivingcase/ endpoint instead of CaseSearchService.
+	/// </summary>
+	protected override async Task LoadCaseDataAsync(string caseNumber)
 	{
-		isSubmitting = true;
-		errorMessage = null;
+		IsLoadingCase = true;
+		ErrorMessage = null;
 		try
 		{
-			var apiBase = ApiHelper.GetApiBaseUrl();
-			var http = new HttpClient { BaseAddress = new Uri(apiBase) };
-			var response = await http.PostAsJsonAsync("drivingprivileges", formModel);
-			if (response.IsSuccessStatusCode)
-			{
-				var content = await response.Content.ReadAsByteArrayAsync();
-				var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "DrivingPrivileges.docx";
-				await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
-			}
-			else
-			{
-				errorMessage = $"Error: {response.ReasonPhrase}";
-			}
+			using var http = new HttpClient { BaseAddress = new Uri(ApiHelper.GetApiBaseUrl()) };
+			var info = await http.GetFromJsonAsync<DrivingCaseInfoDto>(
+				$"api/drivingcase/{Uri.EscapeDataString(caseNumber)}");
+			if (info == null) return;
+			Model.CaseNumber = caseNumber;
+			Model.DefendantFirstName = info.DefFirstName;
+			Model.DefendantLastName = info.DefLastName;
 		}
 		catch (Exception ex)
 		{
-			errorMessage = ex.Message;
+			ErrorMessage = $"Failed to load case: {ex.Message}";
 		}
 		finally
 		{
-			isSubmitting = false;
+			IsLoadingCase = false;
 		}
-	}
-
-	[Inject] NavigationManager NavigationManager { get; set; } = default!;
-	[Inject] IJSRuntime JS { get; set; } = default!;
-	[Inject] Munientry.Poc.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;
-
-	protected override async Task OnInitializedAsync()
-	{
-		if (!string.IsNullOrWhiteSpace(CaseNumber))
-		{
-			//await LoadCaseDataAsync(CaseNumber);
-		}
-	}
-
-	public class FormModel
-	{
-		public string? DefendantFirstName { get; set; }
-		public string? DefendantLastName { get; set; }
-		public string? CaseNumber { get; set; }
-		public DateTime? PleaTrialDate { get; set; }
-		public string? AppearanceReason { get; set; }
-		public string? DefenseCounselName { get; set; }
-		public string? DefenseCounselType { get; set; }
-		public bool DefenseCounselWaived { get; set; }
-		public string? Offense { get; set; }
-		public string? Statute { get; set; }
-		public string? Degree { get; set; }
-		public string? Plea { get; set; }
-		public string? Finding { get; set; }
-		public decimal? Fines { get; set; }
-		public decimal? FinesSuspended { get; set; }
-		public string? CourtCosts { get; set; }
-		public string? AbilityToPay { get; set; }
-		public DateTime? BalanceDueDate { get; set; }
-		public decimal? PayToday { get; set; }
-		public decimal? MonthlyPay { get; set; }
-		public bool CreditForJail { get; set; }
-		public int? JailTimeCredit { get; set; }
-		public bool LicenseSuspension { get; set; }
-		public bool CommunityService { get; set; }
-		public bool OtherConditions { get; set; }
 	}
 }

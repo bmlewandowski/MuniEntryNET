@@ -1,21 +1,6 @@
 @page "/criminal/leap-sentencing/{CaseNumber}"
-
-@using Microsoft.AspNetCore.Components
-
-    [Parameter]
-    public string? CaseNumber { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (!string.IsNullOrWhiteSpace(CaseNumber))
-        {
-            // Comment out the next line to disable auto-load
-            //await LoadCaseDataAsync(CaseNumber);
-        }
-    }
 @page "/criminal/leap-sentencing"
-@using System.ComponentModel.DataAnnotations
-@inject NavigationManager Navigation
+@inherits FormPageBase<LeapSentencingDto>
 
 <PageTitle>LEAP Sentencing</PageTitle>
 
@@ -25,6 +10,10 @@
 
 <EditForm Model="leapSentencingModel" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
+    @if (IsLoadingCase)
+    {
+        <div class="alert alert-info">Loading case data...</div>
+    }
     <ValidationSummary />
     <fieldset>
         <legend>Case/Defendant Information</legend>
@@ -148,7 +137,7 @@
         <button type="button" class="btn btn-primary">Add Conditions</button>
     </fieldset>
     <div class="form-group mt-3">
-        <button type="submit" class="btn btn-success">Open Entry</button>
+        <button type="submit" class="btn btn-success" disabled="@(IsSubmitting || IsLoadingCase)">Open Entry</button>
         <button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
         <button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
         <button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
@@ -159,41 +148,20 @@
 </div>
 
 @code {
-    private LeapSentencingModel leapSentencingModel = new();
+    private LeapSentencingDto leapSentencingModel => Model;
 
-    private void HandleValidSubmit()
+    // ApiEndpoint empty — submit not yet implemented
+    protected override string ApiEndpoint => "leapsentencing";
+
+    protected override Task PopulateFromCaseAsync(List<CaseSearchResultDto> results)
     {
-        // TODO: Submit to API
-    }
-
-    private void CloseOrCancel() => Navigation.NavigateTo("/");
-    private void ClearFields() { leapSentencingModel = new(); }
-
-    public class LeapSentencingModel
-    {
-        [Required]
-        public string DefendantFirstName { get; set; }
-        [Required]
-        public string DefendantLastName { get; set; }
-        public string CaseNumber { get; set; }
-        public string DefenseCounselName { get; set; }
-        public string DefenseCounselType { get; set; }
-        public bool DefenseCounselWaived { get; set; }
-        public string AppearanceReason { get; set; } = "LEAP sentencing";
-        public DateTime? LeapPleaDate { get; set; }
-        public DateTime? PleaTrialDate { get; set; }
-        // Charges grid would be a list of charge models (not implemented here)
-        public string CourtCosts { get; set; }
-        public string AbilityToPay { get; set; }
-        public DateTime? BalanceDueDate { get; set; }
-        public string PayToday { get; set; }
-        public string MonthlyPay { get; set; }
-        public bool CreditForJail { get; set; }
-        public string JailTimeCreditDays { get; set; }
-        public string FraInFile { get; set; }
-        public string FraInCourt { get; set; }
-        public bool LicenseSuspension { get; set; }
-        public bool CommunityService { get; set; }
-        public bool OtherConditions { get; set; }
+        var first = results[0];
+        Model.CaseNumber = CaseNumber;
+        Model.DefendantFirstName = first.DefFirstName;
+        Model.DefendantLastName = first.DefLastName;
+        Model.DefenseCounselName = first.DefenseCounsel;
+        Model.DefenseCounselType = first.PubDef ? "Public Defender" : "Private Counsel";
+        Model.FraInFile = first.FraInFile;
+        return Task.CompletedTask;
     }
 }

@@ -2,6 +2,7 @@
 @using munientry_poc.client.Shared.Models
 @inject HttpClient Http
 @inject NavigationManager Navigation
+@inject IJSRuntime JS
 
 <PageTitle>Arraignment Continuance</PageTitle>
 
@@ -106,7 +107,13 @@
 
     private async Task HandleValidSubmit()
     {
-        // TODO: Call API to create arraignment continuance entry
+        var response = await Http.PostAsJsonAsync("/api/arraignmentcontinuance", continuance);
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsByteArrayAsync();
+            var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "ArraignmentContinuance.docx";
+            await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
+        }
     }
 
     private void CloseOrCancel() => Navigation.NavigateTo("/");

@@ -1,14 +1,13 @@
 @page "/criminal/fine-only-plea-only"
-@using Munientry.Poc.Client.Shared.Models
-@using Microsoft.AspNetCore.Components.Forms
-@inject NavigationManager Navigation
+@page "/criminal/fine-only-plea-only/{CaseNumber}"
+@inherits FormPageBase<FineOnlyDto>
 
 <div class="form-page">
 <div class="form-card">
 <h2>Fine Only Dialog</h2>
 <!-- Legacy: fine_only_plea_dialog_ui.py, plea_only_dialog_ui.py -->
 
-<EditForm Model="model" OnValidSubmit="HandleSubmit">
+<EditForm Model="model" OnValidSubmit="HandleValidSubmit">
 	<DataAnnotationsValidator />
 	<ValidationSummary />
 	<div>
@@ -28,11 +27,11 @@
 		<InputNumber @bind-Value="model.FineAmount" TValue="decimal?" />
 	</div>
 	<div class="form-actions">
-		<button type="submit" class="btn btn-success">Open Entry</button>
+		<button type="submit" class="btn btn-success" disabled="@(IsSubmitting || IsLoadingCase)">Open Entry</button>
 		<button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
 		<button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
 		<button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
-		<span style="margin-left:1rem">@_message</span>
+		<span style="margin-left:1rem">@(ErrorMessage ?? SubmitResult)</span>
 	</div>
 </EditForm>
 
@@ -40,25 +39,18 @@
 </div>
 
 @code {
-	private FineOnlyDto model = new();
-	private string _message = "";
+	private FineOnlyDto model => Model;
 
-	private async Task HandleSubmit()
+	protected override string ApiEndpoint => "api/fineonly";
+
+	protected override Task PopulateFromCaseAsync(List<CaseSearchResultDto> results)
 	{
-		try
-		{
-			var apiBase = Navigation.BaseUri.Replace(":3000", ":5000");
-			var client = new System.Net.Http.HttpClient { BaseAddress = new Uri(apiBase) };
-			var res = await client.PostAsJsonAsync("api/fineonly", model);
-			if (res.IsSuccessStatusCode) _message = "Submitted!";
-			else _message = "Error: " + res.StatusCode;
-		}
-		catch (Exception ex)
-		{
-			_message = ex.Message;
-		}
+		var first = results[0];
+		Model.CaseNumber = CaseNumber;
+		Model.DefendantName = $"{first.DefFirstName} {first.DefLastName}".Trim();
+		Model.Charge = string.Join("; ", results
+			.Where(r => r.Charge != null)
+			.Select(r => $"{r.Charge} ({r.Statute}) - {r.DegreeCode}"));
+		return Task.CompletedTask;
 	}
-
-	private void CloseOrCancel() => Navigation.NavigateTo("/");
-	private void ClearFields() { model = new(); _message = ""; }
 }

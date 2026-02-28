@@ -10,7 +10,7 @@ namespace Munientry.Api.Services
 
         public CivilFreeformEntryService(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetConnectionString("AuthorityCourt");
         }
 
         public void InsertCivilFreeformEntry(CivilFreeformEntryDto dto)

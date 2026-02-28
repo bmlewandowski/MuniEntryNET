@@ -14,7 +14,7 @@ namespace Munientry.Poc.Api.Services
 
         public async Task SaveToDatabaseAsync(TimeToPayOrderDto dto)
         {
-            var connStr = _config.GetConnectionString("DefaultConnection");
+            var connStr = _config.GetConnectionString("AuthorityCourt");
             using var conn = new SqlConnection(connStr);
             using var cmd = conn.CreateCommand();
             cmd.CommandText = @"INSERT INTO TimeToPayOrderEntries

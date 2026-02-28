@@ -10,9 +10,9 @@ namespace Munientry.Api.Services
 
         public CommunityControlTermsNoticesService(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetConnectionString("AuthorityCourt");
             if (string.IsNullOrEmpty(_connectionString))
-                throw new InvalidOperationException("Connection string 'DefaultConnection' is missing or null.");
+                throw new InvalidOperationException("Connection string 'AuthorityCourt' is missing or null.");
         }
 
         public void InsertCommunityControlTermsNotices(CommunityControlTermsNoticesDto dto)

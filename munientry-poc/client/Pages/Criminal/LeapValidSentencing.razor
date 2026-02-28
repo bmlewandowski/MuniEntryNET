@@ -4,6 +4,8 @@
 @using System.ComponentModel.DataAnnotations
 @using Munientry.Poc.Client.Dtos
 @inject NavigationManager Navigation
+@inject HttpClient Http
+@inject IJSRuntime JS
 @using Microsoft.AspNetCore.Components
 
 <div class="form-page">
@@ -81,7 +83,13 @@
 
 	private async Task HandleValidSubmit()
 	{
-		// TODO: Call API to submit form
+		var response = await Http.PostAsJsonAsync("/api/leapvalidsentencing", leapValidSentencingModel);
+		if (response.IsSuccessStatusCode)
+		{
+			var content = await response.Content.ReadAsByteArrayAsync();
+			var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "LeapValidSentencing.docx";
+			await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
+		}
 	}
 
 	private void CloseOrCancel() => Navigation.NavigateTo("/");

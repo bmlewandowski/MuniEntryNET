@@ -10,6 +10,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.Services.AddScoped<ApiHelper>();
 builder.Services.AddScoped<DenyPrivilegesPermitRetestService>();
+builder.Services.AddScoped<CaseSearchService>();
 
 // Load config for API base URL
 var config = new ConfigurationBuilder()
@@ -18,6 +19,16 @@ var config = new ConfigurationBuilder()
     .Build();
 builder.Services.AddSingleton<IConfiguration>(config);
 
+// Shared HttpClient for direct usage (e.g. forms that inject HttpClient Http)
 builder.Services.AddScoped(sp => new HttpClient());
+
+// Typed API client used by FormPageBase<T> for form submissions.
+// Base address is resolved at runtime so Docker / local environments are handled correctly.
+builder.Services.AddScoped<ICriminalFormApiClient>(sp =>
+{
+    var helper = sp.GetRequiredService<ApiHelper>();
+    var http = new HttpClient { BaseAddress = new Uri(helper.GetApiBaseUrl()) };
+    return new CriminalFormApiClient(http);
+});
 
 await builder.Build().RunAsync();

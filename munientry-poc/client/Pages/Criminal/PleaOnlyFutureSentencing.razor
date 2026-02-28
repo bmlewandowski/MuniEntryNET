@@ -3,6 +3,7 @@
 @using Munientry.Poc.Client.Shared.Models
 @inject HttpClient Http
 @inject NavigationManager Navigation
+@inject IJSRuntime JS
 @using Microsoft.AspNetCore.Components
 
 <div class="form-page">
@@ -130,7 +131,9 @@
         var response = await Http.PostAsJsonAsync("/api/pleaonlyfuturesentencing", formModel);
         if (response.IsSuccessStatusCode)
         {
-            submitResult = "Entry saved successfully.";
+            var content = await response.Content.ReadAsByteArrayAsync();
+            var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "PleaOnly.docx";
+            await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
         }
         else
         {

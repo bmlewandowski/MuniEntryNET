@@ -1,17 +1,17 @@
-
 @page "/criminal/appear-on-warrant-no-plea"
 @page "/criminal/appear-on-warrant-no-plea/{CaseNumber}"
-@using Munientry.Poc.Client.Shared.Models
-@inject HttpClient Http
-@inject NavigationManager Navigation
-@using Microsoft.AspNetCore.Components
+@inherits FormPageBase<AppearOnWarrantNoPleaDto>
 
 <div class="form-page">
 <div class="form-card">
 <h2>Appear on Warrant (No Plea) Dialog</h2>
 
 <EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
-	<DataAnnotationsValidator />
+<DataAnnotationsValidator />
+@if (IsLoadingCase)
+{
+<div class="alert alert-info">Loading case data...</div>
+}
 	<ValidationSummary />
 	<div class="form-group">
 		<label>Defendant First Name</label>
@@ -101,47 +101,34 @@
 		<InputText class="form-control" @bind-Value="formModel.SurrenderWeaponsDate" />
 	</div>
 	<div class="form-actions">
-		<button type="submit" class="btn btn-success">Open Entry</button>
+		<button type="submit" class="btn btn-success" disabled="@(IsSubmitting || IsLoadingCase)">Open Entry</button>
 		<button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
 		<button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
 		<button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
 	</div>
 </EditForm>
 
-@if (submitResult != null)
+@if (SubmitResult != null)
 {
-	<div class="alert alert-info">@submitResult</div>
+	<div class="alert alert-info">@SubmitResult</div>
+}
+@if (ErrorMessage != null)
+{
+	<div class="alert alert-danger">@ErrorMessage</div>
 }
 </div>
 </div>
 @code {
-	[Parameter]
-	public string? CaseNumber { get; set; }
-	private AppearOnWarrantNoPleaDto formModel = new();
-	private string? submitResult;
+	private AppearOnWarrantNoPleaDto formModel => Model;
 
-	private async Task HandleValidSubmit()
+	protected override string ApiEndpoint => "api/appearonwarrantnoplea";
+
+	protected override Task PopulateFromCaseAsync(List<CaseSearchResultDto> results)
 	{
-		var response = await Http.PostAsJsonAsync("/api/appearonwarrantnoplea", formModel);
-		if (response.IsSuccessStatusCode)
-		{
-			submitResult = "Entry saved successfully.";
-		}
-		else
-		{
-			submitResult = "Error saving entry.";
-		}
-	}
-
-	private void CloseOrCancel() => Navigation.NavigateTo("/");
-	private void ClearFields() { formModel = new(); }
-
-	protected override async Task OnInitializedAsync()
-	{
-		if (!string.IsNullOrWhiteSpace(CaseNumber))
-		{
-			// Comment out the next line to disable auto-load
-			//await LoadCaseDataAsync(CaseNumber);
-		}
+		var first = results[0];
+		Model.CaseNumber = CaseNumber;
+		Model.DefendantFirstName = first.DefFirstName;
+		Model.DefendantLastName = first.DefLastName;
+		return Task.CompletedTask;
 	}
 }

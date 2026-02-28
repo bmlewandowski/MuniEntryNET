@@ -56,3 +56,21 @@ Below are the main forms available from the side navigation, along with the lega
 - Make sure Docker Desktop is running before executing the above commands.
 - For development, you may want to stop and rebuild containers after making changes to the client or API code.
 - For more details, see the documentation in the `docs/` and `docsource/` folders.
+
+## Client Architecture
+
+All criminal, probation, and driving entry forms (14 total) share a common base class: `FormPageBase<TDto>`
+in `client/Shared/FormPageBase.cs`. This eliminates per-form boilerplate and centralises:
+
+| Concern | How it's handled |
+|---|---|
+| Case pre-population | `OnParametersSetAsync` → `CaseSearchService.SearchCaseAsync` → `PopulateFromCaseAsync` override |
+| DOCX download | `HandleValidSubmit` POSTs via `ICriminalFormApiClient`, detects `wordprocessingml` content-type, triggers JS `downloadFile` interop |
+| Loading / submitting state | `IsLoadingCase` / `IsSubmitting` booleans — all form buttons are disabled while either is true |
+| URL resolution | `ApiHelper.GetApiBaseUrl()` — resolves API base URL dynamically at runtime |
+
+Each form only needs to implement:
+1. `protected override string ApiEndpoint` — the relative POST path (e.g. `"api/diversionplea"`)
+2. `protected override Task PopulateFromCaseAsync(...)` — map case search results onto the model
+
+See `client/Shared/Models/DTO_README.md` and `api/StoredProcedureIntegration.README.md` for more detail.

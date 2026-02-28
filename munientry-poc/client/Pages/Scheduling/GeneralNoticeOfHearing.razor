@@ -1,6 +1,7 @@
 @page "/scheduling/general-notice-of-hearing"
 @using Munientry.Poc.Client.Shared.Models
 @using System.Net.Http.Json
+@inject IJSRuntime JS
 
 <div class="form-page">
 <div class="form-card">
@@ -77,8 +78,16 @@
         {
             var http = new HttpClient { BaseAddress = new Uri(ApiHelper.GetApiBaseUrl()) };
             var response = await http.PostAsJsonAsync("generalnoticeofhearing", formModel);
-            if (!response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsByteArrayAsync();
+                var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "GeneralNoticeOfHearing.docx";
+                await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
+            }
+            else
+            {
                 errorMessage = $"Error: {response.ReasonPhrase}";
+            }
         }
         catch (Exception ex)
         {

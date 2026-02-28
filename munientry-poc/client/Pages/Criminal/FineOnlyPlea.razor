@@ -1,9 +1,6 @@
 @page "/criminal/fineonlyplea"
 @page "/criminal/fineonlyplea/{CaseNumber}"
-@using System.ComponentModel.DataAnnotations
-@using Munientry.Poc.Client.Shared.Models
-@inject NavigationManager Navigation
-@using Microsoft.AspNetCore.Components
+@inherits FormPageBase<FineOnlyPleaDto>
 
 <div class="form-page">
 <div class="form-card">
@@ -11,6 +8,22 @@
 
 <EditForm Model="fineOnlyModel" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
+    @if (IsLoadingCase)
+    {
+        <div class="alert alert-info">Loading case data...</div>
+    }
+    @if (IsLoadingCase)
+    {
+        <div class="alert alert-info">Loading case data...</div>
+    }
+    @if (IsLoadingCase)
+    {
+        <div class="alert alert-info">Loading case data...</div>
+    }
+    @if (IsLoadingCase)
+    {
+        <div class="alert alert-info">Loading case data...</div>
+    }
     <ValidationSummary />
     <div class="form-group">
         <label>Defendant First Name</label>
@@ -129,7 +142,7 @@
         </InputSelect>
     </div>
     <div class="form-actions">
-        <button type="submit" class="btn btn-success">Open Entry</button>
+        <button type="submit" class="btn btn-success" disabled="@(IsSubmitting || IsLoadingCase)">Open Entry</button>
         <button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
         <button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
         <button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
@@ -140,24 +153,23 @@
 </div>
 
 @code {
-    [Parameter]
-    public string? CaseNumber { get; set; }
-    private FineOnlyPleaDto fineOnlyModel = new();
+    private FineOnlyPleaDto fineOnlyModel => Model;
 
-    private async Task HandleValidSubmit()
+    // ApiEndpoint intentionally empty — submit not yet implemented
+    protected override string ApiEndpoint => "fineonlyplea";
+
+    protected override Task PopulateFromCaseAsync(List<CaseSearchResultDto> results)
     {
-        // TODO: Call API to submit form
-    }
-
-    private void CloseOrCancel() => Navigation.NavigateTo("/");
-    private void ClearFields() { fineOnlyModel = new(); }
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (!string.IsNullOrWhiteSpace(CaseNumber))
-        {
-            // Comment out the next line to disable auto-load
-            //await LoadCaseDataAsync(CaseNumber);
-        }
+        var first = results[0];
+        Model.CaseNumber = CaseNumber;
+        Model.DefendantFirstName = first.DefFirstName;
+        Model.DefendantLastName = first.DefLastName;
+        Model.DefenseCounselName = first.DefenseCounsel;
+        Model.DefenseCounselType = first.PubDef ? "Public Defender" : "Private Counsel";
+        Model.FraInFile = first.FraInFile;
+        Model.Charges = string.Join("; ", results
+            .Where(r => r.Charge != null)
+            .Select(r => $"{r.Charge} ({r.Statute}) - {r.DegreeCode}"));
+        return Task.CompletedTask;
     }
 }
