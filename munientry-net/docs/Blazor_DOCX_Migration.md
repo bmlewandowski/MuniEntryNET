@@ -36,7 +36,10 @@ This document summarizes the migration status of legacy Python forms to Blazor, 
 | Time To Pay Order                               | Yes                  | Yes           | /admin/time-to-pay-order                        | timetopayorder                  | Migrated  |
 | Trial Sentencing Judgment Entry                 | Yes                  | Yes           | /criminal/trial-sentencing                      | trialsentencing                 | Migrated  |
 | Trial To Court / Final Jury Notice Of Hearing   | Yes                  | Yes           | /scheduling/trial-to-court-notice-of-hearing    | trialtocourt                    | Migrated  |
-| Criminal Sealing / Deny Privileges Entry        | Yes                  | No            | /criminal/sealing-deny-privileges               | —                               | Stub      |
+| Criminal Sealing / Deny Privileges Entry        | Yes                  | Yes           | /criminal/criminal-sealing (alias: /criminal/sealing-deny-privileges) | criminalsealing | Migrated  |
+| Failure To Appear Entry                         | Yes                  | Yes           | /criminal/failure-to-appear                     | failuretooappear                | Migrated  |
+| Competency Evaluation Entry                     | Yes                  | Yes           | /criminal/competency-evaluation                 | competencyevaluation            | Migrated  |
+| Criminal Freeform Entry                         | Yes                  | Yes           | /criminal/freeform-entry                        | freeformentry                   | Migrated  |
 | Scheduling Entry (Rohrer / Fowler / Hemmeter)   | Yes                  | Yes           | /scheduling/scheduling-entry                    | schedulingentry                 | Migrated  |
 
 ---
@@ -55,10 +58,9 @@ These pages exist in Blazor but do not generate DOCX documents:
 ---
 
 **Summary:**
-- 31 of 32 DOCX-generating forms are fully migrated end-to-end.
-- 1 form is a page stub with no form or submit logic: **Criminal Sealing / Deny Privileges** (`/criminal/sealing-deny-privileges`)
+- 35 of 35 DOCX-generating forms are fully migrated end-to-end.
 - All templates generate DOCX via `Munientry.DocxTemplating.DocxTemplateProcessor.FillTemplate()` — no database writes from Blazor forms.
 - Template source files (`api/Templates/source/*.docx`) contain Jinja2 `{{ variable }}` tokens. Run-consolidation and token replacement are handled at request time by the `Munientry.DocxTemplating` library; no preprocessing step is required.
 - `api/Templates/prepare_templates.py` is retired and no longer part of the build pipeline.
 
-_Last updated: February 28, 2026_
+_Last updated: March 2026_

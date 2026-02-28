@@ -228,6 +228,10 @@ Entering a case number in these forms should trigger the case search SP to pre-p
 | Probation Violation Bond | `client/Pages/Probation/ProbationViolationBond.razor` |
 | Community Control Terms | `client/Pages/Probation/CommunityControlTerms.razor` |
 | Community Control Terms Notices | `client/Pages/Probation/CommunityControlTermsNotices.razor` |
+| Failure To Appear | `client/Pages/Criminal/FailureToAppear.razor` |
+| Criminal Sealing Entry | `client/Pages/Criminal/SealingDenyPrivileges.razor` |
+| Competency Evaluation | `client/Pages/Criminal/CompetencyEvaluation.razor` |
+| Criminal Freeform Entry | `client/Pages/Criminal/FreeformEntry.razor` |
 
 ### Forms that use `/api/dailylist/{listType}/{date}`
 
@@ -259,4 +263,4 @@ These forms load a list of scheduled cases for a given hearing type and date, us
 
 ---
 
-_Last updated: February 28, 2026_
+_Last updated: March 2026_

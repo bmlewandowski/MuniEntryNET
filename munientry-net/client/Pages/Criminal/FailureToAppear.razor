@@ -1,16 +1,15 @@
-@page "/criminal/sealing-deny-privileges"
-@page "/criminal/criminal-sealing"
-@page "/criminal/criminal-sealing/{CaseNumber}"
+@page "/criminal/failure-to-appear"
+@page "/criminal/failure-to-appear/{CaseNumber}"
 @using munientry_poc.client.Shared.Models
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
 
-<PageTitle>Criminal Sealing Entry</PageTitle>
+<PageTitle>Failure To Appear</PageTitle>
 
 <div class="form-page">
 <div class="form-card">
-<h3>Criminal Sealing Entry</h3>
+<h3>Failure To Appear</h3>
 
 <EditForm Model="model" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
@@ -52,26 +51,64 @@
     </div>
 
     <div class="form-section">
-        <h4>Sealing Details</h4>
+        <h4>Appearance Information</h4>
         <div class="form-group">
-            <label>BCI Number</label>
-            <InputText @bind-Value="model.BciNumber" class="form-control" />
-        </div>
-        <div class="form-group">
-            <label>Seal Decision</label>
-            <InputSelect @bind-Value="model.SealDecision" class="form-control">
+            <label>Appearance Reason</label>
+            <InputSelect @bind-Value="model.AppearanceReason" class="form-control">
                 <option value="">Select</option>
-                <option value="Granted">Granted</option>
-                <option value="Denied">Denied</option>
-                <option value="Denied - with reason">Denied - with reason</option>
+                <option value="arraignment">arraignment</option>
+                <option value="final pre-trial">final pre-trial</option>
+                <option value="jury trial">jury trial</option>
+                <option value="trial to court">trial to court</option>
+                <option value="motion hearing">motion hearing</option>
+                <option value="plea">plea</option>
+                <option value="sentencing">sentencing</option>
+                <option value="community control violation hearing">community control violation hearing</option>
             </InputSelect>
         </div>
-        @if (model.SealDecision == "Denied - with reason")
+    </div>
+
+    <div class="form-section">
+        <h4>Arrest Warrant</h4>
+        <div class="form-group">
+            <InputCheckbox @bind-Value="model.ArrestWarrantIssued" @onclick="OnArrestWarrantToggle" />
+            Arrest warrant issued
+        </div>
+        @if (model.ArrestWarrantIssued)
         {
             <div class="form-group">
-                <label>Denial Reasons</label>
-                <InputTextArea @bind-Value="model.DenialReasons" class="form-control" rows="4"
-                    placeholder="Enter the reasons for denial..." />
+                <label>Warrant Radius</label>
+                <InputSelect @bind-Value="model.ArrestWarrantRadius" class="form-control">
+                    <option value="">Select</option>
+                    <option value="statewide">statewide</option>
+                    <option value="county only">county only</option>
+                    <option value="nationwide">nationwide</option>
+                </InputSelect>
+            </div>
+        }
+    </div>
+
+    <div class="form-section">
+        <h4>Bond</h4>
+        <div class="form-group">
+            <InputCheckbox @bind-Value="model.SetBond" @onclick="OnSetBondToggle" />
+            Set bond
+        </div>
+        @if (model.SetBond)
+        {
+            <div class="form-group">
+                <label>Bond Type</label>
+                <InputSelect @bind-Value="model.BondType" class="form-control">
+                    <option value="">Select</option>
+                    <option value="Cash or Surety Bond">Cash or Surety Bond</option>
+                    <option value="Own Recognizance Bond">Own Recognizance Bond</option>
+                    <option value="10% Cash Bond">10% Cash Bond</option>
+                    <option value="Personal Bond">Personal Bond</option>
+                </InputSelect>
+            </div>
+            <div class="form-group">
+                <label>Bond Amount</label>
+                <InputText @bind-Value="model.BondAmount" class="form-control" />
             </div>
         }
     </div>
@@ -97,7 +134,7 @@
 @code {
     [Parameter] public string? CaseNumber { get; set; }
 
-    private CriminalSealingEntryDto model = new();
+    private FailureToAppearDto model = new();
     private bool isSubmitting = false;
     private string? errorMessage;
 
@@ -107,17 +144,29 @@
             model.CaseNumber = CaseNumber;
     }
 
+    private void OnArrestWarrantToggle()
+    {
+        model.ArrestWarrantIssued = !model.ArrestWarrantIssued;
+        if (!model.ArrestWarrantIssued) model.ArrestWarrantRadius = null;
+    }
+
+    private void OnSetBondToggle()
+    {
+        model.SetBond = !model.SetBond;
+        if (!model.SetBond) { model.BondType = null; model.BondAmount = null; }
+    }
+
     private async Task HandleValidSubmit()
     {
         isSubmitting = true;
         errorMessage = null;
         try
         {
-            var response = await Http.PostAsJsonAsync("/api/criminalsealing", model);
+            var response = await Http.PostAsJsonAsync("/api/failuretooappear", model);
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsByteArrayAsync();
-                var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "CriminalSealingEntry.docx";
+                var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "FailureToAppear.docx";
                 await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
             }
             else

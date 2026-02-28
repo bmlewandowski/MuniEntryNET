@@ -69,9 +69,34 @@ SchedulingEntryDto.cs
 SentencingOnlyAlreadyPleadDto.cs
 TimeToPayOrderDto.cs
 TrialToCourtNoticeDto.cs
+CompetencyEvaluationDto.cs
+CriminalFreeformEntryDto.cs
+CriminalSealingEntryDto.cs
+FailureToAppearDto.cs
 ```
 
 All files above are located in: `client/Shared/Models/`
 
 ---
-_Last updated: February 28, 2026_
+
+## Known Limitations / TODOs
+
+### Judicial Officer Auto-Population
+
+> **TODO**: The fields `judicial_officer.first_name`, `judicial_officer.last_name`, and `judicial_officer.officer_type` are currently hardcoded as empty strings in **all** API endpoints in `api/Program.cs`.
+>
+> These must be populated from the authenticated user's session or claims once Entra ID authentication is fully wired. When a judge logs in, their name and role should be resolved from the token claims and injected into the DOCX template automatically, removing the need for manual entry.
+>
+> See `docs/EntraID_Setup.md` for the authentication setup plan.
+
+### Aggregate Reports
+
+The following Python aggregate report features are out of scope for the initial Blazor migration and will be addressed separately:
+
+- Not Guilty Report
+- Courtroom A / B / C Event Reports
+- Event Type Reports
+- Batch FTA processing
+
+---
+_Last updated: June 2026_

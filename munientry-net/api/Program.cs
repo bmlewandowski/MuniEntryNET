@@ -1157,7 +1157,7 @@ app.MapPost("/api/schedulingentry", (Munientry.Poc.Api.Data.SchedulingEntryDto d
         "hemmeter" => "Scheduling_Entry_Template_Hemmeter.docx",
         _          => "Scheduling_Entry_Template_Rohrer.docx"  // default / "rohrer"
     };
-    var templatePath = Path.Combine("Templates", templateFile);
+    var templatePath = Path.Combine("Templates", "source", templateFile);
     var outputName = $"SchedulingEntry_{dto.JudicialOfficer}_{dto.CaseNumber}_{DateTime.UtcNow:yyyyMMddHHmmss}.docx";
     try
     {
@@ -1247,6 +1247,130 @@ app.MapPost("/api/trialsentencing", (Munientry.Poc.Api.Data.FinalJuryNoticeDto d
             ["trial_to_court.time"] = dto.TrialToCourtTime ?? "",
             ["trial_to_court.location"] = dto.AssignedCourtroom ?? "",
             ["interpreter_language"] = dto.LanguageRequired ?? "",
+            ["judicial_officer.first_name"] = "",
+            ["judicial_officer.last_name"] = "",
+            ["judicial_officer.officer_type"] = "",
+        });
+        return Results.File(bytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", outputName);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"DOCX generation failed: {ex.Message}");
+    }
+});
+
+// Failure To Appear POST endpoint
+app.MapPost("/api/failuretooappear", (Munientry.Poc.Api.Data.FailureToAppearDto dto) =>
+{
+    if (dto == null) return Results.BadRequest();
+    var templatePath = Path.Combine("Templates", "source", "Failure_To_Appear_Template.docx");
+    var outputName = $"FailureToAppear_{dto.CaseNumber}_{DateTime.UtcNow:yyyyMMddHHmmss}.docx";
+    try
+    {
+        var bytes = DocxTemplateProcessor.FillTemplate(templatePath, new Dictionary<string, string>
+        {
+            ["case_number"] = dto.CaseNumber ?? "",
+            ["defendant.first_name"] = dto.DefendantFirstName ?? "",
+            ["defendant.last_name"] = dto.DefendantLastName ?? "",
+            ["appearance_reason"] = dto.AppearanceReason ?? "",
+            ["plea_trial_date"] = dto.EntryDate?.ToString("MMMM dd, yyyy") ?? "",
+            ["fta_conditions.arrest_warrant_radius"] = dto.ArrestWarrantRadius ?? "",
+            ["fta_conditions.bond_type"] = dto.BondType ?? "",
+            ["fta_conditions.bond_amount"] = dto.BondAmount ?? "",
+            ["judicial_officer.first_name"] = "",
+            ["judicial_officer.last_name"] = "",
+            ["judicial_officer.officer_type"] = "",
+        });
+        return Results.File(bytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", outputName);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"DOCX generation failed: {ex.Message}");
+    }
+});
+
+// Criminal Sealing Entry POST endpoint
+app.MapPost("/api/criminalsealing", (Munientry.Poc.Api.Data.CriminalSealingEntryDto dto) =>
+{
+    if (dto == null) return Results.BadRequest();
+    var templatePath = Path.Combine("Templates", "source", "Criminal_Sealing_Entry_Template.docx");
+    var outputName = $"CriminalSealingEntry_{dto.CaseNumber}_{DateTime.UtcNow:yyyyMMddHHmmss}.docx";
+    try
+    {
+        var bytes = DocxTemplateProcessor.FillTemplate(templatePath, new Dictionary<string, string>
+        {
+            ["case_number"] = dto.CaseNumber ?? "",
+            ["defendant.first_name"] = dto.DefendantFirstName ?? "",
+            ["defendant.last_name"] = dto.DefendantLastName ?? "",
+            ["defense_counsel"] = dto.DefenseCounselName ?? "",
+            ["defense_counsel_type"] = dto.DefenseCounselType ?? "",
+            ["plea_trial_date"] = dto.EntryDate?.ToString("MMMM dd, yyyy") ?? "",
+            ["seal_decision"] = dto.SealDecision ?? "",
+            ["denial_reasons"] = dto.DenialReasons ?? "",
+            ["bci_number"] = dto.BciNumber ?? "",
+            ["judicial_officer.first_name"] = "",
+            ["judicial_officer.last_name"] = "",
+            ["judicial_officer.officer_type"] = "",
+        });
+        return Results.File(bytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", outputName);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"DOCX generation failed: {ex.Message}");
+    }
+});
+
+// Competency Evaluation POST endpoint
+app.MapPost("/api/competencyevaluation", (Munientry.Poc.Api.Data.CompetencyEvaluationDto dto) =>
+{
+    if (dto == null) return Results.BadRequest();
+    var templatePath = Path.Combine("Templates", "source", "Competency_Evaluation_Template.docx");
+    var outputName = $"CompetencyEvaluation_{dto.CaseNumber}_{DateTime.UtcNow:yyyyMMddHHmmss}.docx";
+    try
+    {
+        var bytes = DocxTemplateProcessor.FillTemplate(templatePath, new Dictionary<string, string>
+        {
+            ["case_number"] = dto.CaseNumber ?? "",
+            ["defendant.first_name"] = dto.DefendantFirstName ?? "",
+            ["defendant.last_name"] = dto.DefendantLastName ?? "",
+            ["plea_trial_date"] = dto.EntryDate?.ToString("MMMM dd, yyyy") ?? "",
+            // treatment_type maps the evaluator/evaluation context in the template
+            ["treatment_type"] = dto.EvaluatorName ?? "",
+            // final_pretrial.date / time holds the competency hearing in the template
+            ["final_pretrial.date"] = dto.CompetencyHearingDate?.ToString("MMMM dd, yyyy") ?? "",
+            ["final_pretrial.time"] = dto.CompetencyHearingType ?? "",
+            // jury_trial.date holds the evaluation date in the template
+            ["jury_trial.date"] = dto.EvaluationDate?.ToString("MMMM dd, yyyy") ?? "",
+            ["judicial_officer.first_name"] = "",
+            ["judicial_officer.last_name"] = "",
+            ["judicial_officer.officer_type"] = "",
+        });
+        return Results.File(bytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", outputName);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"DOCX generation failed: {ex.Message}");
+    }
+});
+
+// Criminal Freeform Entry POST endpoint
+app.MapPost("/api/freeformentry", (Munientry.Poc.Api.Data.CriminalFreeformEntryDto dto) =>
+{
+    if (dto == null) return Results.BadRequest();
+    var templatePath = Path.Combine("Templates", "source", "Freeform_Entry_Template.docx");
+    var outputName = $"FreeformEntry_{dto.CaseNumber}_{DateTime.UtcNow:yyyyMMddHHmmss}.docx";
+    try
+    {
+        var bytes = DocxTemplateProcessor.FillTemplate(templatePath, new Dictionary<string, string>
+        {
+            ["case_number"] = dto.CaseNumber ?? "",
+            ["defendant.first_name"] = dto.DefendantFirstName ?? "",
+            ["defendant.last_name"] = dto.DefendantLastName ?? "",
+            ["defense_counsel"] = dto.DefenseCounselName ?? "",
+            ["defense_counsel_type"] = dto.DefenseCounselType ?? "",
+            ["appearance_reason"] = "",
+            ["plea_trial_date"] = dto.EntryDate?.ToString("MMMM dd, yyyy") ?? "",
+            ["entry_content_text"] = dto.EntryContent ?? "",
             ["judicial_officer.first_name"] = "",
             ["judicial_officer.last_name"] = "",
             ["judicial_officer.officer_type"] = "",

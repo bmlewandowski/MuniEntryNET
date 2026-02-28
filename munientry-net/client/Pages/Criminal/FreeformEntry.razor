@@ -1,16 +1,15 @@
-@page "/criminal/sealing-deny-privileges"
-@page "/criminal/criminal-sealing"
-@page "/criminal/criminal-sealing/{CaseNumber}"
+@page "/criminal/freeform-entry"
+@page "/criminal/freeform-entry/{CaseNumber}"
 @using munientry_poc.client.Shared.Models
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
 
-<PageTitle>Criminal Sealing Entry</PageTitle>
+<PageTitle>Criminal Freeform Entry</PageTitle>
 
 <div class="form-page">
 <div class="form-card">
-<h3>Criminal Sealing Entry</h3>
+<h3>Criminal Freeform Entry</h3>
 
 <EditForm Model="model" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
@@ -52,28 +51,12 @@
     </div>
 
     <div class="form-section">
-        <h4>Sealing Details</h4>
+        <h4>Entry Content</h4>
         <div class="form-group">
-            <label>BCI Number</label>
-            <InputText @bind-Value="model.BciNumber" class="form-control" />
+            <label>Entry Text</label>
+            <InputTextArea @bind-Value="model.EntryContent" class="form-control" rows="10"
+                placeholder="Enter the full text of the court entry here..." />
         </div>
-        <div class="form-group">
-            <label>Seal Decision</label>
-            <InputSelect @bind-Value="model.SealDecision" class="form-control">
-                <option value="">Select</option>
-                <option value="Granted">Granted</option>
-                <option value="Denied">Denied</option>
-                <option value="Denied - with reason">Denied - with reason</option>
-            </InputSelect>
-        </div>
-        @if (model.SealDecision == "Denied - with reason")
-        {
-            <div class="form-group">
-                <label>Denial Reasons</label>
-                <InputTextArea @bind-Value="model.DenialReasons" class="form-control" rows="4"
-                    placeholder="Enter the reasons for denial..." />
-            </div>
-        }
     </div>
 
     <div class="form-actions">
@@ -97,7 +80,7 @@
 @code {
     [Parameter] public string? CaseNumber { get; set; }
 
-    private CriminalSealingEntryDto model = new();
+    private CriminalFreeformEntryDto model = new();
     private bool isSubmitting = false;
     private string? errorMessage;
 
@@ -113,11 +96,11 @@
         errorMessage = null;
         try
         {
-            var response = await Http.PostAsJsonAsync("/api/criminalsealing", model);
+            var response = await Http.PostAsJsonAsync("/api/freeformentry", model);
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsByteArrayAsync();
-                var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "CriminalSealingEntry.docx";
+                var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "FreeformEntry.docx";
                 await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
             }
             else
