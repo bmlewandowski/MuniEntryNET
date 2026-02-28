@@ -1,0 +1,163 @@
+@page "/driving/driving-privileges"
+@page "/driving/driving-privileges/{CaseNumber}"
+@inherits FormPageBase<DrivingPrivilegesDto>
+<div class="form-page">
+<div class="form-card">
+<h2>Driving Privileges / CrimTraffic Helpers</h2>
+
+
+<EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
+	<DataAnnotationsValidator />
+	@if (IsLoadingCase)
+	{
+		<div class="alert alert-info">Loading case data...</div>
+	}
+	<ValidationSummary />
+	<div class="form-group">
+		<label>Defendant First Name</label>
+		<InputText class="form-control" @bind-Value="formModel.DefendantFirstName" />
+	</div>
+	<div class="form-group">
+		<label>Defendant Last Name</label>
+		<InputText class="form-control" @bind-Value="formModel.DefendantLastName" />
+	</div>
+	<div class="form-group">
+		<label>Case Number</label>
+		<InputText class="form-control" @bind-Value="formModel.CaseNumber" />
+	</div>
+	<div class="form-group">
+		<label>Plea/Trial Date</label>
+		<InputDate class="form-control" @bind-Value="formModel.PleaTrialDate" />
+	</div>
+	<div class="form-group">
+		<label>Appearance Reason</label>
+		<InputText class="form-control" @bind-Value="formModel.AppearanceReason" />
+	</div>
+	<div class="form-group">
+		<label>Defense Counsel Name</label>
+		<InputText class="form-control" @bind-Value="formModel.DefenseCounselName" />
+	</div>
+	<div class="form-group">
+		<label>Defense Counsel Type</label>
+		<InputText class="form-control" @bind-Value="formModel.DefenseCounselType" />
+	</div>
+	<div class="form-group">
+		<label>Defense Counsel Waived</label>
+		<InputCheckbox @bind-Value="formModel.DefenseCounselWaived" />
+	</div>
+	<div class="form-group">
+		<label>Offense</label>
+		<InputText class="form-control" @bind-Value="formModel.Offense" />
+	</div>
+	<div class="form-group">
+		<label>Statute</label>
+		<InputText class="form-control" @bind-Value="formModel.Statute" />
+	</div>
+	<div class="form-group">
+		<label>Degree</label>
+		<InputText class="form-control" @bind-Value="formModel.Degree" />
+	</div>
+	<div class="form-group">
+		<label>Plea</label>
+		<InputText class="form-control" @bind-Value="formModel.Plea" />
+	</div>
+	<div class="form-group">
+		<label>Finding</label>
+		<InputText class="form-control" @bind-Value="formModel.Finding" />
+	</div>
+	<div class="form-group">
+		<label>Fines</label>
+		<InputNumber class="form-control" @bind-Value="formModel.Fines" />
+	</div>
+	<div class="form-group">
+		<label>Fines Suspended</label>
+		<InputNumber class="form-control" @bind-Value="formModel.FinesSuspended" />
+	</div>
+	<div class="form-group">
+		<label>Court Costs</label>
+		<InputText class="form-control" @bind-Value="formModel.CourtCosts" />
+	</div>
+	<div class="form-group">
+		<label>Ability to Pay</label>
+		<InputText class="form-control" @bind-Value="formModel.AbilityToPay" />
+	</div>
+	<div class="form-group">
+		<label>Balance Due Date</label>
+		<InputDate class="form-control" @bind-Value="formModel.BalanceDueDate" />
+	</div>
+	<div class="form-group">
+		<label>Pay Today</label>
+		<InputNumber class="form-control" @bind-Value="formModel.PayToday" />
+	</div>
+	<div class="form-group">
+		<label>Monthly Pay</label>
+		<InputNumber class="form-control" @bind-Value="formModel.MonthlyPay" />
+	</div>
+	<div class="form-group">
+		<label>Credit for Jail</label>
+		<InputCheckbox @bind-Value="formModel.CreditForJail" />
+	</div>
+	<div class="form-group">
+		<label>Jail Time Credit</label>
+		<InputNumber class="form-control" @bind-Value="formModel.JailTimeCredit" />
+	</div>
+	<div class="form-group">
+		<label>License Suspension</label>
+		<InputCheckbox @bind-Value="formModel.LicenseSuspension" />
+	</div>
+	<div class="form-group">
+		<label>Community Service</label>
+		<InputCheckbox @bind-Value="formModel.CommunityService" />
+	</div>
+	<div class="form-group">
+		<label>Other Conditions</label>
+		<InputCheckbox @bind-Value="formModel.OtherConditions" />
+	</div>
+	<div class="form-actions">
+		<button type="submit" class="btn btn-success" disabled="@(IsSubmitting || IsLoadingCase)">Generate DOCX</button>
+	</div>
+	@if (ErrorMessage != null)
+	{
+		<div class="alert alert-danger mt-2">@ErrorMessage</div>
+	}
+	@if (SubmitResult != null)
+	{
+		<div class="alert alert-success mt-2">@SubmitResult</div>
+	}
+</EditForm>
+
+</div>
+</div>
+
+@code {
+	private DrivingPrivilegesDto formModel => Model;
+
+	protected override string ApiEndpoint => "drivingprivileges";
+
+	/// <summary>
+	/// Overrides base to use the dedicated /api/drivingcase/ endpoint instead of CaseSearchService.
+	/// </summary>
+	protected override async Task LoadCaseDataAsync(string caseNumber)
+	{
+		IsLoadingCase = true;
+		ErrorMessage = null;
+		try
+		{
+			using var http = new HttpClient { BaseAddress = new Uri(ApiHelper.GetApiBaseUrl()) };
+			var info = await http.GetFromJsonAsync<DrivingCaseInfoDto>(
+				$"api/drivingcase/{Uri.EscapeDataString(caseNumber)}");
+			if (info == null) return;
+			Model.CaseNumber = caseNumber;
+			Model.DefendantFirstName = info.DefFirstName;
+			Model.DefendantLastName = info.DefLastName;
+		}
+		catch (Exception ex)
+		{
+			ErrorMessage = $"Failed to load case: {ex.Message}";
+		}
+		finally
+		{
+			IsLoadingCase = false;
+		}
+	}
+}

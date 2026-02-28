@@ -1,0 +1,86 @@
+
+@page "/criminal/community-service-secondary"
+@using Munientry.Poc.Client.Dtos
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<div class="form-page">
+<div class="form-card">
+<h2>Community Service, License Suspension, Fingerprinting &amp; Victim Notification, Immobilize/Impound and other Conditions Secondary Dialogs</h2>
+
+<EditForm Model="secondaryForm" OnValidSubmit="HandleValidSubmit">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+	<div class="form-group">
+		<InputCheckbox @bind-Value="secondaryForm.CommunityServiceOrdered" />
+		<label>Community Service Ordered</label>
+	</div>
+	<div class="form-group">
+		<label>Community Service Hours</label>
+		<InputText class="form-control" @bind-Value="secondaryForm.CommunityServiceHours" />
+	</div>
+	<div class="form-group">
+		<label>Community Service Days to Complete</label>
+		<InputText class="form-control" @bind-Value="secondaryForm.CommunityServiceDaysToComplete" />
+	</div>
+	<div class="form-group">
+		<label>Community Service Due Date</label>
+		<InputDate class="form-control" @bind-Value="secondaryForm.CommunityServiceDueDate" />
+	</div>
+	<div class="form-group">
+		<InputCheckbox @bind-Value="secondaryForm.LicenseSuspensionOrdered" />
+		<label>License Suspension Ordered</label>
+	</div>
+	<div class="form-group">
+		<label>License Suspension Length</label>
+		<InputText class="form-control" @bind-Value="secondaryForm.LicenseSuspensionLength" />
+	</div>
+	<div class="form-group">
+		<InputCheckbox @bind-Value="secondaryForm.FingerprintingOrdered" />
+		<label>Fingerprinting Ordered</label>
+	</div>
+	<div class="form-group">
+		<InputCheckbox @bind-Value="secondaryForm.VictimNotificationOrdered" />
+		<label>Victim Notification Ordered</label>
+	</div>
+	<div class="form-group">
+		<InputCheckbox @bind-Value="secondaryForm.ImmobilizeImpoundOrdered" />
+		<label>Immobilize/Impound Ordered</label>
+	</div>
+	<div class="form-group">
+		<label>Other Conditions</label>
+		<InputText class="form-control" @bind-Value="secondaryForm.OtherConditions" />
+	</div>
+	<div class="form-actions">
+		<button type="submit" class="btn btn-success">Open Entry</button>
+		<button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+		<button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+		<button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+	</div>
+</EditForm>
+
+@if (submitResult != null)
+{
+	<div class="alert alert-info">@submitResult</div>
+}
+</div>
+</div>
+@code {
+	private CommunityServiceSecondaryDto secondaryForm = new();
+	private string? submitResult;
+
+	private async Task HandleValidSubmit()
+	{
+		var response = await Http.PostAsJsonAsync("/api/communityservicesecondary", secondaryForm);
+		if (response.IsSuccessStatusCode)
+		{
+                        var content = await response.Content.ReadAsByteArrayAsync();
+                        var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "CommunityServiceSecondary.docx";
+                        await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
+		}
+	}
+
+	private void CloseOrCancel() => Navigation.NavigateTo("/");
+	private void ClearFields() { secondaryForm = new(); }
+}

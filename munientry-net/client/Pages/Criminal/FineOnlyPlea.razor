@@ -1,0 +1,254 @@
+@page "/criminal/fineonlyplea"
+@page "/criminal/fineonlyplea/{CaseNumber}"
+@inherits FormPageBase<FineOnlyPleaDto>
+
+<div class="form-page">
+<div class="form-card">
+<h2>Plea of Guilty - Fine Only</h2>
+
+<EditForm Model="fineOnlyModel" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    @if (IsLoadingCase)
+    {
+        <div class="alert alert-info">Loading case data...</div>
+    }
+    @if (IsLoadingCase)
+    {
+        <div class="alert alert-info">Loading case data...</div>
+    }
+    @if (IsLoadingCase)
+    {
+        <div class="alert alert-info">Loading case data...</div>
+    }
+    @if (IsLoadingCase)
+    {
+        <div class="alert alert-info">Loading case data...</div>
+    }
+    <ValidationSummary />
+    <div class="form-group">
+        <label>Defendant First Name</label>
+        <InputText @bind-Value="fineOnlyModel.DefendantFirstName" class="form-control" />
+        <ValidationMessage For="() => fineOnlyModel.DefendantFirstName" />
+    </div>
+    <div class="form-group">
+        <label>Defendant Last Name</label>
+        <InputText @bind-Value="fineOnlyModel.DefendantLastName" class="form-control" />
+        <ValidationMessage For="() => fineOnlyModel.DefendantLastName" />
+    </div>
+    <div class="form-group">
+        <label>Case Number</label>
+        <InputText @bind-Value="fineOnlyModel.CaseNumber" class="form-control" />
+        <ValidationMessage For="() => fineOnlyModel.CaseNumber" />
+    </div>
+    <div class="form-group">
+        <label>Date</label>
+        <InputDate @bind-Value="fineOnlyModel.Date" class="form-control" />
+        <ValidationMessage For="() => fineOnlyModel.Date" />
+    </div>
+    <div class="form-group">
+        <label>Defense Counsel Name</label>
+        <InputText @bind-Value="fineOnlyModel.DefenseCounselName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Defense Counsel Type</label>
+        <InputSelect @bind-Value="fineOnlyModel.DefenseCounselType" class="form-control">
+            <option value="">Select...</option>
+            <option>Public Defender</option>
+            <option>Private Counsel</option>
+        </InputSelect>
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="fineOnlyModel.DefenseCounselWaived" /> Defendant waived right to counsel
+    </div>
+    <div class="form-group">
+        <label>Appearance Reason</label>
+        <InputSelect @bind-Value="fineOnlyModel.AppearanceReason" class="form-control">
+            <option value="">Select...</option>
+            <option>arraignment</option>
+            <option>a change of plea</option>
+            <option>sentencing</option>
+        </InputSelect>
+    </div>
+    <div class="form-group">
+        <label>Court Costs</label>
+        <InputSelect @bind-Value="fineOnlyModel.CourtCosts" class="form-control">
+            <option value="">Select...</option>
+            <option>Yes</option>
+            <option>Waived</option>
+            <option>Imposed in companion case</option>
+            <option>No</option>
+        </InputSelect>
+    </div>
+    <div class="form-group">
+        <label>Time to Pay</label>
+        <InputSelect @bind-Value="fineOnlyModel.TimeToPay" class="form-control">
+            <option value="">Select...</option>
+            <option>forthwith</option>
+            <option>monthly pay</option>
+            <option>partial forthwith then monthly pay</option>
+        </InputSelect>
+    </div>
+    <div class="form-group">
+        <label>Due Date</label>
+        <InputDate @bind-Value="fineOnlyModel.DueDate" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Pay Today</label>
+        <InputNumber @bind-Value="fineOnlyModel.PayToday" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Monthly Pay</label>
+        <InputNumber @bind-Value="fineOnlyModel.MonthlyPay" class="form-control" />
+    </div>
+    <div class="form-group" style="max-width:100%;">
+        <label>Charges</label>
+        <table class="table table-bordered table-sm">
+            <thead>
+                <tr>
+                    <th>Offense</th>
+                    <th>Statute/Ord.</th>
+                    <th>Degree</th>
+                    <th>Plea</th>
+                    <th>Finding</th>
+                    <th>Fines</th>
+                    <th>Fines Suspended</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var charge in Charges)
+                {
+                    <tr>
+                        <td><InputText class="form-control form-control-sm" @bind-Value="charge.Offense" /></td>
+                        <td><InputText class="form-control form-control-sm" @bind-Value="charge.Statute" /></td>
+                        <td>
+                            <InputSelect class="form-select form-select-sm" @bind-Value="charge.Degree">
+                                <option value="">Select</option>
+                                <option>M1</option><option>M2</option><option>M3</option><option>M4</option>
+                                <option>MM</option><option>F</option><option>UCM</option>
+                            </InputSelect>
+                        </td>
+                        <td>
+                            <InputSelect class="form-select form-select-sm" @bind-Value="charge.Plea">
+                                <option value="">Select</option>
+                                <option>Guilty</option><option>No Contest</option><option>Not Guilty</option>
+                            </InputSelect>
+                        </td>
+                        <td>
+                            <InputSelect class="form-select form-select-sm" @bind-Value="charge.Finding">
+                                <option value="">Select</option>
+                                <option>Guilty</option><option>Not Guilty</option>
+                            </InputSelect>
+                        </td>
+                        <td><InputText class="form-control form-control-sm" @bind-Value="charge.FinesAmount" /></td>
+                        <td><InputText class="form-control form-control-sm" @bind-Value="charge.FinesSuspended" /></td>
+                        <td><button type="button" class="btn btn-danger btn-sm" @onclick="() => DeleteCharge(charge)">Delete</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <button type="button" class="btn btn-info btn-sm me-2" @onclick="AddCharge">Add Charge</button>
+        <button type="button" class="btn btn-secondary btn-sm" @onclick="GuiltyAll">Guilty All</button>
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="fineOnlyModel.CreditForJail" /> Credit $50/day in jail
+    </div>
+    <div class="form-group">
+        <label>Jail Time Credit Days</label>
+        <InputNumber @bind-Value="fineOnlyModel.JailTimeCreditDays" class="form-control" />
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="fineOnlyModel.LicenseSuspension" /> License Suspension
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="fineOnlyModel.CommunityService" /> Community Service
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="fineOnlyModel.OtherConditions" /> Other Conditions
+    </div>
+    <div class="form-group">
+        <InputCheckbox @bind-Value="fineOnlyModel.DistractedDriving" /> Add Distracted Driving Course Language
+    </div>
+    <div class="form-group">
+        <label>FRA shown in complaint</label>
+        <InputSelect @bind-Value="fineOnlyModel.FraInFile" class="form-control">
+            <option value="">Select...</option>
+            <option>N/A</option>
+            <option>Yes</option>
+            <option>No</option>
+        </InputSelect>
+    </div>
+    <div class="form-group">
+        <label>FRA shown in court</label>
+        <InputSelect @bind-Value="fineOnlyModel.FraInCourt" class="form-control">
+            <option value="">Select...</option>
+            <option>N/A</option>
+            <option>Yes</option>
+            <option>No</option>
+        </InputSelect>
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-success" disabled="@(IsSubmitting || IsLoadingCase)">Open Entry</button>
+        <button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+        <button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+        <button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+    </div>
+</EditForm>
+
+</div>
+</div>
+
+@code {
+    private FineOnlyPleaDto fineOnlyModel => Model;
+    private List<ChargeGridRow> Charges { get; set; } = new();
+
+    protected override string ApiEndpoint => "fineonlyplea";
+
+    protected override async Task HandleValidSubmit()
+    {
+        if (Charges.Count > 0)
+        {
+            var first = Charges[0];
+            fineOnlyModel.Charges = first.Offense;
+            fineOnlyModel.ChargeStatute = first.Statute;
+            fineOnlyModel.ChargeDegree = first.Degree;
+            fineOnlyModel.ChargePlea = first.Plea;
+            fineOnlyModel.ChargeFinding = first.Finding;
+            fineOnlyModel.ChargeFinesAmount = first.FinesAmount;
+            fineOnlyModel.ChargeFinesSuspended = first.FinesSuspended;
+        }
+        await base.HandleValidSubmit();
+    }
+
+    protected override Task PopulateFromCaseAsync(List<CaseSearchResultDto> results)
+    {
+        var first = results[0];
+        Model.CaseNumber = CaseNumber;
+        Model.DefendantFirstName = first.DefFirstName;
+        Model.DefendantLastName = first.DefLastName;
+        Model.DefenseCounselName = first.DefenseCounsel;
+        Model.DefenseCounselType = first.PubDef ? "Public Defender" : "Private Counsel";
+        Model.FraInFile = first.FraInFile;
+        Charges = results
+            .Where(r => r.Charge != null)
+            .Select(r => new ChargeGridRow { Offense = r.Charge!, Statute = r.Statute ?? "", Degree = r.DegreeCode ?? "" })
+            .ToList();
+        return Task.CompletedTask;
+    }
+
+    private void AddCharge() => Charges.Add(new ChargeGridRow());
+    private void DeleteCharge(ChargeGridRow charge) => Charges.Remove(charge);
+    private void GuiltyAll() { foreach (var c in Charges) c.Plea = "Guilty"; }
+    protected override void ClearFields() { base.ClearFields(); Charges = new(); }
+
+    public class ChargeGridRow
+    {
+        public string Offense { get; set; } = string.Empty;
+        public string Statute { get; set; } = string.Empty;
+        public string Degree { get; set; } = string.Empty;
+        public string Plea { get; set; } = string.Empty;
+        public string Finding { get; set; } = string.Empty;
+        public string FinesAmount { get; set; } = string.Empty;
+        public string FinesSuspended { get; set; } = string.Empty;
+    }
+}

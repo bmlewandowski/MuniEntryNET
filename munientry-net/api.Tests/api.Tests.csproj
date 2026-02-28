@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Azure.Core" Version="1.50.0" />
+    <PackageReference Include="Azure.Identity" Version="1.17.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageReference Include="coverlet.collector" Version="6.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\api\Munientry.Poc.Api.csproj" />
+  </ItemGroup>
+  <Target Name="GenerateRuntimeConfigDevFile" AfterTargets="Build">
+    <PropertyGroup>
+      <_NuGetPackagesRoot Condition="'$(NUGET_PACKAGES)' != ''">$(NUGET_PACKAGES)</_NuGetPackagesRoot>
+      <_NuGetPackagesRoot Condition="'$(NUGET_PACKAGES)' == ''">$(USERPROFILE)\.nuget\packages\</_NuGetPackagesRoot>
+    </PropertyGroup>
+    <WriteLinesToFile
+      File="$(OutDir)$(AssemblyName).runtimeconfig.dev.json"
+      Lines="{&quot;runtimeOptions&quot;:{&quot;additionalProbingPaths&quot;:[&quot;$(_NuGetPackagesRoot.Replace('\', '/'))&quot;]}}"
+      Overwrite="true" />
+  </Target>
+</Project>

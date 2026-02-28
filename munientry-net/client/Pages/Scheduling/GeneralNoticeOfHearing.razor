@@ -1,0 +1,107 @@
+@page "/scheduling/general-notice-of-hearing"
+@using Munientry.Poc.Client.Shared.Models
+@using System.Net.Http.Json
+@inject IJSRuntime JS
+
+<div class="form-page">
+<div class="form-card">
+<h2>General Notice of Hearing Dialog</h2>
+<!-- Legacy: general_notice_of_hearing_dialog_ui.py -->
+
+<EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label>Case Number</label>
+        <InputText @bind-Value="formModel.CaseNumber" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Entry Date</label>
+        <InputDate @bind-Value="formModel.EntryDate" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Defendant First Name</label>
+        <InputText @bind-Value="formModel.DefendantFirstName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Defendant Last Name</label>
+        <InputText @bind-Value="formModel.DefendantLastName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Hearing Date</label>
+        <InputDate @bind-Value="formModel.HearingDate" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Hearing Time</label>
+        <InputText @bind-Value="formModel.HearingTime" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Assigned Courtroom</label>
+        <InputText @bind-Value="formModel.AssignedCourtroom" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Defense Counsel Name</label>
+        <InputText @bind-Value="formModel.DefenseCounselName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Interpreter Required</label>
+        <InputCheckbox @bind-Value="formModel.InterpreterRequired" />
+    </div>
+    <div class="form-group">
+        <label>Language Required</label>
+        <InputText @bind-Value="formModel.LanguageRequired" class="form-control" />
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-success" disabled="@isSubmitting">Open Entry</button>
+        <button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+        <button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+        <button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+    </div>
+    @if (errorMessage != null)
+    {
+        <div class="alert alert-danger mt-2">@errorMessage</div>
+    }
+</EditForm>
+</div>
+</div>
+
+@code {
+    private GeneralNoticeOfHearingDto formModel = new();
+    private bool isSubmitting = false;
+    private string? errorMessage;
+
+    private async Task HandleValidSubmit()
+    {
+        isSubmitting = true;
+        errorMessage = null;
+        try
+        {
+            var http = new HttpClient { BaseAddress = new Uri(ApiHelper.GetApiBaseUrl()) };
+            var response = await http.PostAsJsonAsync("generalnoticeofhearing", formModel);
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsByteArrayAsync();
+                var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "GeneralNoticeOfHearing.docx";
+                await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
+            }
+            else
+            {
+                errorMessage = $"Error: {response.ReasonPhrase}";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void CloseOrCancel() => NavigationManager.NavigateTo("/");
+    private void ClearFields() { formModel = new(); }
+
+    [Inject] NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] Munientry.Poc.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;
+}

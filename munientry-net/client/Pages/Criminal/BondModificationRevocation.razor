@@ -1,0 +1,92 @@
+@page "/criminal/bond-modification-revocation"
+@page "/criminal/bond-modification-revocation/{CaseNumber}"
+@using Munientry.Poc.Client.Dtos
+@inherits FormPageBase<BondModificationRevocationDto>
+
+<div class="form-page">
+<div class="form-card">
+<h2>Bond Modification/Revocation Dialog</h2>
+
+<EditForm Model="bondForm" OnValidSubmit="HandleValidSubmit">
+<DataAnnotationsValidator />
+@if (IsLoadingCase)
+{
+<div class="alert alert-info">Loading case data...</div>
+}
+	<ValidationSummary />
+	<div class="form-group">
+		<label>Defendant First Name</label>
+		<InputText class="form-control" @bind-Value="bondForm.DefendantFirstName" />
+		<ValidationMessage For="@(() => bondForm.DefendantFirstName)" />
+	</div>
+	<div class="form-group">
+		<label>Defendant Last Name</label>
+		<InputText class="form-control" @bind-Value="bondForm.DefendantLastName" />
+		<ValidationMessage For="@(() => bondForm.DefendantLastName)" />
+	</div>
+	<div class="form-group">
+		<label>Case Number</label>
+		<InputText class="form-control" @bind-Value="bondForm.CaseNumber" />
+		<ValidationMessage For="@(() => bondForm.CaseNumber)" />
+	</div>
+	<div class="form-group">
+		<label>Entry Date</label>
+		<InputDate class="form-control" @bind-Value="bondForm.EntryDate" />
+		<ValidationMessage For="@(() => bondForm.EntryDate)" />
+	</div>
+	<div class="form-group">
+		<label>Decision on Bond</label>
+		<InputSelect class="form-control" @bind-Value="bondForm.DecisionOnBond">
+			<option value="">-- Select --</option>
+			<option value="request to modify bond is granted">Request to modify bond is granted</option>
+			<option value="request to modify bond is denied">Request to modify bond is denied</option>
+			<option value="request to revoke bond is granted">Request to revoke bond is granted</option>
+			<option value="request to revoke bond is denied">Request to revoke bond is denied</option>
+		</InputSelect>
+		<ValidationMessage For="@(() => bondForm.DecisionOnBond)" />
+	</div>
+	<div class="form-group">
+		<label>Bond Type</label>
+		<InputText class="form-control" @bind-Value="bondForm.BondType" />
+	</div>
+	<div class="form-group">
+		<label>Bond Amount</label>
+		<InputText class="form-control" @bind-Value="bondForm.BondAmount" />
+	</div>
+	<div class="form-group">
+		<label>Defense Counsel Name</label>
+		<InputText class="form-control" @bind-Value="bondForm.DefenseCounselName" />
+	</div>
+	<div class="form-actions">
+		<button type="submit" class="btn btn-success" disabled="@(IsSubmitting || IsLoadingCase)">Open Entry</button>
+		<button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+		<button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+		<button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+	</div>
+</EditForm>
+
+@if (SubmitResult != null)
+{
+	<div class="alert alert-info">@SubmitResult</div>
+}
+@if (ErrorMessage != null)
+{
+	<div class="alert alert-danger">@ErrorMessage</div>
+}
+</div>
+</div>
+@code {
+	private BondModificationRevocationDto bondForm => Model;
+
+	protected override string ApiEndpoint => "api/bondmodificationrevocation";
+
+	protected override Task PopulateFromCaseAsync(List<CaseSearchResultDto> results)
+	{
+		var first = results[0];
+		Model.CaseNumber = CaseNumber;
+		Model.DefendantFirstName = first.DefFirstName;
+		Model.DefendantLastName = first.DefLastName;
+		Model.DefenseCounselName = first.DefenseCounsel;
+		return Task.CompletedTask;
+	}
+}

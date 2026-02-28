@@ -1,0 +1,349 @@
+@page "/scheduling/scheduling-entry"
+@using munientry_poc.client.Shared.Models
+@using System.Net.Http.Json
+@inject IJSRuntime JS
+
+<!-- Legacy: munientry.builders.scheduling.sched_entry_dialogs -->
+
+<div class="form-page">
+<div class="form-card">
+<h2>Scheduling Entry</h2>
+
+<EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <!-- Judge Selection -->
+    <div class="form-group">
+        <label><strong>Judicial Officer</strong></label>
+        <div>
+            @foreach (var judge in new[] { "Rohrer", "Fowler", "Hemmeter" })
+            {
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="judgeRadio"
+                           id="judge_@judge" value="@judge"
+                           checked="@(formModel.JudicialOfficer == judge)"
+                           @onchange="() => OnJudgeChanged(judge)" />
+                    <label class="form-check-label" for="judge_@judge">@judge</label>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Defendant / Case -->
+    <div class="form-group">
+        <label>Case Number</label>
+        <InputText @bind-Value="formModel.CaseNumber" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Defendant First Name</label>
+        <InputText @bind-Value="formModel.DefendantFirstName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Defendant Last Name</label>
+        <InputText @bind-Value="formModel.DefendantLastName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Defense Counsel</label>
+        <InputText @bind-Value="formModel.DefenseCounsel" class="form-control" />
+    </div>
+
+    <!-- Speedy Trial Inputs -->
+    <div class="form-group">
+        <label>Arrest / Summons Date</label>
+        <InputDate @bind-Value="formModel.ArrestSummonsDate"
+                   class="form-control"
+                   @oninput="RecalcSpeedyTrialDate" />
+    </div>
+    <div class="form-group">
+        <label>Highest Charge</label>
+        <InputSelect @bind-Value="formModel.HighestCharge"
+                     class="form-control"
+                     @oninput="RecalcSpeedyTrialDate">
+            @foreach (var charge in SpeedyTrialDict.Keys)
+            {
+                <option value="@charge">@charge</option>
+            }
+        </InputSelect>
+    </div>
+    <div class="form-group form-check">
+        <InputCheckbox id="inJailCheck" @bind-Value="formModel.InJail"
+                       @oninput="RecalcSpeedyTrialDate" class="form-check-input" />
+        <label class="form-check-label" for="inJailCheck">Defendant Is In Jail</label>
+    </div>
+    @if (formModel.InJail == true)
+    {
+        <div class="form-group">
+            <label>Days In Jail</label>
+            <InputNumber @bind-Value="formModel.DaysInJail"
+                         class="form-control"
+                         @oninput="RecalcSpeedyTrialDate" />
+        </div>
+    }
+    <div class="form-group">
+        <label>Continuance Days</label>
+        <InputNumber @bind-Value="formModel.ContinuanceDays"
+                     class="form-control"
+                     @oninput="RecalcSpeedyTrialDate" />
+    </div>
+    <div class="form-group">
+        <label>Speedy Trial Date</label>
+        <input type="text" class="form-control bg-light" readonly value="@speedyTrialDateDisplay" />
+    </div>
+
+    <!-- Scheduling Dates -->
+    <hr />
+    <h5>Scheduling Dates</h5>
+    <div class="form-group">
+        <label>Pretrial Option</label>
+        @foreach (var opt in PretrialOptions)
+        {
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="pretrialRadio"
+                       id="pretrial_@opt.Key"
+                       checked="@(formModel.PretrialOption == opt.Key)"
+                       @onchange="() => OnPretrialOptionChanged(opt.Key)" />
+                <label class="form-check-label" for="pretrial_@opt.Key">@opt.Key</label>
+            </div>
+        }
+    </div>
+    <div class="form-group">
+        <label>Final Pretrial Date <small class="text-muted">(anchor — recalculates trial &amp; pretrial)</small></label>
+        <InputDate @bind-Value="formModel.FinalPretrialDate"
+                   class="form-control"
+                   @oninput="OnFinalPretrialDateChanged" />
+    </div>
+    <div class="form-group">
+        <label>Final Pretrial Time</label>
+        <InputSelect @bind-Value="formModel.FinalPretrialTime" class="form-control">
+            <option>8:00 AM</option>
+            <option>8:30 AM</option>
+            <option>9:00 AM</option>
+            <option>1:00 PM</option>
+            <option>1:30 PM</option>
+            <option>3:00 PM</option>
+        </InputSelect>
+    </div>
+    @if (formModel.PretrialOption != "No Pretrial")
+    {
+        <div class="form-group">
+            <label>Pretrial Date <small class="text-muted">(auto-calculated)</small></label>
+            <InputDate @bind-Value="formModel.PretrialDate" class="form-control" />
+        </div>
+    }
+    <div class="form-group">
+        <label>Jury Trial Date <small class="text-muted">(auto-calculated)</small></label>
+        <InputDate @bind-Value="formModel.JuryTrialDate" class="form-control" />
+    </div>
+
+    <!-- Interpreter -->
+    <hr />
+    <div class="form-group form-check">
+        <InputCheckbox id="interpreterCheck" @bind-Value="formModel.InterpreterRequired"
+                       class="form-check-input" />
+        <label class="form-check-label" for="interpreterCheck">Interpreter Required</label>
+    </div>
+    @if (formModel.InterpreterRequired)
+    {
+        <div class="form-group">
+            <label>Language Required</label>
+            <InputText @bind-Value="formModel.LanguageRequired" class="form-control" />
+        </div>
+    }
+    <div class="form-group form-check">
+        <InputCheckbox id="datesConfirmedCheck" @bind-Value="formModel.DatesConfirmedWithCounsel"
+                       class="form-check-input" />
+        <label class="form-check-label" for="datesConfirmedCheck">Dates Confirmed With Counsel</label>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-success" disabled="@isSubmitting">Open Entry</button>
+        <button type="button" class="btn btn-danger" @onclick="ClearFields">Clear Fields</button>
+    </div>
+    @if (errorMessage != null)
+    {
+        <div class="alert alert-danger mt-2">@errorMessage</div>
+    }
+</EditForm>
+</div>
+</div>
+
+@code {
+    [Inject] Munientry.Poc.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;
+
+    private SchedulingEntryDto formModel = new()
+    {
+        JudicialOfficer    = "Rohrer",
+        HighestCharge      = "M1",
+        PretrialOption     = "Pretrial 4 weeks before trial",
+        FinalPretrialTime  = "1:00 PM",
+        ArrestSummonsDate  = DateTime.Today,
+        FinalPretrialDate  = DateTime.Today,
+        JuryTrialDate      = DateTime.Today,
+        PretrialDate       = DateTime.Today,
+    };
+
+    private bool isSubmitting = false;
+    private string? errorMessage;
+    private string speedyTrialDateDisplay = "";
+
+    // ── Business constants (mirrors munientry.settings.business_constants) ─────
+
+    private static readonly Dictionary<string, int> SpeedyTrialDict = new()
+    {
+        ["M1"]            = 90,
+        ["M2"]            = 90,
+        ["M3"]            = 45,
+        ["M4"]            = 45,
+        ["MM"]            = 30,
+        ["UCM"]           = 45,
+        ["UCM - 3rd OVI"] = 90,
+    };
+
+    // DayOfWeek values for each judge (matches Python DAY_DICT 1=Mon … 4=Thu)
+    private static readonly Dictionary<string, (DayOfWeek Trial, DayOfWeek FinalPretrial, DayOfWeek Pretrial)> JudgeDays = new()
+    {
+        ["Rohrer"]   = (DayOfWeek.Tuesday,  DayOfWeek.Thursday, DayOfWeek.Monday),
+        ["Fowler"]   = (DayOfWeek.Thursday, DayOfWeek.Tuesday,  DayOfWeek.Wednesday),
+        ["Hemmeter"] = (DayOfWeek.Tuesday,  DayOfWeek.Thursday, DayOfWeek.Monday),  // same schedule as Rohrer
+    };
+
+    private static readonly Dictionary<string, int> PretrialOptions = new()
+    {
+        ["Pretrial 4 weeks before trial"] = 28,
+        ["Pretrial 3 weeks before trial"] = 21,
+        ["Pretrial 2 weeks before trial"] = 14,
+        ["No Pretrial"]                   = 0,
+    };
+
+    // ── Speedy trial calculation ───────────────────────────────────────────────
+    // Mirrors SchedulingEntryDialogSlotFunctions.get_speedy_trial_date()
+
+    private DateTime CalcSpeedyTrialDate()
+    {
+        if (formModel.ArrestSummonsDate is null || string.IsNullOrEmpty(formModel.HighestCharge))
+            return DateTime.Today;
+
+        int days = SpeedyTrialDict.GetValueOrDefault(formModel.HighestCharge, 90);
+        if (formModel.InJail == true)
+            days = days / 3;  // accelerated speedy trial (integer division matches Python int())
+
+        int daysInJailAdjust = (formModel.DaysInJail ?? 0) * 3;
+        int continuance     = formModel.ContinuanceDays ?? 0;
+        int adjusted        = (days + continuance) - daysInJailAdjust;
+        return formModel.ArrestSummonsDate.Value.AddDays(adjusted);
+    }
+
+    private void RecalcSpeedyTrialDate()
+    {
+        speedyTrialDateDisplay = CalcSpeedyTrialDate().ToString("MMMM dd, yyyy");
+        RecalcSchedulingDates();
+    }
+
+    // ── Scheduling date auto-calculation ──────────────────────────────────────
+    // Mirrors SchedulingEntryDialogSlotFunctions.update_trial_and_pretrial_only()
+    // Anchor: FinalPretrialDate → derive JuryTrialDate and PretrialDate.
+
+    private void RecalcSchedulingDates()
+    {
+        if (formModel.FinalPretrialDate is null) return;
+
+        var anchor = formModel.FinalPretrialDate.Value;
+        string judge = formModel.JudicialOfficer ?? "Rohrer";
+        if (!JudgeDays.TryGetValue(judge, out var days)) return;
+
+        // Trial date: finalPretrial + 2 days, snap forward to judge's trial day
+        formModel.JuryTrialDate  = SnapForward(anchor.AddDays(2), days.Trial);
+
+        // Pretrial date: trialDate - pretrialDays, snap backward to judge's pretrial day
+        int pretrialDays = PretrialOptions.GetValueOrDefault(formModel.PretrialOption ?? "", 28);
+        if (pretrialDays > 0)
+            formModel.PretrialDate = SnapBackward(formModel.JuryTrialDate!.Value.AddDays(-pretrialDays), days.Pretrial);
+        else
+            formModel.PretrialDate = null;
+    }
+
+    /// <summary>Advance date forward until it lands on the target weekday.</summary>
+    private static DateTime SnapForward(DateTime date, DayOfWeek target)
+    {
+        while (date.DayOfWeek != target) date = date.AddDays(1);
+        return date;
+    }
+
+    /// <summary>Retreat date backward until it lands on the target weekday.</summary>
+    private static DateTime SnapBackward(DateTime date, DayOfWeek target)
+    {
+        while (date.DayOfWeek != target) date = date.AddDays(-1);
+        return date;
+    }
+
+    // ── Event handlers ─────────────────────────────────────────────────────────
+
+    private void OnJudgeChanged(string judge)
+    {
+        formModel.JudicialOfficer = judge;
+        RecalcSchedulingDates();
+    }
+
+    private void OnFinalPretrialDateChanged() => RecalcSchedulingDates();
+
+    private void OnPretrialOptionChanged(string option)
+    {
+        formModel.PretrialOption = option;
+        RecalcSchedulingDates();
+    }
+
+    // ── Submission ─────────────────────────────────────────────────────────────
+
+    private async Task HandleValidSubmit()
+    {
+        isSubmitting = true;
+        errorMessage = null;
+        try
+        {
+            var http = new HttpClient { BaseAddress = new Uri(ApiHelper.GetApiBaseUrl()) };
+            var response = await http.PostAsJsonAsync("schedulingentry", formModel);
+            if (response.IsSuccessStatusCode)
+            {
+                var bytes    = await response.Content.ReadAsByteArrayAsync();
+                var fileName = $"SchedulingEntry_{formModel.JudicialOfficer}_{formModel.CaseNumber}.docx";
+                await JS.InvokeVoidAsync("downloadFile", fileName,
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document", bytes);
+            }
+            else
+            {
+                errorMessage = $"Error: {response.StatusCode}";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void ClearFields()
+    {
+        formModel              = new SchedulingEntryDto
+        {
+            JudicialOfficer   = "Rohrer",
+            HighestCharge     = "M1",
+            PretrialOption    = "Pretrial 4 weeks before trial",
+            FinalPretrialTime = "1:00 PM",
+            ArrestSummonsDate = DateTime.Today,
+            FinalPretrialDate = DateTime.Today,
+            JuryTrialDate     = DateTime.Today,
+            PretrialDate      = DateTime.Today,
+        };
+        speedyTrialDateDisplay = "";
+        errorMessage           = null;
+    }
+
+    protected override void OnInitialized()
+    {
+        RecalcSpeedyTrialDate();
+    }
+}

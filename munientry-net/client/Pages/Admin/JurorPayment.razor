@@ -1,0 +1,106 @@
+@page "/admin/juror-payment"
+@page "/admin/juror-payment/{CaseNumber}"
+@using Munientry.Poc.Client.Shared.Models
+@using Microsoft.AspNetCore.Components
+@inject NavigationManager Navigation
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+<div class="form-page">
+<div class="form-card">
+<h2>Juror Payment Dialog</h2>
+
+<EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+	<div class="form-group">
+		<label>Case Number</label>
+		<InputText class="form-control" @bind-Value="formModel.CaseNumber" />
+	</div>
+	<div class="form-group">
+		<label>Entry Date</label>
+		<InputDate class="form-control" @bind-Value="formModel.EntryDate" />
+	</div>
+	<div class="form-group">
+		<label>Defendant First Name</label>
+		<InputText class="form-control" @bind-Value="formModel.DefendantFirstName" />
+	</div>
+	<div class="form-group">
+		<label>Defendant Last Name</label>
+		<InputText class="form-control" @bind-Value="formModel.DefendantLastName" />
+	</div>
+	<div class="form-group">
+		<label>Trial Date</label>
+		<InputDate class="form-control" @bind-Value="formModel.TrialDate" />
+	</div>
+	<div class="form-group">
+		<label>Trial Length</label>
+		<InputSelect class="form-control" @bind-Value="formModel.TrialLength">
+			<option value="One Day">One Day</option>
+			<option value="Two Days">Two Days</option>
+			<option value="No Trial - Jury Not Seated">No Trial - Jury Not Seated</option>
+		</InputSelect>
+	</div>
+	<div class="form-group">
+		<label>Jurors Reported</label>
+		<InputNumber class="form-control" @bind-Value="formModel.JurorsReported" />
+	</div>
+	<div class="form-group">
+		<label>Jurors Seated</label>
+		<InputNumber class="form-control" @bind-Value="formModel.JurorsSeated" />
+	</div>
+	<div class="form-group">
+		<label>Jurors Not Seated</label>
+		<InputNumber class="form-control" @bind-Value="formModel.JurorsNotSeated" />
+	</div>
+	<div class="form-group">
+		<label>Jurors Pay Not Seated</label>
+		<InputNumber class="form-control" @bind-Value="formModel.JurorsPayNotSeated" />
+	</div>
+	<div class="form-group">
+		<label>Jurors Pay Seated</label>
+		<InputNumber class="form-control" @bind-Value="formModel.JurorsPaySeated" />
+	</div>
+	<div class="form-group">
+		<label>Jury Panel Total Pay</label>
+		<InputNumber class="form-control" @bind-Value="formModel.JuryPanelTotalPay" />
+	</div>
+	<div class="form-actions">
+		<button type="submit" class="btn btn-success">Open Entry</button>
+		<button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+		<button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+		<button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+	</div>
+</EditForm>
+
+</div>
+</div>
+
+@code {
+	[Parameter]
+	public string? CaseNumber { get; set; }
+	private JurorPaymentDto formModel = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (!string.IsNullOrWhiteSpace(CaseNumber))
+		{
+			// Comment out the next line to disable auto-load
+			//await LoadCaseDataAsync(CaseNumber);
+		}
+	}
+
+	private async Task HandleValidSubmit()
+	{
+		var response = await Http.PostAsJsonAsync("/api/jurorpayment", formModel);
+		if (response.IsSuccessStatusCode)
+		{
+			var content = await response.Content.ReadAsByteArrayAsync();
+			var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "JurorPayment.docx";
+			await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
+		}
+	}
+
+	private void CloseOrCancel() => Navigation.NavigateTo("/");
+	private void ClearFields() { formModel = new(); }
+}

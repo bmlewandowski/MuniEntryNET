@@ -1,0 +1,44 @@
+@* =====================================================================
+   ENTRA ID - Step 5: To enforce authentication, replace everything below with
+   the AuthorizeRouteView version that is commented out at the bottom of this file.
+   ===================================================================== *@
+
+<Router AppAssembly="@typeof(App).Assembly">
+  <Found Context="routeData">
+    <RouteView RouteData="@routeData" DefaultLayout="@typeof(Shared.MainLayout)" />
+  </Found>
+  <NotFound>
+    <LayoutView Layout="@typeof(Shared.MainLayout)">
+      <p>Sorry, there's nothing at this address.</p>
+    </LayoutView>
+  </NotFound>
+</Router>
+
+@* =====================================================================
+   ENTRA ID (disabled) — Replace the Router block above with this once auth is enabled.
+   CascadingAuthenticationState provides the auth state to all child components.
+   AuthorizeRouteView enforces [Authorize] on pages that require it.
+   Pages without [Authorize] remain publicly accessible.
+
+<CascadingAuthenticationState>
+  <Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+      <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(Shared.MainLayout)">
+        <NotAuthorized>
+          <p>You must sign in with your @cityofdelawareoh.gov account to access this page.</p>
+          <a href="authentication/login">Sign in</a>
+        </NotAuthorized>
+        <Authorizing>
+          <p>Verifying your credentials...</p>
+        </Authorizing>
+      </AuthorizeRouteView>
+    </Found>
+    <NotFound>
+      <LayoutView Layout="@typeof(Shared.MainLayout)">
+        <p>Sorry, there's nothing at this address.</p>
+      </LayoutView>
+    </NotFound>
+  </Router>
+</CascadingAuthenticationState>
+
+   ===================================================================== *@

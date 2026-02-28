@@ -1,0 +1,31 @@
+@* =====================================================================
+   ENTRA ID - Step 5b: To activate, remove this outer Razor comment block
+   (the opening at the top of the file and the closing at the bottom) once
+   the MSAL package is referenced and Program.cs is configured.
+   This page handles the Entra ID login/logout redirect callbacks.
+   The path /authentication/{action} is used by MSAL internally — do not rename it.
+   ===================================================================== *@
+
+@*
+@page "/authentication/{action}"
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+<RemoteAuthenticatorView Action="@Action">
+    <LoggingIn>
+        <p>Redirecting to sign-in...</p>
+    </LoggingIn>
+    <CompletingLoggingIn>
+        <p>Completing sign-in...</p>
+    </CompletingLoggingIn>
+    <LogOut>
+        <p>Signing out...</p>
+    </LogOut>
+    <CompletingLogOut>
+        <p>Completing sign-out...</p>
+    </CompletingLogOut>
+</RemoteAuthenticatorView>
+
+@code {
+    [Parameter] public string? Action { get; set; }
+}
+*@

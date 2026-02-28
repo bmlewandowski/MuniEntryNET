@@ -1,0 +1,17 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+# Copy project files first for layer caching
+COPY Munientry.DocxTemplating/Munientry.DocxTemplating.csproj Munientry.DocxTemplating/
+COPY api/Munientry.Poc.Api.csproj api/
+RUN dotnet restore api/Munientry.Poc.Api.csproj
+# Copy all source for both projects and publish
+COPY Munientry.DocxTemplating/ Munientry.DocxTemplating/
+COPY api/ api/
+RUN dotnet publish api/Munientry.Poc.Api.csproj -c Release -o /app
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
+WORKDIR /app
+COPY --from=build /app .
+ENV ASPNETCORE_URLS=http://+:80
+EXPOSE 80
+ENTRYPOINT ["dotnet", "Munientry.Poc.Api.dll"]

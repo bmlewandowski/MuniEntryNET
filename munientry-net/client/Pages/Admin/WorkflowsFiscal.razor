@@ -1,0 +1,69 @@
+@page "/admin/workflows-fiscal"
+@using Munientry.Poc.Client.Shared.Models
+@inject NavigationManager Navigation
+
+<div class="form-page">
+<div class="form-card">
+<h2>Fiscal Journal Entries Dialog</h2>
+
+<EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label>Account Number</label>
+        <InputText class="form-control" @bind-Value="formModel.AccountNumber" />
+    </div>
+    <div class="form-group">
+        <label>Account Name</label>
+        <InputText class="form-control" @bind-Value="formModel.AccountName" />
+    </div>
+    <div class="form-group">
+        <label>Subaccount Number</label>
+        <InputText class="form-control" @bind-Value="formModel.SubaccountNumber" />
+    </div>
+    <div class="form-group">
+        <label>Subaccount Name</label>
+        <InputText class="form-control" @bind-Value="formModel.SubaccountName" />
+    </div>
+    <div class="form-group">
+        <label>Disbursement Reason</label>
+        <InputText class="form-control" @bind-Value="formModel.DisbursementReason" />
+    </div>
+    <div class="form-group">
+        <label>Disbursement Amount</label>
+        <InputNumber class="form-control" @bind-Value="formModel.DisbursementAmount" />
+    </div>
+    <div class="form-group">
+        <label>Disbursement Vendor</label>
+        <InputText class="form-control" @bind-Value="formModel.DisbursementVendor" />
+    </div>
+    <div class="form-group">
+        <label>Invoice Number</label>
+        <InputText class="form-control" @bind-Value="formModel.InvoiceNumber" />
+    </div>
+    <div class="form-group">
+        <label>Judicial Officer</label>
+        <InputText class="form-control" @bind-Value="formModel.JudicialOfficer" />
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-success">Open Entry</button>
+        <button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+        <button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+        <button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+    </div>
+</EditForm>
+
+</div>
+</div>
+
+@code {
+    private FiscalJournalEntryDto formModel = new();
+
+    private async Task HandleValidSubmit()
+    {
+        // TODO: Call API to save form data
+    }
+
+    private void CloseOrCancel() => Navigation.NavigateTo("/");
+    private void ClearFields() { formModel = new(); }
+}

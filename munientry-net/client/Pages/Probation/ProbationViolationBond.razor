@@ -1,0 +1,129 @@
+@page "/probation/violation-bond"
+@page "/probation/violation-bond/{CaseNumber}"
+@inherits FormPageBase<ProbationViolationBondDto>
+
+<div class="form-page">
+<div class="form-card">
+<h2>Preliminary Probation Violation and Bond Dialog</h2>
+
+<EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
+<DataAnnotationsValidator />
+@if (IsLoadingCase)
+{
+<div class="alert alert-info">Loading case data...</div>
+}
+	<ValidationSummary />
+	<div class="form-group">
+		<label>Defendant First Name</label>
+		<InputText class="form-control" @bind-Value="formModel.DefendantFirstName" />
+	</div>
+	<div class="form-group">
+		<label>Defendant Last Name</label>
+		<InputText class="form-control" @bind-Value="formModel.DefendantLastName" />
+	</div>
+	<div class="form-group">
+		<label>Case Number</label>
+		<InputText class="form-control" @bind-Value="formModel.CaseNumber" />
+	</div>
+	<div class="form-group">
+		<label>Appearance Reason</label>
+		<InputText class="form-control" @bind-Value="formModel.AppearanceReason" />
+	</div>
+	<div class="form-group">
+		<label>Defense Counsel Name</label>
+		<InputText class="form-control" @bind-Value="formModel.DefenseCounselName" />
+	</div>
+	<div class="form-group">
+		<label>Defense Counsel Type</label>
+		<InputSelect class="form-control" @bind-Value="formModel.DefenseCounselType">
+			<option value="Public Defender">Public Defender</option>
+			<option value="Private Counsel">Private Counsel</option>
+		</InputSelect>
+	</div>
+	<div class="form-group">
+		<label>Defense Counsel Waived</label>
+		<InputCheckbox @bind-Value="formModel.DefenseCounselWaived" />
+	</div>
+	<div class="form-group">
+		<label>Probable Cause Finding</label>
+		<InputSelect class="form-control" @bind-Value="formModel.ProbableCauseFinding">
+			<option value="Stipulates">Defendant stipulates probable cause exists</option>
+			<option value="Court Finds">Court finds probable cause</option>
+			<option value="No Probable Cause">No probable cause</option>
+		</InputSelect>
+	</div>
+	<div class="form-group">
+		<label>Bond Type</label>
+		<InputSelect class="form-control" @bind-Value="formModel.BondType">
+			<option value="No Bond">No Bond</option>
+			<option value="Recognizance (OR) Bond">Recognizance (OR) Bond</option>
+			<option value="10% Deposit, Cash or Surety Bond">10% Deposit, Cash or Surety Bond</option>
+			<option value="Cash or Surety Bond">Cash or Surety Bond</option>
+		</InputSelect>
+	</div>
+	<div class="form-group">
+		<label>Bond Amount</label>
+		<InputSelect class="form-control" @bind-Value="formModel.BondAmount">
+			<option value="None">None</option>
+			<option value="$1,000">$1,000</option>
+			<option value="$1,500">$1,500</option>
+			<option value="$2,000">$2,000</option>
+			<option value="$2,500">$2,500</option>
+			<option value="$3,000">$3,000</option>
+			<option value="$3,500">$3,500</option>
+			<option value="$5,000">$5,000</option>
+			<option value="$7,500">$7,500</option>
+			<option value="$10,000">$10,000</option>
+		</InputSelect>
+	</div>
+	<div class="form-group">
+		<label>No alcohol/drugs of abuse</label>
+		<InputCheckbox @bind-Value="formModel.NoAlcoholDrugs" />
+	</div>
+	<div class="form-group">
+		<label>Monitoring (GPS/Scram/Smart Start)</label>
+		<InputCheckbox @bind-Value="formModel.Monitoring" />
+	</div>
+	<div class="form-group">
+		<label>Monitoring Type</label>
+		<InputSelect class="form-control" @bind-Value="formModel.MonitoringType">
+			<option value="SCRAM Only">SCRAM Only</option>
+			<option value="GPS Only">GPS Only</option>
+			<option value="Smart Start Only">Smart Start Only</option>
+		</InputSelect>
+	</div>
+	<div class="form-group">
+		<label>Comply with Terms of Protection Order</label>
+		<InputCheckbox @bind-Value="formModel.ComplyProtectionOrder" />
+	</div>
+	<div class="form-group">
+		<label>Other Conditions</label>
+		<InputCheckbox @bind-Value="formModel.OtherConditions" />
+	</div>
+	<div class="form-actions">
+		<button type="submit" class="btn btn-success" disabled="@(IsSubmitting || IsLoadingCase)">Generate DOCX</button>
+		<button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+		<button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+		<button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+	</div>
+</EditForm>
+
+</div>
+</div>
+
+@code {
+	private ProbationViolationBondDto formModel => Model;
+
+	protected override string ApiEndpoint => "probationviolationbond";
+
+	protected override Task PopulateFromCaseAsync(List<CaseSearchResultDto> results)
+	{
+		var first = results[0];
+		Model.CaseNumber = CaseNumber;
+		Model.DefendantFirstName = first.DefFirstName;
+		Model.DefendantLastName = first.DefLastName;
+		Model.DefenseCounselName = first.DefenseCounsel;
+		Model.DefenseCounselType = first.PubDef ? "Public Defender" : "Private Counsel";
+		return Task.CompletedTask;
+	}
+}

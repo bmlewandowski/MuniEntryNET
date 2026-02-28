@@ -1,0 +1,168 @@
+@page "/scheduling/trial-to-court-notice-of-hearing"
+@using Microsoft.AspNetCore.Components.Forms
+@using System.ComponentModel.DataAnnotations
+
+<div class="form-page">
+<div class="form-card">
+<h2>Hemmeter/Rohrer Trial to Court Notice of Hearing Dialog</h2>
+<!-- Legacy: trial_to_court_notice_of_hearing_dialog_ui.py -->
+
+<EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label>Defendant First Name</label>
+        <InputText @bind-Value="formModel.DefendantFirstName" class="form-control" />
+        <ValidationMessage For="@(() => formModel.DefendantFirstName)" />
+    </div>
+    <div class="form-group">
+        <label>Defendant Last Name</label>
+        <InputText @bind-Value="formModel.DefendantLastName" class="form-control" />
+        <ValidationMessage For="@(() => formModel.DefendantLastName)" />
+    </div>
+    <div class="form-group">
+        <label>Case Number</label>
+        <InputText @bind-Value="formModel.CaseNumber" class="form-control" />
+        <ValidationMessage For="@(() => formModel.CaseNumber)" />
+    </div>
+    <div class="form-group">
+        <label>Entry Date</label>
+        <InputDate @bind-Value="formModel.EntryDate" class="form-control" />
+        <ValidationMessage For="@(() => formModel.EntryDate)" />
+    </div>
+    <div class="form-group">
+        <label>Defense Counsel Name</label>
+        <InputText @bind-Value="formModel.DefenseCounselName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Trial To Court Date</label>
+        <InputDate @bind-Value="formModel.TrialToCourtDate" class="form-control" />
+        <ValidationMessage For="@(() => formModel.TrialToCourtDate)" />
+    </div>
+    <div class="form-group">
+        <label>Trial To Court Time</label>
+        <InputSelect @bind-Value="formModel.TrialToCourtTime" class="form-control">
+            <option value="">Select...</option>
+            <option>9:30 AM</option>
+            <option>10:00 AM</option>
+            <option>10:30 AM</option>
+            <option>11:00 AM</option>
+            <option>11:30 AM</option>
+            <option>1:00 PM</option>
+            <option>1:30 PM</option>
+            <option>2:00 PM</option>
+            <option>2:30 PM</option>
+            <option>3:00 PM</option>
+        </InputSelect>
+        <ValidationMessage For="@(() => formModel.TrialToCourtTime)" />
+    </div>
+    <div class="form-group">
+        <label>Assigned Courtroom</label>
+        <InputSelect @bind-Value="formModel.AssignedCourtroom" class="form-control">
+            <option value="">Select...</option>
+            <option>Courtroom C</option>
+            <option>Courtroom B</option>
+            <option>Courtroom A</option>
+        </InputSelect>
+        <ValidationMessage For="@(() => formModel.AssignedCourtroom)" />
+    </div>
+    <div class="form-group">
+        <label>Interpreter Required</label>
+        <InputCheckbox @bind-Value="formModel.InterpreterRequired" />
+    </div>
+    <div class="form-group">
+        <label>Language Required</label>
+        <InputText @bind-Value="formModel.LanguageRequired" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Date Confirmed with Counsel</label>
+        <InputCheckbox @bind-Value="formModel.DateConfirmedWithCounsel" />
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-success" disabled="@isSubmitting">Generate DOCX</button>
+        <button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+        <button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+        <button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+    </div>
+    @if (errorMessage != null)
+    {
+        <div class="alert alert-danger mt-2">@errorMessage</div>
+    }
+</EditForm>
+</div>
+</div>
+
+			@code {
+				private FormModel formModel = new();
+				private bool isSubmitting = false;
+				private string? errorMessage;
+
+				private async Task HandleValidSubmit()
+				{
+					isSubmitting = true;
+					errorMessage = null;
+					try
+					{
+						var apiBase = ApiHelper.GetApiBaseUrl();
+						var http = new HttpClient { BaseAddress = new Uri(apiBase) };
+						var response = await http.PostAsJsonAsync("trialtocourt", formModel);
+						if (response.IsSuccessStatusCode)
+						{
+							var content = await response.Content.ReadAsByteArrayAsync();
+							var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "TrialToCourtNotice.docx";
+							await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
+						}
+						else
+						{
+							errorMessage = $"Error: {response.ReasonPhrase}";
+						}
+					}
+					catch (Exception ex)
+					{
+						errorMessage = ex.Message;
+					}
+					finally
+					{
+						isSubmitting = false;
+					}
+				}
+
+				private void CloseOrCancel() => NavigationManager.NavigateTo("/");
+				private void ClearFields() { formModel = new(); }
+
+				[Inject] NavigationManager NavigationManager { get; set; } = default!;
+				[Inject] IJSRuntime JS { get; set; } = default!;
+				[Inject] Munientry.Poc.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;
+
+				public class FormModel
+				{
+					[Required(ErrorMessage = "Defendant First Name is required")]
+					public string? DefendantFirstName { get; set; }
+
+					[Required(ErrorMessage = "Defendant Last Name is required")]
+					public string? DefendantLastName { get; set; }
+
+					[Required(ErrorMessage = "Case Number is required")]
+					public string? CaseNumber { get; set; }
+
+					[Required(ErrorMessage = "Entry Date is required")]
+					public DateTime? EntryDate { get; set; }
+
+					public string? DefenseCounselName { get; set; }
+
+					[Required(ErrorMessage = "Trial To Court Date is required")]
+					public DateTime? TrialToCourtDate { get; set; }
+
+					[Required(ErrorMessage = "Trial To Court Time is required")]
+					public string? TrialToCourtTime { get; set; }
+
+					[Required(ErrorMessage = "Assigned Courtroom is required")]
+					public string? AssignedCourtroom { get; set; }
+
+					public bool InterpreterRequired { get; set; }
+
+					public string? LanguageRequired { get; set; }
+
+					public bool DateConfirmedWithCounsel { get; set; }
+				}
+			}

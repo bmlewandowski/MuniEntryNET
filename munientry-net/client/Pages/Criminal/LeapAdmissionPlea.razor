@@ -1,0 +1,165 @@
+@page "/criminal/leap-admission-plea"
+@page "/criminal/leap-admission-plea/{CaseNumber}"
+@inherits FormPageBase<LeapAdmissionPleaDto>
+
+<div class="form-page">
+<div class="form-card">
+<h2>LEAP Plea Admission Dialog</h2>
+
+<EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
+<DataAnnotationsValidator />
+@if (IsLoadingCase)
+{
+<div class="alert alert-info">Loading case data...</div>
+}
+	<ValidationSummary />
+	<div class="form-group">
+		<label>Defendant First Name</label>
+		<InputText class="form-control" @bind-Value="formModel.DefendantFirstName" />
+		<ValidationMessage For="@(() => formModel.DefendantFirstName)" />
+	</div>
+	<div class="form-group">
+		<label>Defendant Last Name</label>
+		<InputText class="form-control" @bind-Value="formModel.DefendantLastName" />
+		<ValidationMessage For="@(() => formModel.DefendantLastName)" />
+	</div>
+	<div class="form-group">
+		<label>Case Number</label>
+		<InputText class="form-control" @bind-Value="formModel.CaseNumber" />
+		<ValidationMessage For="@(() => formModel.CaseNumber)" />
+	</div>
+	<div class="form-group">
+		<label>Defense Counsel Name</label>
+		<InputText class="form-control" @bind-Value="formModel.DefenseCounselName" />
+	</div>
+	<div class="form-group">
+		<label>Defense Counsel Type</label>
+		<InputText class="form-control" @bind-Value="formModel.DefenseCounselType" />
+	</div>
+	<div class="form-group">
+		<InputCheckbox @bind-Value="formModel.DefenseCounselWaived" />
+		<label>Defendant waived right to counsel</label>
+	</div>
+	<div class="form-group">
+		<label>Appearance Reason</label>
+		<InputText class="form-control" @bind-Value="formModel.AppearanceReason" />
+	</div>
+	<div class="form-group">
+		<label>Plea Date</label>
+		<InputDate class="form-control" @bind-Value="formModel.PleaDate" />
+	</div>
+	<div class="form-group">
+		<label>Offense</label>
+		<InputText class="form-control" @bind-Value="formModel.Charges" />
+	</div>
+	<div class="form-group">
+		<label>Statute/Ord.</label>
+		<InputText class="form-control" @bind-Value="formModel.ChargeStatute" />
+	</div>
+	<div class="form-group">
+		<label>Degree</label>
+		<InputSelect class="form-select" @bind-Value="formModel.ChargeDegree">
+			<option value="">Select Degree</option>
+			<option value="Misdemeanor">Misdemeanor</option>
+			<option value="Felony">Felony</option>
+			<option value="Infraction">Infraction</option>
+			<option value="Other">Other</option>
+		</InputSelect>
+	</div>
+	<div class="form-group">
+		<label>Plea</label>
+		<InputSelect class="form-select" @bind-Value="formModel.ChargePlea">
+			<option value="">Select Plea</option>
+			<option value="Guilty">Guilty</option>
+			<option value="No Contest">No Contest</option>
+			<option value="Not Guilty">Not Guilty</option>
+			<option value="Other">Other</option>
+		</InputSelect>
+	</div>
+	<div class="form-group">
+		<label>Court Costs</label>
+		<InputText class="form-control" @bind-Value="formModel.CourtCosts" />
+	</div>
+	<div class="form-group">
+		<label>Ability to Pay</label>
+		<InputText class="form-control" @bind-Value="formModel.AbilityToPay" />
+	</div>
+	<div class="form-group">
+		<label>Balance Due Date</label>
+		<InputDate class="form-control" @bind-Value="formModel.BalanceDueDate" />
+	</div>
+	<div class="form-group">
+		<label>Pay Today</label>
+		<InputText class="form-control" @bind-Value="formModel.PayToday" />
+	</div>
+	<div class="form-group">
+		<label>Monthly Pay</label>
+		<InputText class="form-control" @bind-Value="formModel.MonthlyPay" />
+	</div>
+	<div class="form-group">
+		<InputCheckbox @bind-Value="formModel.CreditForJail" />
+		<label>Credit for Jail</label>
+	</div>
+	<div class="form-group">
+		<label>Jail Time Credit Days</label>
+		<InputText class="form-control" @bind-Value="formModel.JailTimeCreditDays" />
+	</div>
+	<div class="form-group">
+		<label>FRA in File</label>
+		<InputText class="form-control" @bind-Value="formModel.FraInFile" />
+	</div>
+	<div class="form-group">
+		<label>FRA in Court</label>
+		<InputText class="form-control" @bind-Value="formModel.FraInCourt" />
+	</div>
+	<div class="form-group">
+		<InputCheckbox @bind-Value="formModel.LicenseSuspension" />
+		<label>License Suspension</label>
+	</div>
+	<div class="form-group">
+		<InputCheckbox @bind-Value="formModel.CommunityService" />
+		<label>Community Service</label>
+	</div>
+	<div class="form-group">
+		<InputCheckbox @bind-Value="formModel.OtherConditions" />
+		<label>Other Conditions</label>
+	</div>
+	<div class="form-actions">
+		<button type="submit" class="btn btn-success" disabled="@(IsSubmitting || IsLoadingCase)">Open Entry</button>
+		<button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
+		<button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
+		<button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
+	</div>
+</EditForm>
+
+@if (SubmitResult != null)
+{
+	<div class="alert alert-info">@SubmitResult</div>
+}
+</div>
+</div>
+@code {
+	private LeapAdmissionPleaDto formModel => Model;
+
+	protected override string ApiEndpoint => "api/leapadmissionplea";
+
+	protected override Task PopulateFromCaseAsync(List<CaseSearchResultDto> results)
+	{
+		var first = results[0];
+		Model.CaseNumber = CaseNumber;
+		Model.DefendantFirstName = first.DefFirstName;
+		Model.DefendantLastName = first.DefLastName;
+		Model.DefenseCounselName = first.DefenseCounsel;
+		Model.DefenseCounselType = first.PubDef ? "Public Defender" : "Private Counsel";
+		Model.FraInFile = first.FraInFile;
+		var firstCharge = results.FirstOrDefault(r => r.Charge != null);
+		if (firstCharge != null)
+		{
+			Model.Charges = firstCharge.Charge ?? "";
+			Model.ChargeStatute = firstCharge.Statute ?? "";
+			Model.ChargeDegree = firstCharge.DegreeCode ?? "";
+			Model.ChargePlea = "";
+		}
+		return Task.CompletedTask;
+	}
+}
