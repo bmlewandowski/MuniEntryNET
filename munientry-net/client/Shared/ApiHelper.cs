@@ -1,10 +1,10 @@
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Configuration;
 
-namespace Munientry.Poc.Client.Shared
+namespace Munientry.Client.Shared
 {
     public class ApiHelper
     {

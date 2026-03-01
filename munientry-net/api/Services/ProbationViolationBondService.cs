@@ -1,10 +1,10 @@
-using Munientry.Poc.Api.Data;
+﻿using Munientry.Api.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
-namespace Munientry.Poc.Api.Services
+namespace Munientry.Api.Services
 {
-    public class ProbationViolationBondService
+    public class ProbationViolationBondService : IProbationViolationBondService
     {
         private readonly IConfiguration _config;
         public ProbationViolationBondService(IConfiguration config)

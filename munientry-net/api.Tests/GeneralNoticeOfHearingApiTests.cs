@@ -4,7 +4,7 @@ using System.Net.Http.Json;
 using Xunit;
 using Microsoft.AspNetCore.Mvc.Testing;
 using System.Threading.Tasks;
-using Munientry.Poc.Api.Data;
+using Munientry.Api.Data;
 
 public class GeneralNoticeOfHearingApiTests : IClassFixture<WebApplicationFactory<Program>>
 {
@@ -31,7 +31,7 @@ public class GeneralNoticeOfHearingApiTests : IClassFixture<WebApplicationFactor
             InterpreterRequired = false,
             LanguageRequired = ""
         };
-        var resp = await client.PostAsJsonAsync("/api/generalnoticeofhearing", dto);
+        var resp = await client.PostAsJsonAsync("/api/v1/generalnoticeofhearing", dto);
         Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
     }
 }

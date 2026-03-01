@@ -1,10 +1,10 @@
-using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+﻿using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
 using Microsoft.Extensions.Configuration;
-using Munientry.Poc.Client.Shared;
+using Munientry.Client.Shared;
 // Bring the generated App component into scope
-using Munientry.Poc.Client;
+using Munientry.Client;
 
 // ENTRA ID - Step 2: Uncomment the using directive below.
 // using Microsoft.Authentication.WebAssembly.Msal;
@@ -13,8 +13,8 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.Services.AddScoped<ApiHelper>();
 builder.Services.AddScoped<DenyPrivilegesPermitRetestService>();
-builder.Services.AddScoped<CaseSearchService>();
-builder.Services.AddScoped<DailyListService>();
+builder.Services.AddScoped<CaseSearchApiClient>();
+builder.Services.AddScoped<DailyListApiClient>();
 
 // Load config for API base URL
 var config = new ConfigurationBuilder()
@@ -39,7 +39,7 @@ builder.Services.AddScoped<ICriminalFormApiClient>(sp =>
 // ENTRA ID AUTHENTICATION — cityofdelawareoh.gov accounts (@cityofdelawareoh.gov)
 //
 // To enable:
-//   Step 1: Uncomment the MSAL package reference in Munientry.Poc.Client.csproj
+//   Step 1: Uncomment the MSAL package reference in Munientry.Client.csproj
 //   Step 2: Uncomment the 'using Microsoft.Authentication.WebAssembly.Msal' line above
 //   Step 3: Fill in TenantId and ClientId in wwwroot/appsettings.json (and appsettings.Docker.json)
 //           - TenantId:  found in Entra ID > Overview in Azure Portal

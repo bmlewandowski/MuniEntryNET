@@ -1,7 +1,7 @@
-using System.Net.Http.Json;
-using Munientry.Poc.Client.Shared.Models;
+﻿using System.Net.Http.Json;
+using Munientry.Client.Shared.Models;
 
-namespace Munientry.Poc.Client.Shared
+namespace Munientry.Client.Shared
 {
     /// <summary>
     /// Client-side service for calling GET /api/case/search/{caseNumber}.
@@ -9,11 +9,11 @@ namespace Munientry.Poc.Client.Shared
     /// to pre-populate criminal entry dialog fields — equivalent to the Python
     /// BaseCmsLoader / CrimCmsLoader pattern in munientry/loaders/cms_case_loaders.py.
     /// </summary>
-    public class CaseSearchService
+    public class CaseSearchApiClient
     {
         private readonly ApiHelper _apiHelper;
 
-        public CaseSearchService(ApiHelper apiHelper)
+        public CaseSearchApiClient(ApiHelper apiHelper)
         {
             _apiHelper = apiHelper;
         }
@@ -31,7 +31,7 @@ namespace Munientry.Poc.Client.Shared
                 var apiBase = _apiHelper.GetApiBaseUrl();
                 using var http = new HttpClient { BaseAddress = new Uri(apiBase) };
                 var result = await http.GetFromJsonAsync<List<CaseSearchResultDto>>(
-                    $"api/case/search/{Uri.EscapeDataString(caseNumber)}");
+                    $"case/search/{Uri.EscapeDataString(caseNumber)}");;
                 return result ?? new List<CaseSearchResultDto>();
             }
             catch

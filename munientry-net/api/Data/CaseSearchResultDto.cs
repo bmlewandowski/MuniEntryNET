@@ -1,4 +1,4 @@
-namespace Munientry.Poc.Api.Data
+﻿namespace Munientry.Api.Data
 {
     /// <summary>
     /// Result from [reports].[DMCMuniEntryCaseSearch] stored procedure.

@@ -1,6 +1,6 @@
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
-namespace Munientry.Poc.Client.Shared.Models
+namespace Munientry.Client.Shared.Models
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum EntryType

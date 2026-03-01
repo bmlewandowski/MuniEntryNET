@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: munientry-client
+  namespace: munientry
+  labels:
+    app.kubernetes.io/name: munientry-client
+    app.kubernetes.io/component: client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: munientry-client
+  template:
+    metadata:
+      labels:
+        app: munientry-client
+        app.kubernetes.io/name: munientry-client
+        app.kubernetes.io/component: client
+    spec:
+      containers:
+        - name: client
+          # Replace with your registry image once you have a CI pipeline:
+          #   e.g. ghcr.io/your-org/munientry-client:latest
+          image: munientry-client:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "200m"
+              memory: "128Mi"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            failureThreshold: 3

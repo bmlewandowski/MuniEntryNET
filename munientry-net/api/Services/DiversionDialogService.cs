@@ -1,8 +1,8 @@
-using Munientry.Poc.Api.Data;
+﻿using Munientry.Api.Data;
 
-namespace Munientry.Poc.Api.Services
+namespace Munientry.Api.Services
 {
-    public class DiversionDialogService
+    public class DiversionDialogService : IDiversionDialogService
     {
         public void Save(DiversionDialogDto dto)
         {

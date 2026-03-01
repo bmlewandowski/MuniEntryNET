@@ -1,8 +1,8 @@
-using MuniEntry.Api.Data;
+using Munientry.Api.Data;
 
-namespace MuniEntry.Api.Services
+namespace Munientry.Api.Services
 {
-    public class FineOnlyPleaService
+    public class FineOnlyPleaService : IFineOnlyPleaService
     {
         // This would be replaced with actual DB logic
         public void CreateFineOnlyPleaEntry(FineOnlyPleaDto dto)

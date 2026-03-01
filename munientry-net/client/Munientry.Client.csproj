@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <!-- Disable Brotli/gzip pre-compression. nginx:stable-alpine has no Brotli module and
@@ -9,8 +9,8 @@
     <BlazorEnableCompression>false</BlazorEnableCompression>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.0" />
     <!-- ENTRA ID - Step 1: Uncomment the line below to add the MSAL package, then follow the remaining steps. -->
-    <!-- <PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="9.0.0" /> -->
+    <!-- <PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="10.0.0" /> -->
   </ItemGroup>
 </Project>

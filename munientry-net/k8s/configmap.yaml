@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: munientry-config
+  namespace: munientry
+  labels:
+    app.kubernetes.io/name: munientry
+data:
+  # ASP.NET Core runtime environment
+  ASPNETCORE_ENVIRONMENT: "Development"
+  # API base URL used by the Blazor WASM client (resolved in browser, so use the ingress hostname)
+  API_BASE_URL: "http://munientry.local/api"

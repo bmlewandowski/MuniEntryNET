@@ -1,16 +1,16 @@
-using System.Data;
+﻿using System.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using Munientry.Poc.Api.Data;
+using Munientry.Api.Data;
 
-namespace Munientry.Poc.Api.Services
+namespace Munientry.Api.Services
 {
     /// <summary>
     /// Executes the [reports].[DMCMuniEntryCaseSearch] stored procedure to retrieve
     /// all charges and defendant info for a given case number.
     /// Replaces the legacy general_case_search_query in crim_sql_server_queries.py.
     /// </summary>
-    public class CaseSearchService
+    public class CaseSearchService : ICaseSearchService
     {
         private readonly string _connectionString;
 

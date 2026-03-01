@@ -2,7 +2,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Xunit;
-using Munientry.Poc.Api.Data;
+using Munientry.Api.Data;
 
 namespace Munientry.Api.Tests
 {
@@ -42,7 +42,7 @@ namespace Munientry.Api.Tests
                 CommunityService = false,
                 OtherConditions = false
             };
-            var response = await client.PostAsJsonAsync("/api/drivingprivileges", dto);
+            var response = await client.PostAsJsonAsync("/api/v1/drivingprivileges", dto);
             response.EnsureSuccessStatusCode();
         }
     }

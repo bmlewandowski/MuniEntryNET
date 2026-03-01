@@ -1,17 +1,17 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using Munientry.Poc.Client.Shared.Models;
+using Munientry.Client.Shared.Models;
 
-namespace Munientry.Poc.Client.Shared
+namespace Munientry.Client.Shared
 {
     /// <summary>
     /// Generic base component for all criminal/probation/driving entry forms.
     /// Eliminates ~60 lines of boilerplate duplicated across forms by centralising:
     ///   - OnParametersSetAsync / _loadedCaseNumber guard
-    ///   - LoadCaseDataAsync via CaseSearchService
+    ///   - LoadCaseDataAsync via CaseSearchApiClient
     ///   - HandleValidSubmit (posts Model to ApiEndpoint, handles DOCX download or text result)
     ///   - IsSubmitting / IsLoadingCase / ErrorMessage / SubmitResult state
     ///   - CloseOrCancel / ClearFields helpers
@@ -33,14 +33,14 @@ namespace Munientry.Poc.Client.Shared
         [Inject] protected NavigationManager Navigation { get; set; } = default!;
         [Inject] protected IJSRuntime JS { get; set; } = default!;
         [Inject] protected ICriminalFormApiClient ApiClient { get; set; } = default!;
-        [Inject] protected CaseSearchService CaseSearchService { get; set; } = default!;
+        [Inject] protected CaseSearchApiClient CaseSearch { get; set; } = default!;
         /// <summary>Available to subclasses that need the API base URL for custom HTTP calls (e.g. GET requests).</summary>
         [Inject] protected ApiHelper ApiHelper { get; set; } = default!;
 
         // ── Abstract / virtual seam points ───────────────────────────────────────
 
         /// <summary>
-        /// The relative API endpoint to POST the form model to (e.g. "api/diversionplea").
+        /// The relative API endpoint to POST the form model to (e.g. "diversionplea").
         /// Return an empty string for forms whose submit is not yet implemented.
         /// </summary>
         protected virtual string ApiEndpoint => string.Empty;
@@ -74,7 +74,7 @@ namespace Munientry.Poc.Client.Shared
             ErrorMessage = null;
             try
             {
-                var results = await CaseSearchService.SearchCaseAsync(caseNumber);
+                var results = await CaseSearch.SearchCaseAsync(caseNumber);
                 if (results == null || results.Count == 0) return;
                 await PopulateFromCaseAsync(results);
             }

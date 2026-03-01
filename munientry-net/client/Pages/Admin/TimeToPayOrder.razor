@@ -1,4 +1,4 @@
-@page "/admin/time-to-pay-order"
+﻿@page "/admin/time-to-pay-order"
 @page "/admin/time-to-pay-order/{CaseNumber}"
 <div class="form-page">
 <div class="form-card">
@@ -98,6 +98,6 @@
 
 	[Inject] NavigationManager NavigationManager { get; set; } = default!;
 	[Inject] IJSRuntime JS { get; set; } = default!;
-	[Inject] Munientry.Poc.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;
+	[Inject] Munientry.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;
 
 }

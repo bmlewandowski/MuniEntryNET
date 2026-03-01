@@ -1,0 +1,27 @@
+# Kustomize root — apply everything with:
+#   kubectl apply -k k8s/
+#
+# Or with kustomize CLI:
+#   kustomize build k8s/ | kubectl apply -f -
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: munientry
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  # secret.yaml is intentionally excluded from the default kustomization.
+  # Create the Secret manually from a local copy with real values:
+  #   kubectl apply -f secret.yaml -n munientry
+  # Or use an external secrets provider (e.g. Azure Key Vault, Sealed Secrets).
+  - api/deployment.yaml
+  - api/service.yaml
+  - client/deployment.yaml
+  - client/service.yaml
+  - ingress.yaml
+
+# Common labels applied to all resources
+commonLabels:
+  app.kubernetes.io/part-of: munientry
+  app.kubernetes.io/managed-by: kustomize

@@ -2,7 +2,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Xunit;
-using Munientry.Poc.Api.Data;
+using Munientry.Api.Data;
 
 namespace Munientry.Api.Tests
 {
@@ -22,7 +22,7 @@ namespace Munientry.Api.Tests
                 DefendantLastName = "Smith",
                 NoticeText = "This is a freeform civil notice."
             };
-            var response = await client.PostAsJsonAsync("/api/noticesfreeformcivil", dto);
+            var response = await client.PostAsJsonAsync("/api/v1/noticesfreeformcivil", dto);
             response.EnsureSuccessStatusCode();
         }
     }

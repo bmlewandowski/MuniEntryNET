@@ -1,10 +1,10 @@
-namespace Munientry.Poc.Client.Shared.Models
+﻿namespace Munientry.Client.Shared.Models
 {
     /// <summary>
     /// Client-side DTO for the result of GET /api/case/search/{caseNumber}.
     /// Maps the [reports].[DMCMuniEntryCaseSearch] stored procedure output.
     /// Each instance represents one charge (SubCase) on the case.
-    /// Mirrors Munientry.Poc.Api.Data.CaseSearchResultDto on the API side.
+    /// Mirrors Munientry.Api.Data.CaseSearchResultDto on the API side.
     /// </summary>
     public class CaseSearchResultDto
     {

@@ -1,5 +1,5 @@
-@page "/scheduling/scheduling-entry"
-@using munientry_poc.client.Shared.Models
+﻿@page "/scheduling/scheduling-entry"
+@using Munientry.Client.Shared.Models
 @using System.Net.Http.Json
 @inject IJSRuntime JS
 
@@ -169,7 +169,7 @@
 </div>
 
 @code {
-    [Inject] Munientry.Poc.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;
+    [Inject] Munientry.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;
 
     private SchedulingEntryDto formModel = new()
     {

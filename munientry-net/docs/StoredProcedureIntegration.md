@@ -171,7 +171,7 @@ GET /api/dailylist/pleas/2026-02-22
 
 All criminal/probation/driving entry forms inherit from `FormPageBase<TDto>` in
 `client/Shared/FormPageBase.cs`. When a case number is provided (via the `[Parameter] CaseNumber`
-property), the base class automatically calls `CaseSearchService.SearchCaseAsync(caseNumber)`,
+property), the base class automatically calls `CaseSearch.SearchCaseAsync(caseNumber)` (via the injected `CaseSearchApiClient`),
 which hits `GET /api/case/search/{caseNumber}` and returns the results. Each form then overrides
 `PopulateFromCaseAsync(results)` to map the SP result rows onto its `Model` properties.
 

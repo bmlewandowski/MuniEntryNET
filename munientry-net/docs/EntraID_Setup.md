@@ -1,6 +1,6 @@
 # Entra ID Authentication Setup
 
-This document describes how to enable Microsoft Entra ID (formerly Azure AD) authentication in the MuniEntry POC Blazor application so that users sign in with their `@cityofdelawareoh.gov` accounts.
+This document describes how to enable Microsoft Entra ID (formerly Azure AD) authentication in the MuniEntry Blazor application so that users sign in with their `@cityofdelawareoh.gov` accounts.
 
 Authentication is fully wired up in the codebase but **disabled by default**. All code is present and commented out so the app builds and runs without authentication. Enabling it requires only the steps below.
 
@@ -16,7 +16,7 @@ Authentication is fully wired up in the codebase but **disabled by default**. Al
 ## Step 1 — Register the App in Azure Portal
 
 1. Go to [portal.azure.com](https://portal.azure.com) → **Entra ID** → **App Registrations** → **New registration**.
-2. Set a name, e.g. `MuniEntry POC Blazor Client`.
+2. Set a name, e.g. `MuniEntry Blazor Client`.
 3. Under **Supported account types**, choose **Accounts in this organizational directory only** (single tenant).
 4. Under **Redirect URI**, select platform **Single-page application (SPA)** and set the URI to:
    - Local dev: `https://localhost/authentication/login-callback`
@@ -54,7 +54,7 @@ Open both files below and replace the placeholder values with the IDs copied in 
 
 ## Step 3 — Uncomment the NuGet Package
 
-In `client/Munientry.Poc.Client.csproj`, uncomment the MSAL package reference:
+In `client/Munientry.Client.csproj`, uncomment the MSAL package reference:
 
 ```xml
 <!-- Before -->
@@ -134,7 +134,7 @@ Pages **without** `[Authorize]` remain publicly accessible.
 
 | File | Purpose |
 |---|---|
-| `client/Munientry.Poc.Client.csproj` | NuGet package reference for MSAL (Step 3) |
+| `client/Munientry.Client.csproj` | NuGet package reference for MSAL (Step 3) |
 | `client/wwwroot/appsettings.json` | Entra ID TenantId / ClientId for local dev (Step 2) |
 | `client/wwwroot/appsettings.Docker.json` | Entra ID TenantId / ClientId for Docker (Step 2) |
 | `client/Program.cs` | MSAL service registration + using directive (Steps 4–5) |

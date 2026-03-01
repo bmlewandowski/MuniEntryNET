@@ -1,4 +1,4 @@
-namespace Munientry.Poc.Api.Data
+﻿namespace Munientry.Api.Data
 {
     /// <summary>
     /// Result row from any of the 6 daily case list stored procedures:

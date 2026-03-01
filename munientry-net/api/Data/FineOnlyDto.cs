@@ -1,6 +1,6 @@
-using System;
+﻿using System;
 
-namespace Munientry.Poc.Api.Data
+namespace Munientry.Api.Data
 {
     public class FineOnlyDto
     {

@@ -1,10 +1,10 @@
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using Munientry.Poc.Api.Data;
+using Munientry.Api.Data;
 using Xunit;
 using Microsoft.AspNetCore.Mvc.Testing;
 
-namespace Munientry.Poc.Api.Tests
+namespace Munientry.Api.Tests
 {
     public class BondHearingApiTests : IClassFixture<WebApplicationFactory<Program>>
     {
@@ -29,7 +29,7 @@ namespace Munientry.Poc.Api.Tests
                 BondAmount = "5000",
                 DefenseCounselName = "Jane Smith"
             };
-            var response = await client.PostAsJsonAsync("/api/bondhearing", dto);
+            var response = await client.PostAsJsonAsync("/api/v1/bondhearing", dto);
             response.EnsureSuccessStatusCode();
             Assert.Equal(
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",

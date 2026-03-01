@@ -1,10 +1,10 @@
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Xunit;
-using Munientry.Poc.Api.Data;
+using Munientry.Api.Data;
 using Microsoft.AspNetCore.Mvc.Testing;
 
-namespace Munientry.Poc.Api.Tests
+namespace Munientry.Api.Tests
 {
     public class CommunityControlTermsApiTests : IClassFixture<WebApplicationFactory<Program>>
     {
@@ -49,7 +49,7 @@ namespace Munientry.Poc.Api.Tests
                 SpecializedDocket = false,
                 SpecializedDocketType = null
             };
-            var response = await client.PostAsJsonAsync("/api/communitycontrolterms", dto);
+            var response = await client.PostAsJsonAsync("/api/v1/communitycontrolterms", dto);
             response.EnsureSuccessStatusCode();
             Assert.Equal(
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",

@@ -4,7 +4,7 @@
 This folder contains all Data Transfer Objects (DTOs) used by the Blazor client for form submissions, API communication, and data binding. Each DTO here should have a matching definition in the API (`api/Data`) to ensure consistent data contracts between client and server.
 
 ## Structure
-- All DTOs use the namespace: `Munientry.Poc.Client.Shared.Models`
+- All DTOs use the namespace: `Munientry.Client.Shared.Models`
 - DTOs are named according to their form or data purpose (e.g., `ArraignmentContinuanceDto`, `DrivingCaseInfoDto`).
 - Each DTO should match the fields and types of its API counterpart.
 - `EntryType.cs` in this folder is a shared enum, not a DTO — it is used by `DenyPrivilegesPermitRetestDto` to distinguish entry types.
@@ -24,7 +24,7 @@ All 14 entry forms (`Criminal/`, `Probation/`, `Driving/`) now inherit from `For
 
 - Holds the typed `TDto Model` instance used for form binding.
 - Manages `IsSubmitting` / `IsLoadingCase` UI state.
-- Calls `CaseSearchService.SearchCaseAsync` to pre-populate the model on case number load.
+- Calls `CaseSearch.SearchCaseAsync` (via the injected `CaseSearchApiClient`) to pre-populate the model on case number load.
 - POSTs the model to the API via `ICriminalFormApiClient` and handles DOCX streaming or text result display.
 
 The typed HTTP client interface is `ICriminalFormApiClient` (`client/Shared/ICriminalFormApiClient.cs`),

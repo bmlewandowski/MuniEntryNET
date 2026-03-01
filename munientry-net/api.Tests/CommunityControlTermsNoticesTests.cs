@@ -2,7 +2,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Xunit;
-using Munientry.Poc.Api.Data;
+using Munientry.Api.Data;
 namespace Munientry.Api.Tests
 {
     public class CommunityControlTermsNoticesTests
@@ -25,7 +25,7 @@ namespace Munientry.Api.Tests
                 ViolationType = "Probation Violation",
                 LanguageRequired = "None"
             };
-            var response = await client.PostAsJsonAsync("/api/communitycontroltermsnotices", dto);
+            var response = await client.PostAsJsonAsync("/api/v1/communitycontroltermsnotices", dto);
             response.EnsureSuccessStatusCode();
         }
     }

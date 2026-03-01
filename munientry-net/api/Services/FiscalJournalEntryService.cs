@@ -1,14 +1,9 @@
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using Munientry.Poc.Api.Data;
+using Munientry.Api.Data;
 
 namespace Munientry.Api.Services
 {
-    public interface IFiscalJournalEntryService
-    {
-        void InsertFiscalJournalEntry(FiscalJournalEntryDto dto);
-    }
-
     public class FiscalJournalEntryService : IFiscalJournalEntryService
     {
         private readonly string _connectionString;

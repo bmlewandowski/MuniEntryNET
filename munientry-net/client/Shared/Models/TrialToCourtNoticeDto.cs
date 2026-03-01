@@ -1,7 +1,7 @@
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Munientry.Poc.Client.Shared.Models
+namespace Munientry.Client.Shared.Models
 {
     public class TrialToCourtNoticeDto
     {

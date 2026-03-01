@@ -1,5 +1,5 @@
-using System.Net.Http.Json;
-using Munientry.Poc.Client.Shared.Models;
+﻿using System.Net.Http.Json;
+using Munientry.Client.Shared.Models;
 
 namespace Munientry.Client.Services
 {
@@ -13,7 +13,7 @@ namespace Munientry.Client.Services
 
         public async Task<bool> SubmitProbationViolationBondAsync(ProbationViolationBondDto dto)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/probationviolationbond", dto);
+            var response = await _httpClient.PostAsJsonAsync("/api/v1/probationviolationbond", dto);
             return response.IsSuccessStatusCode;
         }
     }

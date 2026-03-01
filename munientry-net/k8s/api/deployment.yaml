@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: munientry-api
+  namespace: munientry
+  labels:
+    app.kubernetes.io/name: munientry-api
+    app.kubernetes.io/component: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: munientry-api
+  template:
+    metadata:
+      labels:
+        app: munientry-api
+        app.kubernetes.io/name: munientry-api
+        app.kubernetes.io/component: api
+    spec:
+      containers:
+        - name: api
+          # Replace with your registry image once you have a CI pipeline:
+          #   e.g. ghcr.io/your-org/munientry-api:latest
+          #        myregistry.azurecr.io/munientry-api:latest
+          image: munientry-api:latest
+          # Use IfNotPresent for locally-built images loaded into the cluster
+          # (e.g. `minikube image load munientry-net-api:latest`)
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          env:
+            # Non-sensitive config from ConfigMap
+            - name: ASPNETCORE_ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: munientry-config
+                  key: ASPNETCORE_ENVIRONMENT
+            # Sensitive config from Secret
+            - name: ENTRA_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: munientry-secrets
+                  key: ENTRA_CLIENT_ID
+            - name: ENTRA_TENANT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: munientry-secrets
+                  key: ENTRA_TENANT_ID
+            - name: ENTRA_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: munientry-secrets
+                  key: ENTRA_CLIENT_SECRET
+            - name: ConnectionStrings__AuthorityCourt
+              valueFrom:
+                secretKeyRef:
+                  name: munientry-secrets
+                  key: AUTHORITY_COURT_CONNSTR
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            initialDelaySeconds: 20
+            periodSeconds: 30
+            failureThreshold: 3

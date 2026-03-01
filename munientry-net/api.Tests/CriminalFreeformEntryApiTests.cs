@@ -1,10 +1,10 @@
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using Munientry.Poc.Api.Data;
+using Munientry.Api.Data;
 using Xunit;
 using Microsoft.AspNetCore.Mvc.Testing;
 
-namespace munientry_poc.api.Tests
+namespace Munientry.Api.Tests
 {
     public class CriminalFreeformEntryApiTests : IClassFixture<WebApplicationFactory<Program>>
     {
@@ -31,7 +31,7 @@ namespace munientry_poc.api.Tests
             };
 
             var client = _factory.CreateClient();
-            var response = await client.PostAsJsonAsync("/api/freeformentry", dto);
+            var response = await client.PostAsJsonAsync("/api/v1/freeformentry", dto);
             response.EnsureSuccessStatusCode();
             Assert.Equal(
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",

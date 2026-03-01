@@ -1,7 +1,7 @@
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Xunit;
-using Munientry.Poc.Api.Data;
+using Munientry.Api.Data;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace api.Tests
@@ -44,7 +44,7 @@ namespace api.Tests
             };
 
             var client = _factory.CreateClient();
-            var response = await client.PostAsJsonAsync("/api/appearonwarrantnoplea", dto);
+            var response = await client.PostAsJsonAsync("/api/v1/appearonwarrantnoplea", dto);
             response.EnsureSuccessStatusCode();
             Assert.Equal(
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",

@@ -4,7 +4,7 @@ using System.Net.Http.Json;
 using Xunit;
 using Microsoft.AspNetCore.Mvc.Testing;
 using System.Threading.Tasks;
-using Munientry.Poc.Api.Data;
+using Munientry.Api.Data;
 
 public class JurorPaymentApiTests : IClassFixture<WebApplicationFactory<Program>>
 {
@@ -33,7 +33,7 @@ public class JurorPaymentApiTests : IClassFixture<WebApplicationFactory<Program>
             JurorsPaySeated = 40,
             JuryPanelTotalPay = 65
         };
-        var resp = await client.PostAsJsonAsync("/api/jurorpayment", dto);
+        var resp = await client.PostAsJsonAsync("/api/v1/jurorpayment", dto);
         Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
     }
 }

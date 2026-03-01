@@ -1,10 +1,10 @@
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using Munientry.Poc.Api.Data;
+using Munientry.Api.Data;
 using Xunit;
 using Microsoft.AspNetCore.Mvc.Testing;
 
-namespace Munientry.Poc.Api.Tests
+namespace Munientry.Api.Tests
 {
     public class BondModificationRevocationApiTests : IClassFixture<WebApplicationFactory<Program>>
     {
@@ -30,7 +30,7 @@ namespace Munientry.Poc.Api.Tests
                 BondAmount = "2500",
                 DefenseCounselName = "Jane Smith"
             };
-            var response = await client.PostAsJsonAsync("/api/bondmodificationrevocation", dto);
+            var response = await client.PostAsJsonAsync("/api/v1/bondmodificationrevocation", dto);
             response.EnsureSuccessStatusCode();
             Assert.Equal(
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",

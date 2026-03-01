@@ -1,6 +1,6 @@
 using System;
 
-namespace MuniEntry.Api.Data
+namespace Munientry.Api.Data
 {
     public class FineOnlyPleaDto
     {

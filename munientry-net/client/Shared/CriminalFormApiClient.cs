@@ -1,8 +1,8 @@
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
-namespace Munientry.Poc.Client.Shared
+namespace Munientry.Client.Shared
 {
     public class CriminalFormApiClient : ICriminalFormApiClient
     {

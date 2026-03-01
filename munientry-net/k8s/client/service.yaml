@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: munientry-client
+  namespace: munientry
+  labels:
+    app.kubernetes.io/name: munientry-client
+    app.kubernetes.io/component: client
+spec:
+  type: ClusterIP
+  selector:
+    app: munientry-client
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80

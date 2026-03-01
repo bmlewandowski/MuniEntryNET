@@ -191,7 +191,10 @@ Each form only needs to implement:
 
 Integration tests live in `munientry-net/api.Tests/` using `WebApplicationFactory<Program>`.
 Every test asserts HTTP 2xx and — for DOCX endpoints — a `wordprocessingml` content-type with
-non-empty bytes. **35 test methods across 32 test files.**
+non-empty bytes. **87 test methods across 36 test files.**
+
+GET endpoint tests (case search, daily list, driving case) inject a fake in-memory service via
+`ConfigureTestServices` so no real SQL Server connection is required.
 
 ### Criminal
 
@@ -255,8 +258,27 @@ non-empty bytes. **35 test methods across 32 test files.**
 | `JurorPaymentApiTests.cs` | `POST /api/jurorpayment` |
 | `TimeToPayOrderApiTests.cs` | `POST /api/timetopayorder` |
 
-> `FiscalJournalEntryTests` injects a `FiscalJournalEntryServiceStub` (no-op) so no real SQL
-> Server connection is required during testing.
+### Data Queries
+
+GET endpoints that return JSON from SQL stored procedures. Each test uses a fake in-memory
+service (no SQL Server needed); tests cover happy-path, not-found, and error paths.
+
+| Test File | API Endpoint | Tests |
+|---|---|---|
+| `CaseSearchApiTests.cs` | `GET /api/case/search/{caseNumber}` | Found→200+charges, unknown→404, defendant fields, charge/statute fields |
+| `DailyListApiTests.cs` | `GET /api/dailylist/{listType}/{date}` | All 6 list types→200, case-insensitive list type, empty list, unknown type→400, bad date→400, slash-date routing, DTO shape |
+| `DrivingCaseApiTests.cs` | `GET /api/drivingcase/{caseNumber}` | Found→200+DTO, defendant info, license/address, unknown→404, all DTO fields populated |
+
+> `FiscalJournalEntryTests`, `CaseSearchApiTests`, `DailyListApiTests`, and `DrivingCaseApiTests`
+> all inject fake/stub services so no real SQL Server connection is required during testing.
+
+### Pure Unit Tests
+
+Logic-only tests — no HTTP server, no database, no fakes required.
+
+| Test File | What it tests |
+|---|---|
+| `DailyListStoredProcsTests.cs` | `DailyListStoredProcs.GetProcName()` and `ValidTypes`: all 6 valid list types map to the correct stored procedure name; case-insensitivity; invalid/partial/empty inputs return `null`; `ValidTypes` has exactly 6 entries; all proc names are unique and follow `[reports].[DMCMuniEntry*]` format |
 
 ### Pages Without API Endpoints
 

@@ -4,9 +4,9 @@ using System.Net.Http.Json;
 using Xunit;
 using Microsoft.AspNetCore.Mvc.Testing;
 using System.Threading.Tasks;
-using MuniEntry.Api.Data;
+using Munientry.Api.Data;
 
-namespace MuniEntry.Api.Tests
+namespace Munientry.Api.Tests
 {
     public class FineOnlyApiTests : IClassFixture<WebApplicationFactory<Program>>
     {
@@ -20,7 +20,7 @@ namespace MuniEntry.Api.Tests
         public async Task Get_FineOnly_ReturnsSample()
         {
             var client = _factory.CreateClient();
-            var resp = await client.GetAsync("/api/fineonly/CASE123");
+            var resp = await client.GetAsync("/api/v1/fineonly/CASE123");
             Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
             var dto = await resp.Content.ReadFromJsonAsync<FineOnlyPleaDto>();
             Assert.NotNull(dto);
@@ -32,7 +32,7 @@ namespace MuniEntry.Api.Tests
         {
             var client = _factory.CreateClient();
             var dto = new FineOnlyPleaDto { CaseNumber = "CASE999", DefendantFirstName = "Test", DefendantLastName = "User", Charges = "Speeding", ChargeStatute = "4511.21", ChargeDegree = "MM", ChargePlea = "Guilty", ChargeFinding = "Guilty", ChargeFinesAmount = "150.00", ChargeFinesSuspended = "0.00", CourtCosts = "Yes", FineAmount = 150 };
-            var resp = await client.PostAsJsonAsync("/api/fineonlyplea", dto);
+            var resp = await client.PostAsJsonAsync("/api/v1/fineonlyplea", dto);
             Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
             // Accepts either file or JSON response
             Assert.True(resp.Content.Headers.ContentType!.MediaType == "application/json" || resp.Content.Headers.ContentType!.MediaType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document");

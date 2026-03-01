@@ -1,4 +1,4 @@
-namespace Munientry.Poc.Client.Shared.Models
+﻿namespace Munientry.Client.Shared.Models
 {
 	public class DrivingCaseInfoDto
 	{

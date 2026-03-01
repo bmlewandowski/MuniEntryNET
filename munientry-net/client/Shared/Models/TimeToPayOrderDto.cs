@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace Munientry.Poc.Client.Shared.Models
+namespace Munientry.Client.Shared.Models
 {
 	public class TimeToPayOrderDto
 	{

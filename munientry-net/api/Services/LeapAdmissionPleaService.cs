@@ -1,13 +1,8 @@
-using System.Threading.Tasks;
-using Munientry.Poc.Api.Data;
+﻿using System.Threading.Tasks;
+using Munientry.Api.Data;
 
-namespace Munientry.Poc.Api.Services
+namespace Munientry.Api.Services
 {
-    public interface ILeapAdmissionPleaService
-    {
-        Task<int> CreateLeapAdmissionPleaEntryAsync(LeapAdmissionPleaDto dto);
-    }
-
     public class LeapAdmissionPleaService : ILeapAdmissionPleaService
     {
         public async Task<int> CreateLeapAdmissionPleaEntryAsync(LeapAdmissionPleaDto dto)

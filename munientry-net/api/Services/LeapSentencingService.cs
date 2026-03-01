@@ -1,7 +1,7 @@
-using System.Threading.Tasks;
-using Munientry.Poc.Api.Data;
+﻿using System.Threading.Tasks;
+using Munientry.Api.Data;
 
-namespace Munientry.Poc.Api.Services
+namespace Munientry.Api.Services
 {
     public interface ILeapSentencingService
     {

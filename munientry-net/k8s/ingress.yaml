@@ -1,0 +1,50 @@
+# Requires an Ingress controller to be installed in the cluster.
+# For local dev (minikube):  minikube addons enable ingress
+# For local dev (kind):       https://kind.sigs.k8s.io/docs/user/ingress/
+# For AKS/GKE/EKS:           install the nginx-ingress-controller Helm chart
+#
+# Path-based routing on a single host:
+#   /api/v1/*  → munientry-api  (ASP.NET Core; all versioned routes are prefixed /api/v1/)
+#   /*         → munientry-client (Blazor WASM served by nginx)
+#
+# To test locally, add this entry to your hosts file:
+#   127.0.0.1  munientry.local
+# Then run:  kubectl port-forward ... OR use minikube tunnel / kind LoadBalancer
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: munientry-ingress
+  namespace: munientry
+  labels:
+    app.kubernetes.io/name: munientry
+  annotations:
+    # No rewrite needed: the API already registers all routes under /api/...
+    # so the path is forwarded as-is.
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: munientry.local
+      http:
+        paths:
+          # API: forward /api and everything under it as-is.
+          # All API routes are versioned (/api/v1/...) — the /api prefix
+          # match here captures all past and future version segments.
+          # ASP.NET Core routes omit the /api prefix internally; it is
+          # supplied by the MapGroup("/api/v1") call in Program.cs.
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: munientry-api
+                port:
+                  number: 80
+          # Client: serve the Blazor WASM SPA for all other paths.
+          # The client nginx config handles SPA fallback to index.html.
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: munientry-client
+                port:
+                  number: 80

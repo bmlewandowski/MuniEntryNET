@@ -1,10 +1,10 @@
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using Munientry.Poc.Api.Data;
+using Munientry.Api.Data;
 
 namespace Munientry.Api.Services
 {
-    public class CommunityControlTermsNoticesService
+    public class CommunityControlTermsNoticesService : ICommunityControlTermsNoticesService
     {
         private readonly string? _connectionString;
 

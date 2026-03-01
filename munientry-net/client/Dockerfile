@@ -1,8 +1,8 @@
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 # Copy csproj and restore as distinct layers
-COPY Munientry.Poc.Client.csproj ./
+COPY Munientry.Client.csproj ./
 RUN dotnet restore
 # Copy all source files and folders
 COPY . ./

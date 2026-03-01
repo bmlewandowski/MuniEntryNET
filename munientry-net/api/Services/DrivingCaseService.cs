@@ -1,11 +1,11 @@
-using System.Data;
+﻿using System.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using Munientry.Poc.Api.Data;
+using Munientry.Api.Data;
 
-namespace Munientry.Poc.Api.Services
+namespace Munientry.Api.Services
 {
-    public class DrivingCaseService
+    public class DrivingCaseService : IDrivingCaseService
     {
         private readonly string _connectionString;
 

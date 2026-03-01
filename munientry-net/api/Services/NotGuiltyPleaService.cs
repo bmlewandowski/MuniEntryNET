@@ -1,11 +1,11 @@
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using Munientry.Poc.Api.Data;
+using Munientry.Api.Data;
 
-namespace Munientry.Poc.Api.Services
+namespace Munientry.Api.Services
 {
-    public class NotGuiltyPleaService
+    public class NotGuiltyPleaService : INotGuiltyPleaService
     {
         private readonly IConfiguration _config;
         public NotGuiltyPleaService(IConfiguration config)

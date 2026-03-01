@@ -29,3 +29,24 @@ __pycache__/
 .env
 .env.*
 secrets.json
+
+# Kubernetes — prevent committing files with real values
+# Local overrides (any *.local.yaml / *.local.yml under k8s/)
+k8s/**/*.local.yaml
+k8s/**/*.local.yml
+
+# Generated/rendered manifests (e.g. from `kustomize build` or `helm template`)
+k8s/**/rendered/
+k8s/**/*.generated.yaml
+k8s/**/*.generated.yml
+
+# Helm chart lock files and local values overrides
+k8s/**/charts/
+k8s/**/*-values.local.yaml
+k8s/**/*-values.local.yml
+
+# Kubeconfig files that may get dropped in the repo
+kubeconfig
+kubeconfig.*
+.kubeconfig
+*.kubeconfig

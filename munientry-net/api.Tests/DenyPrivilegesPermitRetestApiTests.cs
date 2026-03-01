@@ -4,7 +4,7 @@ using System.Net.Http.Json;
 using Xunit;
 using Microsoft.AspNetCore.Mvc.Testing;
 using System.Threading.Tasks;
-using Munientry.Poc.Api.Data;
+using Munientry.Api.Data;
 
 public class DenyPrivilegesPermitRetestApiTests : IClassFixture<WebApplicationFactory<Program>>
 {
@@ -38,7 +38,7 @@ public class DenyPrivilegesPermitRetestApiTests : IClassFixture<WebApplicationFa
             PrivilegesGrantDate = DateTime.UtcNow.AddDays(-30),
             NufcDate = DateTime.UtcNow.AddDays(-10)
         };
-        var resp = await client.PostAsJsonAsync("/api/denyprivilegespermitretest", dto);
+        var resp = await client.PostAsJsonAsync("/api/v1/denyprivilegespermitretest", dto);
         Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
     }
 }

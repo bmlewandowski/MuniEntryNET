@@ -1,7 +1,7 @@
-using munientry_poc.client.Shared.Models;
+﻿using Munientry.Client.Shared.Models;
 using System.Net.Http.Json;
 
-namespace munientry_poc.client.Shared
+namespace Munientry.Client.Shared
 {
     public class FinalJuryNoticeService
     {
@@ -13,7 +13,7 @@ namespace munientry_poc.client.Shared
 
         public async Task<bool> CreateFinalJuryNoticeAsync(FinalJuryNoticeDto dto)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/finaljurynotice", dto);
+            var response = await _httpClient.PostAsJsonAsync("/api/v1/finaljurynotice", dto);
             return response.IsSuccessStatusCode;
         }
     }

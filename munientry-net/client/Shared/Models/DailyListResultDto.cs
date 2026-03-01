@@ -1,4 +1,4 @@
-namespace Munientry.Poc.Client.Shared.Models
+﻿namespace Munientry.Client.Shared.Models
 {
     /// <summary>
     /// Client-side mirror of the API's DailyListResultDto.

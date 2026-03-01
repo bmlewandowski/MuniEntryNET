@@ -1,11 +1,11 @@
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using Munientry.Poc.Api.Data;
+using Munientry.Api.Data;
 using Microsoft.Data.SqlClient;
 
-namespace Munientry.Poc.Api.Services
+namespace Munientry.Api.Services
 {
-    public class DenyPrivilegesPermitRetestService
+    public class DenyPrivilegesPermitRetestService : IDenyPrivilegesPermitRetestService
     {
         private readonly IConfiguration _config;
         public DenyPrivilegesPermitRetestService(IConfiguration config)

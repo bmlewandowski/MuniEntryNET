@@ -2,7 +2,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Xunit;
-using Munientry.Poc.Api.Data;
+using Munientry.Api.Data;
 using Munientry.Api.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -50,7 +50,7 @@ namespace Munientry.Api.Tests
                 InvoiceNumber = "INV-2026-01",
                 JudicialOfficer = "Judge Smith"
             };
-            var response = await client.PostAsJsonAsync("/api/fiscaljournalentry", dto);
+            var response = await client.PostAsJsonAsync("/api/v1/fiscaljournalentry", dto);
             response.EnsureSuccessStatusCode();
         }
     }

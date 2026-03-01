@@ -1,7 +1,7 @@
-using System.Net.Http.Json;
-using Munientry.Poc.Client.Shared.Models;
+﻿using System.Net.Http.Json;
+using Munientry.Client.Shared.Models;
 
-namespace Munientry.Poc.Client.Shared
+namespace Munientry.Client.Shared
 {
     /// <summary>
     /// Client-side service for calling GET /api/dailylist/{listType}/{date}.
@@ -11,11 +11,11 @@ namespace Munientry.Poc.Client.Shared
     ///
     /// Valid listType values: arraignments, slated, pleas, pcvh_fcvh, final_pretrial, trials_to_court
     /// </summary>
-    public class DailyListService
+    public class DailyListApiClient
     {
         private readonly ApiHelper _apiHelper;
 
-        public DailyListService(ApiHelper apiHelper)
+        public DailyListApiClient(ApiHelper apiHelper)
         {
             _apiHelper = apiHelper;
         }
@@ -27,7 +27,7 @@ namespace Munientry.Poc.Client.Shared
                 var apiBase = _apiHelper.GetApiBaseUrl();
                 using var http = new HttpClient { BaseAddress = new Uri(apiBase) };
                 var result = await http.GetFromJsonAsync<List<DailyListResultDto>>(
-                    $"api/dailylist/{listType}/{date:yyyy-MM-dd}");
+                    $"dailylist/{listType}/{date:yyyy-MM-dd}");;
                 return result ?? new List<DailyListResultDto>();
             }
             catch

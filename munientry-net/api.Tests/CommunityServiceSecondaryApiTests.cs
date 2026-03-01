@@ -1,10 +1,10 @@
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using Munientry.Poc.Api.Data;
+using Munientry.Api.Data;
 using Xunit;
 using Microsoft.AspNetCore.Mvc.Testing;
 
-namespace Munientry.Poc.Api.Tests
+namespace Munientry.Api.Tests
 {
     public class CommunityServiceSecondaryApiTests : IClassFixture<WebApplicationFactory<Program>>
     {
@@ -32,7 +32,7 @@ namespace Munientry.Poc.Api.Tests
                 ImmobilizeImpoundOrdered = false,
                 OtherConditions = null
             };
-            var response = await client.PostAsJsonAsync("/api/communityservicesecondary", dto);
+            var response = await client.PostAsJsonAsync("/api/v1/communityservicesecondary", dto);
             response.EnsureSuccessStatusCode();
             Assert.Equal(
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",

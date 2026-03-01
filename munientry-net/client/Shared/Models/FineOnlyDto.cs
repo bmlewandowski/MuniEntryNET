@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;
-namespace Munientry.Poc.Client.Shared.Models
+﻿using System.ComponentModel.DataAnnotations;
+namespace Munientry.Client.Shared.Models
 {
     public class FineOnlyDto
     {

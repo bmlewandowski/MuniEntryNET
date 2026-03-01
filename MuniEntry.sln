@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "munientry-net", "munientry-
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "api", "api", "{2D394622-AB1D-BC09-613B-0E652E6CBDF4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Munientry.Poc.Api", "munientry-net\api\Munientry.Poc.Api.csproj", "{A72D94D9-C7F4-689B-6A52-2205E9A5E07C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Munientry.Api", "munientry-net\api\Munientry.Api.csproj", "{A72D94D9-C7F4-689B-6A52-2205E9A5E07C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Munientry.DocxTemplating", "munientry-net\Munientry.DocxTemplating\Munientry.DocxTemplating.csproj", "{E8450C1D-8810-481F-970A-816D6EEDF679}"
 EndProject

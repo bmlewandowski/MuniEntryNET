@@ -1,10 +1,10 @@
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using Munientry.Poc.Api.Data;
+using Munientry.Api.Data;
 using Xunit;
 using Microsoft.AspNetCore.Mvc.Testing;
 
-namespace munientry_poc.api.Tests
+namespace Munientry.Api.Tests
 {
     public class SchedulingEntryApiTests : IClassFixture<WebApplicationFactory<Program>>
     {
@@ -40,7 +40,7 @@ namespace munientry_poc.api.Tests
         private async Task AssertDocxResponse(string judicialOfficer)
         {
             var client   = _factory.CreateClient();
-            var response = await client.PostAsJsonAsync("/api/schedulingentry", BuildDto(judicialOfficer));
+            var response = await client.PostAsJsonAsync("/api/v1/schedulingentry", BuildDto(judicialOfficer));
             response.EnsureSuccessStatusCode();
             Assert.Equal(
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",

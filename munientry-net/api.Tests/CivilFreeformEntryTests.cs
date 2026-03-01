@@ -2,7 +2,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Xunit;
-using Munientry.Poc.Api.Data;
+using Munientry.Api.Data;
 
 namespace Munientry.Api.Tests
 {
@@ -23,7 +23,7 @@ namespace Munientry.Api.Tests
                 AppearanceReason = "motion hearing",
                 EntryContent = "This is a civil freeform entry."
             };
-            var response = await client.PostAsJsonAsync("/api/civilfreeformentry", dto);
+            var response = await client.PostAsJsonAsync("/api/v1/civilfreeformentry", dto);
             response.EnsureSuccessStatusCode();
         }
     }

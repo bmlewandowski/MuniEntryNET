@@ -1,9 +1,9 @@
-using System.Data;
+﻿using System.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using Munientry.Poc.Api.Data;
+using Munientry.Api.Data;
 
-namespace Munientry.Poc.Api.Services
+namespace Munientry.Api.Services
 {
     /// <summary>
     /// Executes one of the 6 daily case list stored procedures to retrieve
@@ -17,7 +17,7 @@ namespace Munientry.Poc.Api.Services
     ///   final_pretrial  → [reports].[DMCMuniEntryFinalPreTrials]
     ///   trials_to_court → [reports].[DMCMuniEntryBenchTrials]
     /// </summary>
-    public class DailyListService
+    public class DailyListService : IDailyListService
     {
         private readonly string _connectionString;
 
