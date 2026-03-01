@@ -14,7 +14,4 @@
     <!-- Source templates (Jinja2 {{ }} format) — filled at runtime by DocxTemplateProcessor -->
     <Content Include="Templates\source\*.docx" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Munientry.DocxTemplating\Munientry.DocxTemplating.csproj" />
-  </ItemGroup>
 </Project>

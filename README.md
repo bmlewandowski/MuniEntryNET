@@ -58,7 +58,7 @@ Run all commands from the `munientry-net/` directory:
 ```sh
 cd munientry-net
 
-docker compose build api      # Build the API (includes Munientry.DocxTemplating library)
+docker compose build api      # Build the API
 docker compose build client   # Build the Blazor WASM client
 docker compose up --no-build  # Start all services
 ```

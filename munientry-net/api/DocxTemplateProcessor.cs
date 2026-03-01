@@ -2,7 +2,7 @@ using System.IO.Compression;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Munientry.DocxTemplating;
+namespace Munientry.Api;
 
 /// <summary>
 /// Fills Jinja2-style DOCX templates directly — no preprocessing step required.
@@ -84,24 +84,24 @@ public static class DocxTemplateProcessor
     ];
 
     /// <summary>
-    /// Fills a DOCX template read from <paramref name="templatePath"/>.
-    /// Keys in <paramref name="values"/> must match the variable names inside the
-    /// <c>{{ }}</c> tokens in the template (e.g. <c>"defendant.first_name"</c>).
-    /// Whitespace differences inside the tokens are normalised automatically.
+    /// Fills a DOCX template, supporting both flat string tokens and
+    /// <c>{%tc for item in list %}</c> table-row loops.
+    /// <para>
+    /// Values whose type is <see cref="string"/> are substituted as plain tokens.
+    /// Values whose type is <c>IEnumerable&lt;Dictionary&lt;string,string&gt;&gt;</c>
+    /// drive table-row cloning: every <c>&lt;w:tr&gt;</c> that contains
+    /// <c>{%tc for varName in listName %}</c> is replaced by one cloned row per item,
+    /// with <c>{{ varName.field }}</c> tokens substituted from that item's dictionary.
+    /// </para>
     /// </summary>
-    public static byte[] FillTemplate(string templatePath, Dictionary<string, string> values)
+    public static byte[] FillTemplate(string templatePath, Dictionary<string, object> values)
     {
         using var fs = File.OpenRead(templatePath);
         return FillTemplate(fs, values);
     }
 
-    /// <summary>
-    /// Fills a DOCX template read from <paramref name="templateStream"/>.
-    /// Keys in <paramref name="values"/> must match the variable names inside the
-    /// <c>{{ }}</c> tokens in the template (e.g. <c>"defendant.first_name"</c>).
-    /// Whitespace differences inside the tokens are normalised automatically.
-    /// </summary>
-    public static byte[] FillTemplate(Stream templateStream, Dictionary<string, string> values)
+    /// <inheritdoc cref="FillTemplate(string,Dictionary{string,object})"/>
+    public static byte[] FillTemplate(Stream templateStream, Dictionary<string, object> values)
     {
         // Read the entire stream so we can safely seek / re-open as a ZIP
         using var inMs = new MemoryStream();
@@ -137,6 +137,14 @@ public static class DocxTemplateProcessor
         return outMs.ToArray();
     }
 
+    /// <summary>Backward-compatible overload — flat string tokens only.</summary>
+    public static byte[] FillTemplate(string templatePath, Dictionary<string, string> values)
+        => FillTemplate(templatePath, values.ToDictionary(kv => kv.Key, kv => (object)kv.Value));
+
+    /// <summary>Backward-compatible overload — flat string tokens only.</summary>
+    public static byte[] FillTemplate(Stream templateStream, Dictionary<string, string> values)
+        => FillTemplate(templateStream, values.ToDictionary(kv => kv.Key, kv => (object)kv.Value));
+
     // -------------------------------------------------------------------------
     // Internal helpers
     // -------------------------------------------------------------------------
@@ -151,20 +159,91 @@ public static class DocxTemplateProcessor
         return true;
     }
 
-    private static string ProcessXml(string xml, Dictionary<string, string> values)
+    private static string ProcessXml(string xml, Dictionary<string, object> values)
     {
+        // Step 1: expand {%tc for varName in listName %} table-row loops.
+        // This must run before paragraph processing so the cloned rows are
+        // already in place when paragraph-level token substitution runs.
+        xml = ProcessTableRowLoops(xml, values);
+
+        // Step 2: extract flat string values for paragraph-level substitution.
+        var stringValues = values
+            .Where(kv => kv.Value is string)
+            .ToDictionary(kv => kv.Key, kv => (string)kv.Value!);
+
         // Process each <w:p> paragraph independently.
         // The paragraph boundary is where run-fragmentation is contained.
         xml = Regex.Replace(
             xml,
             @"<w:p[ >].*?</w:p>",
-            m => ProcessParagraph(m.Value, values),
+            m => ProcessParagraph(m.Value, stringValues),
             RegexOptions.Singleline);
 
         // Final sweep: remove any Jinja control tags or tokens that weren't in the map
         xml = Regex.Replace(xml, @"\{%.*?%\}",      "",  RegexOptions.Singleline);
         xml = Regex.Replace(xml, @"\{\{[^{}<>]*?\}\}", "", RegexOptions.Singleline);
         return xml;
+    }
+
+    /// <summary>
+    /// Finds every <c>&lt;w:tr&gt;</c> row that contains a
+    /// <c>{%tc for varName in listName %}</c> / <c>{%tc endfor %}</c> pair
+    /// and replaces it with one cloned row per item in the named list.
+    /// The loop variable tokens (<c>{{ varName.field }}</c>) in each cloned
+    /// row are substituted via <see cref="ProcessParagraph"/> before the
+    /// control tags are stripped.
+    /// </summary>
+    private static string ProcessTableRowLoops(string xml, Dictionary<string, object> values)
+    {
+        return Regex.Replace(
+            xml,
+            @"<w:tr[ >].*?</w:tr>",
+            m => ExpandTableRow(m.Value, values),
+            RegexOptions.Singleline);
+    }
+
+    private static string ExpandTableRow(string rowXml, Dictionary<string, object> values)
+    {
+        // Concatenate all <w:t> text in the row (may be fragmented across runs)
+        var textMatches = Regex.Matches(rowXml, @"<w:t\b[^>]*>(.*?)</w:t>", RegexOptions.Singleline);
+        var rowText = string.Concat(textMatches.Select(m => m.Groups[1].Value));
+
+        // Collapse whitespace for reliable pattern matching
+        var normalised = Regex.Replace(rowText, @"\s+", " ");
+
+        // Detect {%tc for varName in listName %}
+        var forMatch = Regex.Match(normalised, @"\{%tc\s+for\s+(\w+)\s+in\s+(\w+)\s*%\}");
+        if (!forMatch.Success) return rowXml;
+
+        var varName  = forMatch.Groups[1].Value; // e.g. "charge"
+        var listName = forMatch.Groups[2].Value; // e.g. "charges_list"
+
+        if (!values.TryGetValue(listName, out var listObj) ||
+            listObj is not IEnumerable<Dictionary<string, string>> items)
+            return ""; // No data — remove the template row entirely
+
+        var sb = new StringBuilder();
+        foreach (var item in items)
+        {
+            // Build a per-item substitution dictionary: "charge.offense" => "...", ...
+            var itemValues = item.ToDictionary(
+                kv => $"{varName}.{kv.Key}",
+                kv => kv.Value,
+                StringComparer.OrdinalIgnoreCase);
+
+            // Clone the row and apply paragraph-level token substitution
+            var cloned = Regex.Replace(
+                rowXml,
+                @"<w:p[ >].*?</w:p>",
+                pm => ProcessParagraph(pm.Value, itemValues),
+                RegexOptions.Singleline);
+
+            // Strip the {%tc ... %} control tags from the cloned row
+            cloned = Regex.Replace(cloned, @"\{%tc[^%]*%\}", "", RegexOptions.Singleline);
+
+            sb.Append(cloned);
+        }
+        return sb.ToString();
     }
 
     private static string ProcessParagraph(string paraXml, Dictionary<string, string> values)

@@ -32,5 +32,8 @@ namespace Munientry.Client.Shared.Models
         public bool LicenseSuspension { get; set; }
         public bool CommunityService { get; set; }
         public bool OtherConditions { get; set; }
+
+        /// <summary>All charges; drives the charges_list table loop in the DOCX template.</summary>
+        public List<ChargeItemDto> ChargeItems { get; set; } = new();
     }
 }

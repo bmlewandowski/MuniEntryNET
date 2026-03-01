@@ -21,5 +21,8 @@ namespace Munientry.Client.Shared.Models
         public string? ChargeStatute { get; set; }
         public string? ChargeDegree { get; set; }
         public string? ChargePlea { get; set; }
+
+        /// <summary>All charges; drives the charges_list table loop in the DOCX template.</summary>
+        public List<ChargeItemDto> ChargeItems { get; set; } = new();
     }
 }

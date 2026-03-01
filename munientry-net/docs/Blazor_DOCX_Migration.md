@@ -59,8 +59,11 @@ These pages exist in Blazor but do not generate DOCX documents:
 
 **Summary:**
 - 35 of 35 DOCX-generating forms are fully migrated end-to-end.
-- All templates generate DOCX via `Munientry.DocxTemplating.DocxTemplateProcessor.FillTemplate()` — no database writes from Blazor forms.
-- Template source files (`api/Templates/source/*.docx`) contain Jinja2 `{{ variable }}` tokens. Run-consolidation and token replacement are handled at request time by the `Munientry.DocxTemplating` library; no preprocessing step is required.
+- All templates generate DOCX via `DocxTemplateProcessor.FillTemplate()` — no database writes from Blazor forms.
+- Template source files (`api/Templates/source/*.docx`) contain Jinja2 `{{ variable }}` tokens. Run-consolidation and token replacement are handled at request time by `DocxTemplateProcessor` (in `api/DocxTemplateProcessor.cs`); no preprocessing step is required.
 - `api/Templates/prepare_templates.py` is retired and no longer part of the build pipeline.
+- **Multi-charge table-row looping**: templates that require one row per charge use `{%tc for charge in charges_list %}` / `{%tc endfor %}` markers in the first and last cells of a `<w:tr>` row. `DocxTemplateProcessor` clones the row once per item in the `charges_list` value (a `List<Dictionary<string,string>>`). The following forms support multi-charge submission:
+  - `leapadmissionalreadyvalid` / `leapvalidsentencing` — use `ChargeItemDto` (fields: `Offense`, `Statute`, `Degree`, `Plea`)
+  - `leapsentencing` / `jailccplea` — use `SentencingChargeItemDto` (adds `Finding`, `FinesAmount`, `FinesSuspended`, `JailDays`, `JailDaysSuspended`)
 
 _Last updated: March 2026_

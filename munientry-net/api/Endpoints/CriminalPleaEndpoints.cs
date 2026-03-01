@@ -1,4 +1,4 @@
-using Munientry.DocxTemplating;
+using Munientry.Api;
 
 namespace Munientry.Api.Endpoints;
 
@@ -39,7 +39,7 @@ internal static class CriminalPleaEndpoints
             var outputName = $"JailCcPlea_{dto.CaseNumber}_{DateTime.UtcNow:yyyyMMddHHmmss}.docx";
             try
             {
-                var bytes = DocxTemplateProcessor.FillTemplate(templatePath, new Dictionary<string, string>
+                var bytes = DocxTemplateProcessor.FillTemplate(templatePath, new Dictionary<string, object>
                 {
                     ["case_number"] = dto.CaseNumber ?? "",
                     ["defendant.first_name"] = dto.DefendantFirstName ?? "",
@@ -48,15 +48,6 @@ internal static class CriminalPleaEndpoints
                     ["defense_counsel_type"] = dto.DefenseCounselType ?? "",
                     ["appearance_reason"] = dto.AppearanceReason ?? "",
                     ["plea_trial_date"] = dto.Date?.ToString("MMMM dd, yyyy") ?? "",
-                    ["charge.offense"] = dto.Charges ?? "",
-                    ["charge.statute"] = dto.ChargeStatute ?? "",
-                    ["charge.degree"] = dto.ChargeDegree ?? "",
-                    ["charge.plea"] = dto.ChargePlea ?? "",
-                    ["charge.finding"] = dto.ChargeFinding ?? "",
-                    ["charge.fines_amount"] = dto.ChargeFinesAmount ?? "",
-                    ["charge.fines_suspended"] = dto.ChargeFinesSuspended ?? "",
-                    ["charge.jail_days"] = dto.ChargeJailDays ?? "",
-                    ["charge.jail_days_suspended"] = dto.ChargeJailDaysSuspended ?? "",
                     ["amend_offense_details.motion_disposition"] = "",
                     ["court_costs.pay_today_amount"] = dto.PayToday?.ToString("F2") ?? "",
                     ["court_costs.monthly_pay_amount"] = dto.MonthlyPay?.ToString("F2") ?? "",
@@ -98,6 +89,10 @@ internal static class CriminalPleaEndpoints
                     ["judicial_officer.first_name"] = "",
                     ["judicial_officer.last_name"] = "",
                     ["judicial_officer.officer_type"] = "",
+                    ["charges_list"] = BuildSentencingChargesList(
+                        dto.ChargeItems, dto.Charges, dto.ChargeStatute, dto.ChargeDegree,
+                        dto.ChargePlea, dto.ChargeFinding, dto.ChargeFinesAmount, dto.ChargeFinesSuspended,
+                        dto.ChargeJailDays, dto.ChargeJailDaysSuspended),
                 });
                 return Results.File(bytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", outputName);
             }
@@ -432,5 +427,48 @@ internal static class CriminalPleaEndpoints
         });
 
         return app;
+    }
+
+    /// <summary>
+    /// Builds the <c>charges_list</c> for jail/sentencing forms.
+    /// Falls back to legacy flat fields when <paramref name="items"/> is empty.
+    /// </summary>
+    private static List<Dictionary<string, string>> BuildSentencingChargesList(
+        List<Data.SentencingChargeItemDto> items,
+        string? offense, string? statute, string? degree, string? plea,
+        string? finding, string? finesAmount, string? finesSuspended,
+        string? jailDays = null, string? jailDaysSuspended = null)
+    {
+        if (items.Count > 0)
+            return items
+                .Select(c => new Dictionary<string, string>
+                {
+                    ["offense"]             = c.Offense,
+                    ["statute"]             = c.Statute,
+                    ["degree"]              = c.Degree,
+                    ["plea"]                = c.Plea,
+                    ["finding"]             = c.Finding,
+                    ["fines_amount"]        = c.FinesAmount,
+                    ["fines_suspended"]     = c.FinesSuspended,
+                    ["jail_days"]           = c.JailDays,
+                    ["jail_days_suspended"] = c.JailDaysSuspended,
+                })
+                .ToList();
+
+        return new()
+        {
+            new()
+            {
+                ["offense"]             = offense          ?? "",
+                ["statute"]             = statute          ?? "",
+                ["degree"]              = degree           ?? "",
+                ["plea"]                = plea             ?? "",
+                ["finding"]             = finding          ?? "",
+                ["fines_amount"]        = finesAmount      ?? "",
+                ["fines_suspended"]     = finesSuspended   ?? "",
+                ["jail_days"]           = jailDays         ?? "",
+                ["jail_days_suspended"] = jailDaysSuspended ?? "",
+            },
+        };
     }
 }

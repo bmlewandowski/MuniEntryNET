@@ -39,6 +39,7 @@ ArraignmentContinuanceDto.cs
 BondHearingDto.cs
 BondModificationRevocationDto.cs
 CaseSearchResultDto.cs          ← API response DTO for /api/case/search; not a form submission DTO
+ChargeItemDto.cs                ← Per-charge row for LEAP Admission forms (Offense, Statute, Degree, Plea)
 CivilFreeformEntryDto.cs
 CommunityControlTermsDto.cs
 CommunityControlTermsNoticesDto.cs
@@ -66,6 +67,7 @@ NoticesFreeformCivilDto.cs
 PleaOnlyFutureSentencingDto.cs
 ProbationViolationBondDto.cs
 SchedulingEntryDto.cs
+SentencingChargeItemDto.cs      ← Per-charge row for sentencing/jail forms (adds Finding, FinesAmount, FinesSuspended, JailDays, JailDaysSuspended)
 SentencingOnlyAlreadyPleadDto.cs
 TimeToPayOrderDto.cs
 TrialToCourtNoticeDto.cs

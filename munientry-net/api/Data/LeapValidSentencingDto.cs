@@ -21,5 +21,11 @@ namespace Munientry.Api.Data
         public string? ChargeStatute { get; set; }
         public string? ChargeDegree { get; set; }
         public string? ChargePlea { get; set; }
+
+        /// <summary>
+        /// All charges for the entry. Drives the <c>{%tc for charge in charges_list %}</c>
+        /// table-row loop in the DOCX template.
+        /// </summary>
+        public List<ChargeItemDto> ChargeItems { get; set; } = new();
     }
 }

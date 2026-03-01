@@ -33,5 +33,6 @@ namespace Munientry.Api.Data
         public bool LicenseSuspension { get; set; }
         public bool CommunityService { get; set; }
         public bool OtherConditions { get; set; }
+        public List<SentencingChargeItemDto> ChargeItems { get; set; } = new();
     }
 }

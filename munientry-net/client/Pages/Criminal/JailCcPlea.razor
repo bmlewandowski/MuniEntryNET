@@ -249,19 +249,20 @@
 
 	protected override async Task HandleValidSubmit()
 	{
-		if (Charges.Count > 0)
-		{
-			var first = Charges[0];
-			jailCcModel.Charges = first.Offense;
-			jailCcModel.ChargeStatute = first.Statute;
-			jailCcModel.ChargeDegree = first.Degree;
-			jailCcModel.ChargePlea = first.Plea;
-			jailCcModel.ChargeFinding = first.Finding;
-			jailCcModel.ChargeFinesAmount = first.FinesAmount;
-			jailCcModel.ChargeFinesSuspended = first.FinesSuspended;
-			jailCcModel.ChargeJailDays = first.JailDays;
-			jailCcModel.ChargeJailDaysSuspended = first.JailDaysSuspended;
-		}
+		jailCcModel.ChargeItems = Charges
+			.Select(c => new Munientry.Client.Shared.Models.SentencingChargeItemDto
+			{
+				Offense           = c.Offense,
+				Statute           = c.Statute,
+				Degree            = c.Degree,
+				Plea              = c.Plea,
+				Finding           = c.Finding,
+				FinesAmount       = c.FinesAmount,
+				FinesSuspended    = c.FinesSuspended,
+				JailDays          = c.JailDays,
+				JailDaysSuspended = c.JailDaysSuspended,
+			})
+			.ToList();
 		await base.HandleValidSubmit();
 	}
 

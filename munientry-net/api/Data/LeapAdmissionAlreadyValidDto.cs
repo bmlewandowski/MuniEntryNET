@@ -32,5 +32,11 @@ namespace Munientry.Api.Data
         public bool LicenseSuspension { get; set; }
         public bool CommunityService { get; set; }
         public bool OtherConditions { get; set; }
+
+        /// <summary>
+        /// All charges for the entry. Drives the <c>{%tc for charge in charges_list %}</c>
+        /// table-row loop in the DOCX template. Each item maps to one row.
+        /// </summary>
+        public List<ChargeItemDto> ChargeItems { get; set; } = new();
     }
 }

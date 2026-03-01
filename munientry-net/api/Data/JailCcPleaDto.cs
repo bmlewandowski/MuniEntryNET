@@ -50,5 +50,6 @@ namespace Munientry.Api.Data
         public string? FraInFile { get; set; }
         public string? FraInCourt { get; set; }
         public bool DistractedDriving { get; set; }
+        public List<SentencingChargeItemDto> ChargeItems { get; set; } = new();
     }
 }
