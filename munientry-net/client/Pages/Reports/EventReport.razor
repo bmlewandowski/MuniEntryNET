@@ -1,0 +1,179 @@
+@page "/reports/event"
+@using Munientry.Client.Shared
+@inject ReportsApiClient ReportsSvc
+
+<PageTitle>Event Report</PageTitle>
+
+<div class="form-page">
+    <div class="form-card">
+        <h2>Event Report</h2>
+        <p class="form-subtitle">
+            Queries AuthorityCourt for all cases of a specific event type scheduled on the
+            selected date. Equivalent to the legacy <em>run_event_type_report()</em> in
+            <code>authoritycourt_reports.py</code>. If a case does not appear but is scheduled,
+            it is likely set incorrectly in AuthorityCourt — contact the Clerk's office.
+        </p>
+
+        <div class="daily-list-toolbar">
+            <div class="form-group">
+                <label>Event Type</label>
+                <select class="form-control" @bind="EventCode">
+                    @foreach (var opt in EventOptions)
+                    {
+                        <option value="@opt.Code">@opt.Label</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Report Date</label>
+                <input type="date"
+                       class="form-control"
+                       value="@ReportDate.ToString("yyyy-MM-dd")"
+                       @onchange="OnDateChanged" />
+            </div>
+            <button class="btn btn-primary" @onclick="LoadReportAsync" disabled="@IsLoading">
+                @(IsLoading ? "Loading…" : "Run Report")
+            </button>
+        </div>
+
+        @if (ErrorMessage is not null)
+        {
+            <div class="alert alert-danger mt-2">@ErrorMessage</div>
+        }
+
+        @if (_results is not null)
+        {
+            <div class="mt-3">
+                <h4>@_reportTitle — @ReportDate.ToString("MMMM d, yyyy") — @_results.Count @(_results.Count == 1 ? "case" : "cases")</h4>
+
+                @if (_results.Count == 0)
+                {
+                    <p class="text-muted">No cases found for this event type and date.</p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        @* Table sorted ascending by Time — mirrors Python sortByColumn(0, Ascending). *@
+                        <table class="table table-sm table-hover report-table">
+                            <thead>
+                                <tr>
+                                    <th @onclick="() => SortBy(nameof(EventReportResultDto.Time))"          class="sortable-header">
+                                        Time <span>@SortIndicator(nameof(EventReportResultDto.Time))</span>
+                                    </th>
+                                    <th @onclick="() => SortBy(nameof(EventReportResultDto.CaseNumber))"    class="sortable-header">
+                                        Case Number <span>@SortIndicator(nameof(EventReportResultDto.CaseNumber))</span>
+                                    </th>
+                                    <th @onclick="() => SortBy(nameof(EventReportResultDto.DefFullName))"   class="sortable-header">
+                                        Defendant Name <span>@SortIndicator(nameof(EventReportResultDto.DefFullName))</span>
+                                    </th>
+                                    <th @onclick="() => SortBy(nameof(EventReportResultDto.Charge))"        class="sortable-header">
+                                        Primary Charge <span>@SortIndicator(nameof(EventReportResultDto.Charge))</span>
+                                    </th>
+                                    <th @onclick="() => SortBy(nameof(EventReportResultDto.DefenseCounsel))" class="sortable-header">
+                                        Attorney <span>@SortIndicator(nameof(EventReportResultDto.DefenseCounsel))</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var row in SortedResults)
+                                {
+                                    <tr>
+                                        <td class="text-nowrap">@(row.Time ?? "")</td>
+                                        <td class="text-nowrap">@(row.CaseNumber ?? "")</td>
+                                        <td>@(row.DefFullName ?? "")</td>
+                                        <td>@(row.Charge ?? "")</td>
+                                        <td>@(row.DefenseCounsel ?? "")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+
+    // ── Event type options ─────────────────────────────────────────────────────────
+    // Mirrors EVENT_IDS keys from report_constants.py:
+    //   'Arraignments', 'Final Pretrials', 'Trials To Court', 'Pleas', 'Jury Trials'
+    // The Code value is passed as @EventCode to [reports].[DMCMuniEntryEventReport].
+    // Confirm these code values match the SP's expected input with the DBA.
+    private sealed record EventOption(string Code, string Label);
+
+    private static readonly List<EventOption> EventOptions = new()
+    {
+        new("Arraignments",    "Arraignments"),
+        new("Final Pretrials", "Final Pretrials"),
+        new("Trials To Court", "Trials To Court"),
+        new("Pleas",           "Pleas"),
+        new("Jury Trials",     "Jury Trials"),
+    };
+
+    // ── State ────────────────────────────────────────────────────────────────────
+    private string  EventCode  { get; set; } = "Arraignments";
+    private DateOnly ReportDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+    private bool     IsLoading  { get; set; }
+    private string?  ErrorMessage { get; set; }
+    private string?  _reportTitle;
+    private List<EventReportResultDto>? _results;
+
+    // ── Sorting ───────────────────────────────────────────────────────────────────
+    // Default: ascending by Time — matches Python sortByColumn(0, Qt.SortOrder.AscendingOrder)
+    private string _sortColumn = nameof(EventReportResultDto.Time);
+    private bool   _sortAsc    = true;
+
+    private IEnumerable<EventReportResultDto> SortedResults =>
+        _results is null ? Enumerable.Empty<EventReportResultDto>()
+        : _sortColumn switch
+        {
+            nameof(EventReportResultDto.CaseNumber) =>
+                _sortAsc ? _results.OrderBy(r => r.CaseNumber) : _results.OrderByDescending(r => r.CaseNumber),
+            nameof(EventReportResultDto.DefFullName) =>
+                _sortAsc ? _results.OrderBy(r => r.DefFullName) : _results.OrderByDescending(r => r.DefFullName),
+            nameof(EventReportResultDto.Charge) =>
+                _sortAsc ? _results.OrderBy(r => r.Charge) : _results.OrderByDescending(r => r.Charge),
+            nameof(EventReportResultDto.DefenseCounsel) =>
+                _sortAsc ? _results.OrderBy(r => r.DefenseCounsel) : _results.OrderByDescending(r => r.DefenseCounsel),
+            _ =>
+                _sortAsc ? _results.OrderBy(r => r.Time) : _results.OrderByDescending(r => r.Time),
+        };
+
+    private void SortBy(string column)
+    {
+        if (_sortColumn == column) _sortAsc = !_sortAsc;
+        else { _sortColumn = column; _sortAsc = true; }
+    }
+
+    private string SortIndicator(string column) =>
+        _sortColumn != column ? "" : _sortAsc ? "▲" : "▼";
+
+    // ── Event handlers ────────────────────────────────────────────────────────────
+    private void OnDateChanged(ChangeEventArgs e)
+    {
+        if (DateOnly.TryParse(e.Value?.ToString(), out var d)) ReportDate = d;
+    }
+
+    private async Task LoadReportAsync()
+    {
+        IsLoading = true;
+        ErrorMessage = null;
+        _results = null;
+        _reportTitle = EventOptions.FirstOrDefault(o => o.Code == EventCode)?.Label ?? EventCode;
+
+        try
+        {
+            _results = await ReportsSvc.GetEventReportAsync(EventCode, ReportDate);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error running report: {ex.Message}";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+}

@@ -1,14 +1,16 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using Munientry.Client.Shared.Models;
+using Munientry.Shared.Dtos;
 
 namespace Munientry.Client.Shared
 {
     /// <summary>
-    /// Generic base component for all criminal/probation/driving entry forms.
+    /// Generic base component for all entry forms (criminal, probation, driving, admin, civil, notices, scheduling).
     /// Eliminates ~60 lines of boilerplate duplicated across forms by centralising:
     ///   - OnParametersSetAsync / _loadedCaseNumber guard
     ///   - LoadCaseDataAsync via CaseSearchApiClient
@@ -16,28 +18,28 @@ namespace Munientry.Client.Shared
     ///   - IsSubmitting / IsLoadingCase / ErrorMessage / SubmitResult state
     ///   - CloseOrCancel / ClearFields helpers
     /// Forms only need to override PopulateFromCaseAsync and ApiEndpoint.
+    /// Forms that need a custom GET call (e.g. DrivingPrivileges) should inject
+    /// ApiHelper directly rather than relying on the base class.
     /// </summary>
     public abstract class FormPageBase<TModel> : ComponentBase where TModel : class, new()
     {
-        // ── Parameters ──────────────────────────────────────────────────────────
+        // -- Parameters ----------------------------------------------------------
         [Parameter] public string? CaseNumber { get; set; }
 
-        // ── State ────────────────────────────────────────────────────────────────
+        // -- State ----------------------------------------------------------------
         protected TModel Model { get; set; } = new();
         protected bool IsSubmitting { get; set; }
         protected bool IsLoadingCase { get; set; }
         protected string? ErrorMessage { get; set; }
         protected string? SubmitResult { get; set; }
 
-        // ── Injected services ────────────────────────────────────────────────────
+        // -- Injected services ----------------------------------------------------
         [Inject] protected NavigationManager Navigation { get; set; } = default!;
         [Inject] protected IJSRuntime JS { get; set; } = default!;
-        [Inject] protected ICriminalFormApiClient ApiClient { get; set; } = default!;
+        [Inject] protected IEntryFormApiClient ApiClient { get; set; } = default!;
         [Inject] protected CaseSearchApiClient CaseSearch { get; set; } = default!;
-        /// <summary>Available to subclasses that need the API base URL for custom HTTP calls (e.g. GET requests).</summary>
-        [Inject] protected ApiHelper ApiHelper { get; set; } = default!;
 
-        // ── Abstract / virtual seam points ───────────────────────────────────────
+        // -- Abstract / virtual seam points ---------------------------------------
 
         /// <summary>
         /// The relative API endpoint to POST the form model to (e.g. "diversionplea").
@@ -52,7 +54,7 @@ namespace Munientry.Client.Shared
         protected virtual Task PopulateFromCaseAsync(List<CaseSearchResultDto> results)
             => Task.CompletedTask;
 
-        // ── Lifecycle ────────────────────────────────────────────────────────────
+        // -- Lifecycle ------------------------------------------------------------
         private string? _loadedCaseNumber;
 
         protected override async Task OnParametersSetAsync()
@@ -66,7 +68,7 @@ namespace Munientry.Client.Shared
 
         /// <summary>
         /// Fetches case data and calls PopulateFromCaseAsync. Override completely for forms
-        /// that use a different API endpoint (e.g. DrivingPrivileges → /api/drivingcase/).
+        /// that use a different API endpoint (e.g. DrivingPrivileges ? /api/drivingcase/).
         /// </summary>
         protected virtual async Task LoadCaseDataAsync(string caseNumber)
         {
@@ -78,9 +80,9 @@ namespace Munientry.Client.Shared
                 if (results == null || results.Count == 0) return;
                 await PopulateFromCaseAsync(results);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                ErrorMessage = $"Failed to load case: {ex.Message}";
+                ErrorMessage = "Failed to load case data. Please try again.";
             }
             finally
             {
@@ -88,7 +90,7 @@ namespace Munientry.Client.Shared
             }
         }
 
-        // ── Submit ───────────────────────────────────────────────────────────────
+        // -- Submit ---------------------------------------------------------------
 
         /// <summary>
         /// Default submit handler: POSTs Model to ApiEndpoint. If the response is a DOCX,
@@ -130,12 +132,12 @@ namespace Munientry.Client.Shared
                 }
                 else
                 {
-                    ErrorMessage = $"Error: {response.ReasonPhrase}";
+                    ErrorMessage = await ReadErrorMessageAsync(response);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                ErrorMessage = ex.Message;
+                ErrorMessage = "An unexpected error occurred. Please try again.";
             }
             finally
             {
@@ -143,7 +145,33 @@ namespace Munientry.Client.Shared
             }
         }
 
-        // ── Navigation helpers ───────────────────────────────────────────────────
+        // -- Error helpers --------------------------------------------------------
+
+        /// <summary>
+        /// Reads the RFC 7807 Problem Details <c>detail</c> field from a non-success
+        /// API response. Falls back to a generic message if the body is absent or unparseable.
+        /// Never surfaces raw exception messages or internal server paths to the UI.
+        /// </summary>
+        private static async Task<string> ReadErrorMessageAsync(HttpResponseMessage response)
+        {
+            try
+            {
+                var body = await response.Content.ReadAsStringAsync();
+                if (!string.IsNullOrWhiteSpace(body))
+                {
+                    using var doc = JsonDocument.Parse(body);
+                    if (doc.RootElement.TryGetProperty("detail", out var detail))
+                        return detail.GetString() ?? "An error occurred. Please try again.";
+                }
+            }
+            catch (Exception)
+            {
+                // Ignore parse failures — fall through to the generic message.
+            }
+            return "An error occurred. Please try again.";
+        }
+
+        // -- Navigation helpers ---------------------------------------------------
         protected virtual void CloseOrCancel() => Navigation.NavigateTo("/");
 
         protected virtual void ClearFields()

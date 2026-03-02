@@ -1,24 +1,30 @@
-﻿using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.JSInterop;
-using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 
 namespace Munientry.Client.Shared
 {
     public class ApiHelper
     {
         private readonly IConfiguration _config;
-        private readonly NavigationManager _nav;
-        public ApiHelper(IConfiguration config, NavigationManager nav)
+
+        public ApiHelper(IConfiguration config)
         {
             _config = config;
-            _nav = nav;
         }
+
+        /// <summary>
+        /// Returns the API base URL from configuration.
+        /// Throws <see cref="InvalidOperationException"/> if ApiBaseUrl is not set —
+        /// a misconfigured environment is caught at startup rather than producing a
+        /// silent wrong-host 404 during a form submission.
+        /// </summary>
         public string GetApiBaseUrl()
         {
             var url = _config["ApiBaseUrl"];
-            return string.IsNullOrEmpty(url) ? _nav.BaseUri : url;
+            if (string.IsNullOrEmpty(url))
+                throw new InvalidOperationException(
+                    "ApiBaseUrl is not configured. Ensure wwwroot/appsettings.json (or " +
+                    "appsettings.Docker.json) contains a non-empty 'ApiBaseUrl' value.");
+            return url;
         }
     }
 }

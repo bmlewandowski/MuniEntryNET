@@ -2,7 +2,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Xunit;
-using Munientry.Api.Data;
+using Munientry.Shared.Dtos;
 namespace Munientry.Api.Tests
 {
     public class CommunityControlTermsNoticesTests

@@ -1,9 +1,8 @@
-﻿@page "/"
-@using Munientry.Client.Shared.Models
+@page "/"
 @inject DailyListApiClient DailyListSvc
 @inject NavigationManager Navigation
 
-<PageTitle>MuniEntry — Daily Case Lists</PageTitle>
+<PageTitle>MuniEntry � Daily Case Lists</PageTitle>
 
 <div class="form-page">
     <div class="form-card daily-list-card">
@@ -22,7 +21,7 @@
                        @onchange="OnDateChanged" />
             </div>
             <button class="btn btn-secondary" @onclick="LoadAllListsAsync" disabled="@IsLoading">
-                @(IsLoading ? "Loading…" : "⟳  Reload")
+                @(IsLoading ? "Loading�" : "?  Reload")
             </button>
         </div>
 
@@ -31,7 +30,7 @@
             <div class="alert alert-danger">@ErrorMessage</div>
         }
 
-        <!-- 3 × 2 grid of case list panels -->
+        <!-- 3 � 2 grid of case list panels -->
         <div class="daily-list-grid">
             @foreach (var list in _lists)
             {
@@ -44,7 +43,7 @@
                     <select class="daily-case-select"
                             size="9"
                             @onchange="e => OnCaseSelected(list.Key, e.Value?.ToString())">
-                        <option value="">— select a case —</option>
+                        <option value="">� select a case �</option>
                         @foreach (var c in list.Cases)
                         {
                             <option value="@c.CaseNumber">@FormatCaseLabel(c)</option>
@@ -54,7 +53,7 @@
             }
         </div>
 
-        <!-- Selected-case action bar – appears once a case is chosen -->
+        <!-- Selected-case action bar � appears once a case is chosen -->
         @if (SelectedCaseNumber is not null)
         {
             <div class="daily-list-selected-bar">
@@ -62,7 +61,7 @@
                     <strong>Selected:</strong>&nbsp;@SelectedCaseName&nbsp;
                     <span class="daily-list-case-tag">@SelectedCaseNumber</span>
                     <button class="btn btn-sm btn-secondary daily-list-clear-btn"
-                            @onclick="ClearSelection">✕ Clear</button>
+                            @onclick="ClearSelection">? Clear</button>
                 </div>
                 <div class="daily-list-actions">
                     @foreach (var link in GetFormLinks())
@@ -77,7 +76,7 @@
 
 @code {
 
-    // ── State ─────────────────────────────────────────────────────────────────
+    // -- State -----------------------------------------------------------------
 
     private DateOnly ReportDate = DateOnly.FromDateTime(DateTime.Today);
     private bool IsLoading;
@@ -86,7 +85,7 @@
     private string? SelectedCaseNumber;
     private string? SelectedCaseName;
 
-    // ── List configuration ───────────────────────────────────────────────────
+    // -- List configuration ---------------------------------------------------
 
     private sealed class ListState
     {
@@ -105,11 +104,11 @@
         new() { Key = "trials_to_court", Label = "Trials to Court"              },
     };
 
-    // ── Lifecycle ────────────────────────────────────────────────────────────
+    // -- Lifecycle ------------------------------------------------------------
 
     protected override async Task OnInitializedAsync() => await LoadAllListsAsync();
 
-    // ── Event handlers ───────────────────────────────────────────────────────
+    // -- Event handlers -------------------------------------------------------
 
     private async Task OnDateChanged(ChangeEventArgs e)
     {
@@ -164,10 +163,10 @@
         SelectedCaseName = null;
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
+    // -- Helpers ---------------------------------------------------------------
 
     /// <summary>
-    /// Formats a case as "LastName - CaseNumber  |  HH:MM" —
+    /// Formats a case as "LastName - CaseNumber  |  HH:MM" �
     /// matching the Python "LastName - CaseNumber" ComboBox pattern.
     /// </summary>
     private static string FormatCaseLabel(DailyListResultDto c)
@@ -175,10 +174,13 @@
         var lastName = c.DefFullName?.Split(' ', StringSplitOptions.RemoveEmptyEntries).LastOrDefault()
                        ?? c.DefFullName ?? "";
         var time     = string.IsNullOrWhiteSpace(c.Time) ? "" : $"  |  {c.Time}";
-        return $"{lastName} — {c.CaseNumber}{time}";
+        return $"{lastName} � {c.CaseNumber}{time}";
     }
 
-    // ── Form links per list type ─────────────────────────────────────────────
+    // -- Form links per list type ---------------------------------------------
+
+    // Common form link added to all list types � always available once a case is selected.
+    private static readonly FormLink ViewDocketLink = new("View Docket", "/case/docket/{cn}");
 
     private record FormLink(string Label, string Url);
 
@@ -240,9 +242,13 @@
     private IEnumerable<FormLink> GetFormLinks()
     {
         var key = ActiveListKey ?? "";
+        var cn  = SelectedCaseNumber ?? "";
+
+        // View Docket is available for every list type.
+        yield return ViewDocketLink with { Url = ViewDocketLink.Url.Replace("{cn}", cn) };
+
         if (!_formLinks.TryGetValue(key, out var links))
             yield break;
-        var cn = SelectedCaseNumber ?? "";
         foreach (var l in links)
             yield return l with { Url = l.Url.Replace("{cn}", cn) };
     }

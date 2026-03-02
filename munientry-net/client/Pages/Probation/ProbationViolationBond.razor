@@ -6,8 +6,8 @@
 <div class="form-card">
 <h2>Preliminary Probation Violation and Bond Dialog</h2>
 
-<EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
-<DataAnnotationsValidator />
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+<FluentValidationValidator />
 @if (IsLoadingCase)
 {
 <div class="alert alert-info">Loading case data...</div>
@@ -15,38 +15,38 @@
 	<ValidationSummary />
 	<div class="form-group">
 		<label>Defendant First Name</label>
-		<InputText class="form-control" @bind-Value="formModel.DefendantFirstName" />
+		<InputText class="form-control" @bind-Value="Model.DefendantFirstName" />
 	</div>
 	<div class="form-group">
 		<label>Defendant Last Name</label>
-		<InputText class="form-control" @bind-Value="formModel.DefendantLastName" />
+		<InputText class="form-control" @bind-Value="Model.DefendantLastName" />
 	</div>
 	<div class="form-group">
 		<label>Case Number</label>
-		<InputText class="form-control" @bind-Value="formModel.CaseNumber" />
+		<InputText class="form-control" @bind-Value="Model.CaseNumber" />
 	</div>
 	<div class="form-group">
 		<label>Appearance Reason</label>
-		<InputText class="form-control" @bind-Value="formModel.AppearanceReason" />
+		<InputText class="form-control" @bind-Value="Model.AppearanceReason" />
 	</div>
 	<div class="form-group">
 		<label>Defense Counsel Name</label>
-		<InputText class="form-control" @bind-Value="formModel.DefenseCounselName" />
+		<InputText class="form-control" @bind-Value="Model.DefenseCounselName" />
 	</div>
 	<div class="form-group">
 		<label>Defense Counsel Type</label>
-		<InputSelect class="form-control" @bind-Value="formModel.DefenseCounselType">
+		<InputSelect class="form-control" @bind-Value="Model.DefenseCounselType">
 			<option value="Public Defender">Public Defender</option>
 			<option value="Private Counsel">Private Counsel</option>
 		</InputSelect>
 	</div>
 	<div class="form-group">
 		<label>Defense Counsel Waived</label>
-		<InputCheckbox @bind-Value="formModel.DefenseCounselWaived" />
+		<InputCheckbox @bind-Value="Model.DefenseCounselWaived" />
 	</div>
 	<div class="form-group">
 		<label>Probable Cause Finding</label>
-		<InputSelect class="form-control" @bind-Value="formModel.ProbableCauseFinding">
+		<InputSelect class="form-control" @bind-Value="Model.ProbableCauseFinding">
 			<option value="Stipulates">Defendant stipulates probable cause exists</option>
 			<option value="Court Finds">Court finds probable cause</option>
 			<option value="No Probable Cause">No probable cause</option>
@@ -54,7 +54,7 @@
 	</div>
 	<div class="form-group">
 		<label>Bond Type</label>
-		<InputSelect class="form-control" @bind-Value="formModel.BondType">
+		<InputSelect class="form-control" @bind-Value="Model.BondType">
 			<option value="No Bond">No Bond</option>
 			<option value="Recognizance (OR) Bond">Recognizance (OR) Bond</option>
 			<option value="10% Deposit, Cash or Surety Bond">10% Deposit, Cash or Surety Bond</option>
@@ -63,7 +63,7 @@
 	</div>
 	<div class="form-group">
 		<label>Bond Amount</label>
-		<InputSelect class="form-control" @bind-Value="formModel.BondAmount">
+		<InputSelect class="form-control" @bind-Value="Model.BondAmount">
 			<option value="None">None</option>
 			<option value="$1,000">$1,000</option>
 			<option value="$1,500">$1,500</option>
@@ -78,15 +78,15 @@
 	</div>
 	<div class="form-group">
 		<label>No alcohol/drugs of abuse</label>
-		<InputCheckbox @bind-Value="formModel.NoAlcoholDrugs" />
+		<InputCheckbox @bind-Value="Model.NoAlcoholDrugs" />
 	</div>
 	<div class="form-group">
 		<label>Monitoring (GPS/Scram/Smart Start)</label>
-		<InputCheckbox @bind-Value="formModel.Monitoring" />
+		<InputCheckbox @bind-Value="Model.Monitoring" />
 	</div>
 	<div class="form-group">
 		<label>Monitoring Type</label>
-		<InputSelect class="form-control" @bind-Value="formModel.MonitoringType">
+		<InputSelect class="form-control" @bind-Value="Model.MonitoringType">
 			<option value="SCRAM Only">SCRAM Only</option>
 			<option value="GPS Only">GPS Only</option>
 			<option value="Smart Start Only">Smart Start Only</option>
@@ -94,11 +94,11 @@
 	</div>
 	<div class="form-group">
 		<label>Comply with Terms of Protection Order</label>
-		<InputCheckbox @bind-Value="formModel.ComplyProtectionOrder" />
+		<InputCheckbox @bind-Value="Model.ComplyProtectionOrder" />
 	</div>
 	<div class="form-group">
 		<label>Other Conditions</label>
-		<InputCheckbox @bind-Value="formModel.OtherConditions" />
+		<InputCheckbox @bind-Value="Model.OtherConditions" />
 	</div>
 	<div class="form-actions">
 		<button type="submit" class="btn btn-success" disabled="@(IsSubmitting || IsLoadingCase)">Generate DOCX</button>
@@ -112,7 +112,6 @@
 </div>
 
 @code {
-	private ProbationViolationBondDto formModel => Model;
 
 	protected override string ApiEndpoint => "probationviolationbond";
 

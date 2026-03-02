@@ -1,6 +1,9 @@
-﻿using Munientry.Api;
+﻿using FluentValidation;
+using Munientry.Api;
 using Munientry.Api.Endpoints;
 using Munientry.Api.Middleware;
+using Munientry.Api.Validation;
+using Munientry.Shared.Validation;
 // ENTRA ID - Step 2: Uncomment the using directive below.
 // using Microsoft.Identity.Web;
 
@@ -38,9 +41,16 @@ builder.Services.AddCors(options =>
 //         .Build());
 
 builder.Services.AddHealthChecks();
-builder.Services.AddMuniEntryServices();
+builder.Services.AddMuniEntryServices(builder.Configuration);
+// Register all IValidator<T> implementations discovered in the Munientry.Shared assembly.
+// Validators live in shared/Validation/FormValidators.cs so the Blazor client can reference
+// the same rules for client-side validation via Blazored.FluentValidation.
+builder.Services.AddValidatorsFromAssemblyContaining<NotGuiltyPleaValidator>(lifetime: ServiceLifetime.Singleton);
 
 var app = builder.Build();
+// UseHostFiltering must precede UseCors so the AllowedHosts setting in
+// appsettings.json actually takes effect (security item #7).
+app.UseHostFiltering();
 app.UseCors();
 app.UseExceptionHandler();
 app.UseMiddleware<AuditMiddleware>();
@@ -59,7 +69,7 @@ if (app.Environment.IsDevelopment())
 // omit the /api prefix (e.g. "/case/search/{id}") because the group supplies it.
 // To add a new endpoint: open the relevant Endpoints/ file and add a MapXxx call.
 // To add a new version: duplicate the group block with a new prefix ("/api/v2").
-var v1 = app.MapGroup("/api/v1");
+var v1 = app.MapGroup("/api/v1").AddEndpointFilter<FluentValidationFilter>();
 v1.MapCaseDataEndpoints();
 v1.MapDrivingEndpoints();
 v1.MapCriminalPleaEndpoints();
@@ -70,6 +80,7 @@ v1.MapProbationEndpoints();
 v1.MapNoticesAndSchedulingEndpoints();
 v1.MapCivilEndpoints();
 v1.MapAdminEndpoints();
+v1.MapReportsEndpoints();
 
 app.Run();
 

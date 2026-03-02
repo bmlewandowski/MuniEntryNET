@@ -1,5 +1,6 @@
-﻿using System.Net.Http.Json;
-using Munientry.Client.Shared.Models;
+using System.Net.Http.Json;
+using Microsoft.Extensions.Logging;
+using Munientry.Shared.Dtos;
 
 namespace Munientry.Client.Shared
 {
@@ -11,11 +12,13 @@ namespace Munientry.Client.Shared
     /// </summary>
     public class CaseSearchApiClient
     {
-        private readonly ApiHelper _apiHelper;
+        private readonly HttpClient _http;
+        private readonly ILogger<CaseSearchApiClient> _logger;
 
-        public CaseSearchApiClient(ApiHelper apiHelper)
+        public CaseSearchApiClient(HttpClient http, ILogger<CaseSearchApiClient> logger)
         {
-            _apiHelper = apiHelper;
+            _http = http;
+            _logger = logger;
         }
 
         /// <summary>
@@ -28,14 +31,13 @@ namespace Munientry.Client.Shared
         {
             try
             {
-                var apiBase = _apiHelper.GetApiBaseUrl();
-                using var http = new HttpClient { BaseAddress = new Uri(apiBase) };
-                var result = await http.GetFromJsonAsync<List<CaseSearchResultDto>>(
-                    $"case/search/{Uri.EscapeDataString(caseNumber)}");;
+                var result = await _http.GetFromJsonAsync<List<CaseSearchResultDto>>(
+                    $"case/search/{Uri.EscapeDataString(caseNumber)}");
                 return result ?? new List<CaseSearchResultDto>();
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "CaseSearchApiClient.SearchCaseAsync failed for case {CaseNumber}.", caseNumber);
                 return new List<CaseSearchResultDto>();
             }
         }

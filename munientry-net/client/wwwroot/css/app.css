@@ -402,6 +402,45 @@ body {
 /* =============================================
    Validation
    ============================================= */
+
+/* Blazor automatically adds .invalid / .valid / .modified to InputText,
+   InputDate, InputNumber, InputSelect, InputCheckbox, InputTextArea, etc.
+   .invalid is applied to ALL fields on submit attempt, and to individual
+   fields as soon as the user modifies them and the value fails validation. */
+.form-card input.invalid,
+.form-card select.invalid,
+.form-card textarea.invalid {
+    border-color: var(--btn-danger-bg) !important;
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.20);
+}
+
+/* Only show green border after the user has touched the field (modified),
+   not on initial render, so the form doesn't open all-green. */
+.form-card input.modified.valid,
+.form-card select.modified.valid,
+.form-card textarea.modified.valid {
+    border-color: #28a745 !important;
+    box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.15);
+}
+
+/* ValidationSummary — the error list that appears above the form fields */
+.form-card .validation-summary-errors {
+    background: rgba(220, 53, 69, 0.07);
+    border: 1px solid var(--btn-danger-bg);
+    border-radius: 6px;
+    padding: 0.6rem 1rem;
+    margin-bottom: 0.75rem;
+}
+.form-card .validation-summary-errors ul {
+    margin: 0;
+    padding-left: 1.25rem;
+}
+.form-card .validation-summary-errors li {
+    color: var(--btn-danger-bg);
+    font-size: 0.875rem;
+}
+
+/* Per-field ValidationMessage helper text */
 .form-card .validation-message {
     color: var(--btn-danger-bg);
     font-size: 0.85rem;

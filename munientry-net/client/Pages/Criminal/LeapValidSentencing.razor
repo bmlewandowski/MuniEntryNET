@@ -7,47 +7,47 @@
 <div class="form-card">
 <h2>LEAP Sentencing - Already Valid</h2>
 
-<EditForm Model="leapValidSentencingModel" OnValidSubmit="HandleValidSubmit">
-	<DataAnnotationsValidator />
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+	<FluentValidationValidator />
 	<ValidationSummary />
 	<div class="form-group">
 		<label>Defendant First Name</label>
-		<InputText @bind-Value="leapValidSentencingModel.DefendantFirstName" class="form-control" />
-		<ValidationMessage For="() => leapValidSentencingModel.DefendantFirstName" />
+		<InputText @bind-Value="Model.DefendantFirstName" class="form-control" />
+		<ValidationMessage For="() => Model.DefendantFirstName" />
 	</div>
 	<div class="form-group">
 		<label>Defendant Last Name</label>
-		<InputText @bind-Value="leapValidSentencingModel.DefendantLastName" class="form-control" />
-		<ValidationMessage For="() => leapValidSentencingModel.DefendantLastName" />
+		<InputText @bind-Value="Model.DefendantLastName" class="form-control" />
+		<ValidationMessage For="() => Model.DefendantLastName" />
 	</div>
 	<div class="form-group">
 		<label>Case Number</label>
-		<InputText @bind-Value="leapValidSentencingModel.CaseNumber" class="form-control" />
-		<ValidationMessage For="() => leapValidSentencingModel.CaseNumber" />
+		<InputText @bind-Value="Model.CaseNumber" class="form-control" />
+		<ValidationMessage For="() => Model.CaseNumber" />
 	</div>
 	<div class="form-group">
 		<label>Date</label>
-		<InputDate @bind-Value="leapValidSentencingModel.Date" class="form-control" />
-		<ValidationMessage For="() => leapValidSentencingModel.Date" />
+		<InputDate @bind-Value="Model.Date" class="form-control" />
+		<ValidationMessage For="() => Model.Date" />
 	</div>
 	<div class="form-group">
 		<label>Defense Counsel Name</label>
-		<InputText @bind-Value="leapValidSentencingModel.DefenseCounselName" class="form-control" />
+		<InputText @bind-Value="Model.DefenseCounselName" class="form-control" />
 	</div>
 	<div class="form-group">
 		<label>Defense Counsel Type</label>
-		<InputSelect @bind-Value="leapValidSentencingModel.DefenseCounselType" class="form-control">
+		<InputSelect @bind-Value="Model.DefenseCounselType" class="form-control">
 			<option value="">Select...</option>
 			<option>Public Defender</option>
 			<option>Private Counsel</option>
 		</InputSelect>
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="leapValidSentencingModel.DefenseCounselWaived" /> Defendant waived right to counsel
+		<InputCheckbox @bind-Value="Model.DefenseCounselWaived" /> Defendant waived right to counsel
 	</div>
 	<div class="form-group">
 		<label>Appearance Reason</label>
-		<InputSelect @bind-Value="leapValidSentencingModel.AppearanceReason" class="form-control">
+		<InputSelect @bind-Value="Model.AppearanceReason" class="form-control">
 			<option value="">Select...</option>
 			<option>arraignment</option>
 			<option>change of plea</option>
@@ -107,15 +107,14 @@
 </div>
 
 @code {
-	private LeapValidSentencingDto leapValidSentencingModel => Model;
 	private List<ChargeGridRow> Charges { get; set; } = new();
 
 	protected override string ApiEndpoint => "leapvalidsentencing";
 
 	protected override async Task HandleValidSubmit()
 	{
-		leapValidSentencingModel.ChargeItems = Charges
-			.Select(c => new Munientry.Client.Shared.Models.ChargeItemDto
+		Model.ChargeItems = Charges
+			.Select(c => new ChargeItemDto
 			{
 				Offense = c.Offense,
 				Statute = c.Statute,

@@ -17,6 +17,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\api\Munientry.Api.csproj" />
+    <ProjectReference Include="..\shared\Munientry.Shared.csproj" />
   </ItemGroup>
   <Target Name="GenerateRuntimeConfigDevFile" AfterTargets="Build">
     <PropertyGroup>

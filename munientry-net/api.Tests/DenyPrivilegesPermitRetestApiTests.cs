@@ -2,14 +2,14 @@ using System;
 using System.Net;
 using System.Net.Http.Json;
 using Xunit;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Munientry.Api.Tests.Infrastructure;
 using System.Threading.Tasks;
-using Munientry.Api.Data;
+using Munientry.Shared.Dtos;
 
-public class DenyPrivilegesPermitRetestApiTests : IClassFixture<WebApplicationFactory<Program>>
+public class DenyPrivilegesPermitRetestApiTests : IClassFixture<MuniEntryWebApplicationFactory>
 {
-    private readonly WebApplicationFactory<Program> _factory;
-    public DenyPrivilegesPermitRetestApiTests(WebApplicationFactory<Program> factory)
+    private readonly MuniEntryWebApplicationFactory _factory;
+    public DenyPrivilegesPermitRetestApiTests(MuniEntryWebApplicationFactory factory)
     {
         _factory = factory;
     }
@@ -24,7 +24,7 @@ public class DenyPrivilegesPermitRetestApiTests : IClassFixture<WebApplicationFa
             DefendantLastName = "Smith",
             CaseNumber = "22TRC99999",
             EntryDate = DateTime.UtcNow,
-            EntryType = "DenyDrivingPrivileges",
+            EntryType = EntryType.DenyDrivingPrivileges,
             HardTimeNotPassed = true,
             PermanentIdCard = false,
             OutOfStateLicense = false,

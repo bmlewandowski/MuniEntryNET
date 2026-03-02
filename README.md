@@ -141,7 +141,7 @@ All criminal, probation, and driving entry forms share `client/Shared/FormPageBa
 | Concern | How it's handled |
 |---|---|
 | Case pre-population | `OnParametersSetAsync` → `CaseSearchService.SearchCaseAsync` → `PopulateFromCaseAsync` override |
-| DOCX download | `HandleValidSubmit` POSTs via `ICriminalFormApiClient`, detects `wordprocessingml` content-type, triggers JS `downloadFile` interop |
+| DOCX download | `HandleValidSubmit` POSTs via `IEntryFormApiClient`, detects `wordprocessingml` content-type, triggers JS `downloadFile` interop |
 | Loading / submitting state | `IsLoadingCase` / `IsSubmitting` booleans — all form buttons disabled while either is true |
 | URL resolution | `ApiHelper.GetApiBaseUrl()` — resolves API base URL dynamically for Docker / local environments |
 

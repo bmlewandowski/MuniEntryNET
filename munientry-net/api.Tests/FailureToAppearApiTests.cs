@@ -1,16 +1,16 @@
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using Munientry.Api.Data;
+using Munientry.Shared.Dtos;
 using Xunit;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Munientry.Api.Tests.Infrastructure;
 
 namespace Munientry.Api.Tests
 {
-    public class FailureToAppearApiTests : IClassFixture<WebApplicationFactory<Program>>
+    public class FailureToAppearApiTests : IClassFixture<MuniEntryWebApplicationFactory>
     {
-        private readonly WebApplicationFactory<Program> _factory;
+        private readonly MuniEntryWebApplicationFactory _factory;
 
-        public FailureToAppearApiTests(WebApplicationFactory<Program> factory)
+        public FailureToAppearApiTests(MuniEntryWebApplicationFactory factory)
         {
             _factory = factory;
         }
@@ -36,7 +36,7 @@ namespace Munientry.Api.Tests
             };
 
             var client = _factory.CreateClient();
-            var response = await client.PostAsJsonAsync("/api/v1/failuretooappear", dto);
+            var response = await client.PostAsJsonAsync("/api/v1/failuretoappear", dto);
             response.EnsureSuccessStatusCode();
             Assert.Equal(
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",

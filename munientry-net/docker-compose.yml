@@ -17,7 +17,9 @@ services:
       #   AUTHORITY_COURT_CONNSTR=Server=host.docker.internal;Database=AuthorityCourt;User Id=munientry_app;Password=CHANGE_ME;TrustServerCertificate=True;
       - ConnectionStrings__AuthorityCourt=${AUTHORITY_COURT_CONNSTR:-}
   client:
-    build: ./client
+    build:
+      context: .
+      dockerfile: client/Dockerfile
     ports:
       - "3000:80"
     depends_on:

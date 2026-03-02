@@ -1,5 +1,4 @@
-﻿@page "/admin/workflows-fiscal"
-@using Munientry.Client.Shared.Models
+@page "/admin/workflows-fiscal"
 @inject NavigationManager Navigation
 
 <div class="form-page">
@@ -7,7 +6,7 @@
 <h2>Fiscal Journal Entries Dialog</h2>
 
 <EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
+    <FluentValidationValidator />
     <ValidationSummary />
     <div class="form-group">
         <label>Account Number</label>

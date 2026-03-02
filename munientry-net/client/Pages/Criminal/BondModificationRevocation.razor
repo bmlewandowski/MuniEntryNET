@@ -6,8 +6,8 @@
 <div class="form-card">
 <h2>Bond Modification/Revocation Dialog</h2>
 
-<EditForm Model="bondForm" OnValidSubmit="HandleValidSubmit">
-<DataAnnotationsValidator />
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+<FluentValidationValidator />
 @if (IsLoadingCase)
 {
 <div class="alert alert-info">Loading case data...</div>
@@ -15,46 +15,46 @@
 	<ValidationSummary />
 	<div class="form-group">
 		<label>Defendant First Name</label>
-		<InputText class="form-control" @bind-Value="bondForm.DefendantFirstName" />
-		<ValidationMessage For="@(() => bondForm.DefendantFirstName)" />
+		<InputText class="form-control" @bind-Value="Model.DefendantFirstName" />
+		<ValidationMessage For="@(() => Model.DefendantFirstName)" />
 	</div>
 	<div class="form-group">
 		<label>Defendant Last Name</label>
-		<InputText class="form-control" @bind-Value="bondForm.DefendantLastName" />
-		<ValidationMessage For="@(() => bondForm.DefendantLastName)" />
+		<InputText class="form-control" @bind-Value="Model.DefendantLastName" />
+		<ValidationMessage For="@(() => Model.DefendantLastName)" />
 	</div>
 	<div class="form-group">
 		<label>Case Number</label>
-		<InputText class="form-control" @bind-Value="bondForm.CaseNumber" />
-		<ValidationMessage For="@(() => bondForm.CaseNumber)" />
+		<InputText class="form-control" @bind-Value="Model.CaseNumber" />
+		<ValidationMessage For="@(() => Model.CaseNumber)" />
 	</div>
 	<div class="form-group">
 		<label>Entry Date</label>
-		<InputDate class="form-control" @bind-Value="bondForm.EntryDate" />
-		<ValidationMessage For="@(() => bondForm.EntryDate)" />
+		<InputDate class="form-control" @bind-Value="Model.EntryDate" />
+		<ValidationMessage For="@(() => Model.EntryDate)" />
 	</div>
 	<div class="form-group">
 		<label>Decision on Bond</label>
-		<InputSelect class="form-control" @bind-Value="bondForm.DecisionOnBond">
+		<InputSelect class="form-control" @bind-Value="Model.DecisionOnBond">
 			<option value="">-- Select --</option>
 			<option value="request to modify bond is granted">Request to modify bond is granted</option>
 			<option value="request to modify bond is denied">Request to modify bond is denied</option>
 			<option value="request to revoke bond is granted">Request to revoke bond is granted</option>
 			<option value="request to revoke bond is denied">Request to revoke bond is denied</option>
 		</InputSelect>
-		<ValidationMessage For="@(() => bondForm.DecisionOnBond)" />
+		<ValidationMessage For="@(() => Model.DecisionOnBond)" />
 	</div>
 	<div class="form-group">
 		<label>Bond Type</label>
-		<InputText class="form-control" @bind-Value="bondForm.BondType" />
+		<InputText class="form-control" @bind-Value="Model.BondType" />
 	</div>
 	<div class="form-group">
 		<label>Bond Amount</label>
-		<InputText class="form-control" @bind-Value="bondForm.BondAmount" />
+		<InputText class="form-control" @bind-Value="Model.BondAmount" />
 	</div>
 	<div class="form-group">
 		<label>Defense Counsel Name</label>
-		<InputText class="form-control" @bind-Value="bondForm.DefenseCounselName" />
+		<InputText class="form-control" @bind-Value="Model.DefenseCounselName" />
 	</div>
 	<div class="form-actions">
 		<button type="submit" class="btn btn-success" disabled="@(IsSubmitting || IsLoadingCase)">Open Entry</button>
@@ -75,7 +75,6 @@
 </div>
 </div>
 @code {
-	private BondModificationRevocationDto bondForm => Model;
 
 	protected override string ApiEndpoint => "bondmodificationrevocation";
 

@@ -1,37 +1,35 @@
-# DTOs in client/Shared/Models
+# DTOs — shared/Dtos
 
 ## Purpose
-This folder contains all Data Transfer Objects (DTOs) used by the Blazor client for form submissions, API communication, and data binding. Each DTO here should have a matching definition in the API (`api/Data`) to ensure consistent data contracts between client and server.
+All Data Transfer Objects (DTOs) used by both the Blazor client and the API live in a single shared library: `shared/Munientry.Shared.csproj`. This eliminates the client/server drift that existed when each project maintained its own copy.
 
 ## Structure
-- All DTOs use the namespace: `Munientry.Client.Shared.Models`
+- All DTOs use the namespace: `Munientry.Shared.Dtos`
+- Source location: `shared/Dtos/*.cs`
+- Validation attributes (`PastDateAttribute`, `FutureDateAttribute`) use the namespace `Munientry.Shared.Validation` and live in `shared/Validation/`.
 - DTOs are named according to their form or data purpose (e.g., `ArraignmentContinuanceDto`, `DrivingCaseInfoDto`).
-- Each DTO should match the fields and types of its API counterpart.
 - `EntryType.cs` in this folder is a shared enum, not a DTO — it is used by `DenyPrivilegesPermitRetestDto` to distinguish entry types.
 
 ## Maintenance Guidelines
-- When adding a new form, create or update the corresponding DTO in this folder.
-- Keep DTOs in sync with the API: update fields, types, and names as needed.
+- When adding a new form, create or update the corresponding DTO in `shared/Dtos/` — **one file, used by both the API and the client**.
 - Remove obsolete DTOs when forms are retired or replaced.
-
-## `client/Dtos` folder
-The `client/Dtos/` folder has been removed. All DTOs now live in `client/Shared/Models/`.
+- All three projects (`Munientry.Api`, `Munientry.Client`, `api.Tests`) reference `Munientry.Shared` via `<ProjectReference>`.
 
 ## Base Class and Typed Client Infrastructure
 
-All 14 entry forms (`Criminal/`, `Probation/`, `Driving/`) now inherit from `FormPageBase<TDto>` defined in
+All 35 entry forms (`Criminal/`, `Probation/`, `Driving/`, `Notices/`, `Scheduling/`, `Admin/`) now inherit from `FormPageBase<TDto>` defined in
 `client/Shared/FormPageBase.cs`. This base class:
 
 - Holds the typed `TDto Model` instance used for form binding.
 - Manages `IsSubmitting` / `IsLoadingCase` UI state.
 - Calls `CaseSearch.SearchCaseAsync` (via the injected `CaseSearchApiClient`) to pre-populate the model on case number load.
-- POSTs the model to the API via `ICriminalFormApiClient` and handles DOCX streaming or text result display.
+- POSTs the model to the API via `IEntryFormApiClient` and handles DOCX streaming or text result display.
 
-The typed HTTP client interface is `ICriminalFormApiClient` (`client/Shared/ICriminalFormApiClient.cs`),
-implemented by `CriminalFormApiClient` (`client/Shared/CriminalFormApiClient.cs`) and registered in
+The typed HTTP client interface is `IEntryFormApiClient` (`client/Shared/IEntryFormApiClient.cs`),
+implemented by `EntryFormApiClient` (`client/Shared/EntryFormApiClient.cs`) and registered in
 `Program.cs` as a scoped service using `ApiHelper.GetApiBaseUrl()` for the base address.
 
-## DTO List (Location: client/Shared/Models)
+## DTO List (Location: shared/Dtos/)
 
 ```
 AppearOnWarrantNoPleaDto.cs
@@ -77,7 +75,7 @@ CriminalSealingEntryDto.cs
 FailureToAppearDto.cs
 ```
 
-All files above are located in: `client/Shared/Models/`
+All files above are located in: `shared/Dtos/`
 
 ---
 
@@ -93,12 +91,11 @@ All files above are located in: `client/Shared/Models/`
 
 ### Aggregate Reports
 
-The following Python aggregate report features are out of scope for the initial Blazor migration and will be addressed separately:
+All aggregate report features are now fully migrated:
 
-- Not Guilty Report
-- Courtroom A / B / C Event Reports
-- Event Type Reports
-- Batch FTA processing
+- Not Guilty Report — `GET /api/v1/reports/not-guilty/{date}`
+- Event Type Reports — `GET /api/v1/reports/events/{code}/{date}`
+- Batch FTA processing — `GET /api/v1/reports/fta/{date}` + `GET /api/v1/reports/fta/batch`
 
 ---
 _Last updated: June 2026_

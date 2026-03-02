@@ -1,17 +1,16 @@
-﻿@page "/admin/juror-payment"
+@page "/admin/juror-payment"
 @page "/admin/juror-payment/{CaseNumber}"
-@using Munientry.Client.Shared.Models
 @using Microsoft.AspNetCore.Components
 @inject NavigationManager Navigation
-@inject HttpClient Http
 @inject IJSRuntime JS
+@inject ApiHelper ApiHelper
 
 <div class="form-page">
 <div class="form-card">
 <h2>Juror Payment Dialog</h2>
 
 <EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
-	<DataAnnotationsValidator />
+	<FluentValidationValidator />
 	<ValidationSummary />
 	<div class="form-group">
 		<label>Case Number</label>
@@ -92,7 +91,8 @@
 
 	private async Task HandleValidSubmit()
 	{
-		var response = await Http.PostAsJsonAsync("/api/jurorpayment", formModel);
+		using var http = new HttpClient { BaseAddress = new Uri(ApiHelper.GetApiBaseUrl()) };
+		var response = await http.PostAsJsonAsync("jurorpayment", formModel);
 		if (response.IsSuccessStatusCode)
 		{
 			var content = await response.Content.ReadAsByteArrayAsync();

@@ -1,8 +1,5 @@
-﻿@page "/Criminal/ArraignmentContinuance"
-@using Munientry.Client.Shared.Models
-@inject HttpClient Http
-@inject NavigationManager Navigation
-@inject IJSRuntime JS
+@page "/Criminal/ArraignmentContinuance"
+@inherits FormPageBase<ArraignmentContinuanceDto>
 
 <PageTitle>Arraignment Continuance</PageTitle>
 
@@ -10,45 +7,45 @@
 <div class="form-card">
 <h3>Arraignment Continuance</h3>
 
-<EditForm Model="continuance" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+    <FluentValidationValidator />
     <ValidationSummary />
     <div class="form-section">
         <h4>Case Information</h4>
         <div class="form-group">
             <label>Defendant First Name</label>
-            <InputText @bind-Value="continuance.DefendantFirstName" class="form-control" />
+            <InputText @bind-Value="Model.DefendantFirstName" class="form-control" />
         </div>
         <div class="form-group">
             <label>Defendant Last Name</label>
-            <InputText @bind-Value="continuance.DefendantLastName" class="form-control" />
+            <InputText @bind-Value="Model.DefendantLastName" class="form-control" />
         </div>
         <div class="form-group">
             <label>Case Number</label>
-            <InputText @bind-Value="continuance.CaseNumber" class="form-control" />
+            <InputText @bind-Value="Model.CaseNumber" class="form-control" />
         </div>
         <div class="form-group">
             <label>Date (Plea/Trial)</label>
-            <InputDate @bind-Value="continuance.PleaTrialDate" class="form-control" />
+            <InputDate @bind-Value="Model.PleaTrialDate" class="form-control" />
         </div>
         <div class="form-group">
             <label>Defense Counsel Name</label>
-            <InputText @bind-Value="continuance.DefenseCounselName" class="form-control" />
+            <InputText @bind-Value="Model.DefenseCounselName" class="form-control" />
         </div>
         <div class="form-group">
             <label>Defense Counsel Type</label>
-            <InputSelect @bind-Value="continuance.DefenseCounselType" class="form-control">
+            <InputSelect @bind-Value="Model.DefenseCounselType" class="form-control">
                 <option value="">Select</option>
                 <option value="Public Defender">Public Defender</option>
                 <option value="Private Counsel">Private Counsel</option>
             </InputSelect>
         </div>
         <div class="form-group">
-            <InputCheckbox @bind-Value="continuance.CounselWaived" /> Defendant appeared without counsel
+            <InputCheckbox @bind-Value="Model.CounselWaived" /> Defendant appeared without counsel
         </div>
         <div class="form-group">
             <label>Appearance Reason</label>
-            <InputSelect @bind-Value="continuance.AppearanceReason" class="form-control">
+            <InputSelect @bind-Value="Model.AppearanceReason" class="form-control">
                 <option value="">Select</option>
                 <option value="arraignment">arraignment</option>
                 <option value="final community control violation hearing">final community control violation hearing</option>
@@ -66,15 +63,15 @@
         <h4>Continuance Information</h4>
         <div class="form-group">
             <label>Current Arraignment Date</label>
-            <InputDate @bind-Value="continuance.CurrentArraignmentDate" class="form-control" />
+            <InputDate @bind-Value="Model.CurrentArraignmentDate" class="form-control" />
         </div>
         <div class="form-group">
             <label>New Arraignment Date</label>
-            <InputDate @bind-Value="continuance.NewArraignmentDate" class="form-control" />
+            <InputDate @bind-Value="Model.NewArraignmentDate" class="form-control" />
         </div>
         <div class="form-group">
             <label>Continuance Length</label>
-            <InputSelect @bind-Value="continuance.ContinuanceLength" class="form-control">
+            <InputSelect @bind-Value="Model.ContinuanceLength" class="form-control">
                 <option value="">Select</option>
                 <option value="2 Weeks">2 Weeks</option>
                 <option value="1 Week">1 Week</option>
@@ -82,7 +79,7 @@
         </div>
         <div class="form-group">
             <label>Continuance Reason</label>
-            <InputSelect @bind-Value="continuance.ContinuanceReason" class="form-control">
+            <InputSelect @bind-Value="Model.ContinuanceReason" class="form-control">
                 <option value="">Select</option>
                 <option value="to arrange for an interpreter for defendant">to arrange for an interpreter for defendant</option>
                 <option value="general continuance - granted">general continuance - granted</option>
@@ -103,19 +100,5 @@
 </div>
 
 @code {
-    private ArraignmentContinuanceDto continuance = new();
-
-    private async Task HandleValidSubmit()
-    {
-        var response = await Http.PostAsJsonAsync("/api/arraignmentcontinuance", continuance);
-        if (response.IsSuccessStatusCode)
-        {
-            var content = await response.Content.ReadAsByteArrayAsync();
-            var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "ArraignmentContinuance.docx";
-            await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
-        }
-    }
-
-    private void CloseOrCancel() => Navigation.NavigateTo("/");
-    private void ClearFields() { continuance = new(); }
+    protected override string ApiEndpoint => "arraignmentcontinuance";
 }

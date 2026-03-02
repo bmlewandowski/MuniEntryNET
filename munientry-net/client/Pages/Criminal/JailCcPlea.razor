@@ -6,8 +6,8 @@
 <div class="form-card">
 <h2>Plea of Guilty - Jail/CC Only</h2>
 
-<EditForm Model="jailCcModel" OnValidSubmit="HandleValidSubmit">
-<DataAnnotationsValidator />
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+<FluentValidationValidator />
 @if (IsLoadingCase)
 {
 <div class="alert alert-info">Loading case data...</div>
@@ -15,42 +15,42 @@
 	<ValidationSummary />
 	<div class="form-group">
 		<label>Defendant First Name</label>
-		<InputText @bind-Value="jailCcModel.DefendantFirstName" class="form-control" />
-		<ValidationMessage For="() => jailCcModel.DefendantFirstName" />
+		<InputText @bind-Value="Model.DefendantFirstName" class="form-control" />
+		<ValidationMessage For="() => Model.DefendantFirstName" />
 	</div>
 	<div class="form-group">
 		<label>Defendant Last Name</label>
-		<InputText @bind-Value="jailCcModel.DefendantLastName" class="form-control" />
-		<ValidationMessage For="() => jailCcModel.DefendantLastName" />
+		<InputText @bind-Value="Model.DefendantLastName" class="form-control" />
+		<ValidationMessage For="() => Model.DefendantLastName" />
 	</div>
 	<div class="form-group">
 		<label>Case Number</label>
-		<InputText @bind-Value="jailCcModel.CaseNumber" class="form-control" />
-		<ValidationMessage For="() => jailCcModel.CaseNumber" />
+		<InputText @bind-Value="Model.CaseNumber" class="form-control" />
+		<ValidationMessage For="() => Model.CaseNumber" />
 	</div>
 	<div class="form-group">
 		<label>Date</label>
-		<InputDate @bind-Value="jailCcModel.Date" class="form-control" />
-		<ValidationMessage For="() => jailCcModel.Date" />
+		<InputDate @bind-Value="Model.Date" class="form-control" />
+		<ValidationMessage For="() => Model.Date" />
 	</div>
 	<div class="form-group">
 		<label>Defense Counsel Name</label>
-		<InputText @bind-Value="jailCcModel.DefenseCounselName" class="form-control" />
+		<InputText @bind-Value="Model.DefenseCounselName" class="form-control" />
 	</div>
 	<div class="form-group">
 		<label>Defense Counsel Type</label>
-		<InputSelect @bind-Value="jailCcModel.DefenseCounselType" class="form-control">
+		<InputSelect @bind-Value="Model.DefenseCounselType" class="form-control">
 			<option value="">Select...</option>
 			<option>Public Defender</option>
 			<option>Private Counsel</option>
 		</InputSelect>
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="jailCcModel.DefenseCounselWaived" /> Defendant waived right to counsel
+		<InputCheckbox @bind-Value="Model.DefenseCounselWaived" /> Defendant waived right to counsel
 	</div>
 	<div class="form-group">
 		<label>Appearance Reason</label>
-		<InputSelect @bind-Value="jailCcModel.AppearanceReason" class="form-control">
+		<InputSelect @bind-Value="Model.AppearanceReason" class="form-control">
 			<option value="">Select...</option>
 			<option>arraignment</option>
 			<option>a change of plea</option>
@@ -112,41 +112,41 @@
 		<button type="button" class="btn btn-secondary btn-sm" @onclick="GuiltyAll">Guilty All</button>
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="jailCcModel.OffenseOfViolence" /> Offense of Violence
+		<InputCheckbox @bind-Value="Model.OffenseOfViolence" /> Offense of Violence
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="jailCcModel.VictimStatements" /> Court Heard Victim Statements
+		<InputCheckbox @bind-Value="Model.VictimStatements" /> Court Heard Victim Statements
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="jailCcModel.VictimNotification" /> Fingerprinting and Victim Notification
+		<InputCheckbox @bind-Value="Model.VictimNotification" /> Fingerprinting and Victim Notification
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="jailCcModel.Impoundment" /> Immobilize/Impound
+		<InputCheckbox @bind-Value="Model.Impoundment" /> Immobilize/Impound
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="jailCcModel.CommunityControl" /> Community Control
+		<InputCheckbox @bind-Value="Model.CommunityControl" /> Community Control
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="jailCcModel.LicenseSuspension" /> License Suspension
+		<InputCheckbox @bind-Value="Model.LicenseSuspension" /> License Suspension
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="jailCcModel.CommunityService" /> Community Service
+		<InputCheckbox @bind-Value="Model.CommunityService" /> Community Service
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="jailCcModel.OtherConditions" /> Other Conditions
+		<InputCheckbox @bind-Value="Model.OtherConditions" /> Other Conditions
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="jailCcModel.AdditionalConditions" /> Add Additional Conditions
+		<InputCheckbox @bind-Value="Model.AdditionalConditions" /> Add Additional Conditions
 	</div>
 	   <div class="form-group">
 		   <label>Jail Credit and Reporting</label>
 	   </div>
 	   <div class="form-group">
-		   <InputNumber @bind-Value="jailCcModel.JailTimeCreditDays" class="form-control" placeholder="Days in jail" />
+		   <InputNumber @bind-Value="Model.JailTimeCreditDays" class="form-control" placeholder="Days in jail" />
 	   </div>
 	   <div class="form-group">
 		   <label>Apply JTC to:</label>
-		   <InputSelect @bind-Value="jailCcModel.JailTimeCreditApply" class="form-control">
+		   <InputSelect @bind-Value="Model.JailTimeCreditApply" class="form-control">
 			   <option value="">Select...</option>
 			   <option>Costs and Fines</option>
 			   <option>Sentence</option>
@@ -154,7 +154,7 @@
 	   </div>
 	   <div class="form-group">
 		   <label>Currently In Jail:</label>
-		   <InputSelect @bind-Value="jailCcModel.InJail" class="form-control">
+		   <InputSelect @bind-Value="Model.InJail" class="form-control">
 			   <option value="">Select...</option>
 			   <option>Yes</option>
 			   <option>No</option>
@@ -162,33 +162,33 @@
 	   </div>
 	   <div class="form-group">
 		   <label>Companion Cases</label>
-		   <InputText @bind-Value="jailCcModel.CompanionCases" class="form-control" />
+		   <InputText @bind-Value="Model.CompanionCases" class="form-control" />
 	   </div>
 	   <div class="form-group">
 		   <label>Companion Case Jail Time Served:</label>
-		   <InputSelect @bind-Value="jailCcModel.CompanionCasesSentence" class="form-control">
+		   <InputSelect @bind-Value="Model.CompanionCasesSentence" class="form-control">
 			   <option value="">Select...</option>
 			   <option>consecutively</option>
 			   <option>concurrently</option>
 		   </InputSelect>
 	   </div>
 	   <div class="form-group">
-		   <InputCheckbox @bind-Value="jailCcModel.JailReportingTerms" /> Set Jail Reporting Terms
+		   <InputCheckbox @bind-Value="Model.JailReportingTerms" /> Set Jail Reporting Terms
 	   </div>
 	   <div class="form-group">
-		   <InputCheckbox @bind-Value="jailCcModel.AddJailReportDate" /> Add Jail Report Date
+		   <InputCheckbox @bind-Value="Model.AddJailReportDate" /> Add Jail Report Date
 	   </div>
 	<div class="form-group">
 		<label>Pay Today</label>
-		<InputNumber @bind-Value="jailCcModel.PayToday" class="form-control" />
+		<InputNumber @bind-Value="Model.PayToday" class="form-control" />
 	</div>
 	<div class="form-group">
 		<label>Monthly Pay</label>
-		<InputNumber @bind-Value="jailCcModel.MonthlyPay" class="form-control" />
+		<InputNumber @bind-Value="Model.MonthlyPay" class="form-control" />
 	</div>
 	<div class="form-group">
 		<label>Court Costs</label>
-		<InputSelect @bind-Value="jailCcModel.CourtCosts" class="form-control">
+		<InputSelect @bind-Value="Model.CourtCosts" class="form-control">
 			<option value="">Select...</option>
 			<option>Yes</option>
 			<option>Waived</option>
@@ -198,7 +198,7 @@
 	</div>
 	<div class="form-group">
 		<label>Time to Pay</label>
-		<InputSelect @bind-Value="jailCcModel.TimeToPay" class="form-control">
+		<InputSelect @bind-Value="Model.TimeToPay" class="form-control">
 			<option value="">Select...</option>
 			<option>forthwith</option>
 			<option>monthly pay</option>
@@ -207,11 +207,11 @@
 	</div>
 	<div class="form-group">
 		<label>Due Date</label>
-		<InputDate @bind-Value="jailCcModel.DueDate" class="form-control" />
+		<InputDate @bind-Value="Model.DueDate" class="form-control" />
 	</div>
 	<div class="form-group">
 		<label>FRA shown in complaint</label>
-		<InputSelect @bind-Value="jailCcModel.FraInFile" class="form-control">
+		<InputSelect @bind-Value="Model.FraInFile" class="form-control">
 			<option value="">Select...</option>
 			<option>N/A</option>
 			<option>Yes</option>
@@ -220,7 +220,7 @@
 	</div>
 	<div class="form-group">
 		<label>FRA shown in court</label>
-		<InputSelect @bind-Value="jailCcModel.FraInCourt" class="form-control">
+		<InputSelect @bind-Value="Model.FraInCourt" class="form-control">
 			<option value="">Select...</option>
 			<option>N/A</option>
 			<option>Yes</option>
@@ -228,7 +228,7 @@
 		</InputSelect>
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="jailCcModel.DistractedDriving" /> Add Distracted Driving Course Language
+		<InputCheckbox @bind-Value="Model.DistractedDriving" /> Add Distracted Driving Course Language
 	</div>
 	<div class="form-actions">
 		<button type="submit" class="btn btn-success" disabled="@(IsSubmitting || IsLoadingCase)">Generate DOCX</button>
@@ -242,15 +242,14 @@
 </div>
 
 @code {
-	private JailCcPleaDto jailCcModel => Model;
 	private List<ChargeGridRow> Charges { get; set; } = new();
 
 	protected override string ApiEndpoint => "jailccplea";
 
 	protected override async Task HandleValidSubmit()
 	{
-		jailCcModel.ChargeItems = Charges
-			.Select(c => new Munientry.Client.Shared.Models.SentencingChargeItemDto
+		Model.ChargeItems = Charges
+			.Select(c => new SentencingChargeItemDto
 			{
 				Offense           = c.Offense,
 				Statute           = c.Statute,

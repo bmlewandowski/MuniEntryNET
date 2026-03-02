@@ -1,9 +1,6 @@
-﻿@page "/criminal/failure-to-appear"
+@page "/criminal/failure-to-appear"
 @page "/criminal/failure-to-appear/{CaseNumber}"
-@using Munientry.Client.Shared.Models
-@inject HttpClient Http
-@inject NavigationManager Navigation
-@inject IJSRuntime JS
+@inherits FormPageBase<FailureToAppearDto>
 
 <PageTitle>Failure To Appear</PageTitle>
 
@@ -11,42 +8,42 @@
 <div class="form-card">
 <h3>Failure To Appear</h3>
 
-<EditForm Model="model" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+    <FluentValidationValidator />
     <ValidationSummary />
 
     <div class="form-section">
         <h4>Case Information</h4>
         <div class="form-group">
             <label>Defendant First Name</label>
-            <InputText @bind-Value="model.DefendantFirstName" class="form-control" />
+            <InputText @bind-Value="Model.DefendantFirstName" class="form-control" />
         </div>
         <div class="form-group">
             <label>Defendant Last Name</label>
-            <InputText @bind-Value="model.DefendantLastName" class="form-control" />
+            <InputText @bind-Value="Model.DefendantLastName" class="form-control" />
         </div>
         <div class="form-group">
             <label>Case Number</label>
-            <InputText @bind-Value="model.CaseNumber" class="form-control" />
+            <InputText @bind-Value="Model.CaseNumber" class="form-control" />
         </div>
         <div class="form-group">
             <label>Entry Date</label>
-            <InputDate @bind-Value="model.EntryDate" class="form-control" />
+            <InputDate @bind-Value="Model.EntryDate" class="form-control" />
         </div>
         <div class="form-group">
             <label>Defense Counsel Name</label>
-            <InputText @bind-Value="model.DefenseCounselName" class="form-control" />
+            <InputText @bind-Value="Model.DefenseCounselName" class="form-control" />
         </div>
         <div class="form-group">
             <label>Defense Counsel Type</label>
-            <InputSelect @bind-Value="model.DefenseCounselType" class="form-control">
+            <InputSelect @bind-Value="Model.DefenseCounselType" class="form-control">
                 <option value="">Select</option>
                 <option value="Public Defender">Public Defender</option>
                 <option value="Private Counsel">Private Counsel</option>
             </InputSelect>
         </div>
         <div class="form-group">
-            <InputCheckbox @bind-Value="model.CounselWaived" /> Defendant appeared without counsel
+            <InputCheckbox @bind-Value="Model.CounselWaived" /> Defendant appeared without counsel
         </div>
     </div>
 
@@ -54,7 +51,7 @@
         <h4>Appearance Information</h4>
         <div class="form-group">
             <label>Appearance Reason</label>
-            <InputSelect @bind-Value="model.AppearanceReason" class="form-control">
+            <InputSelect @bind-Value="Model.AppearanceReason" class="form-control">
                 <option value="">Select</option>
                 <option value="arraignment">arraignment</option>
                 <option value="final pre-trial">final pre-trial</option>
@@ -71,14 +68,14 @@
     <div class="form-section">
         <h4>Arrest Warrant</h4>
         <div class="form-group">
-            <InputCheckbox @bind-Value="model.ArrestWarrantIssued" @onclick="OnArrestWarrantToggle" />
+            <InputCheckbox @bind-Value="Model.ArrestWarrantIssued" @onclick="OnArrestWarrantToggle" />
             Arrest warrant issued
         </div>
-        @if (model.ArrestWarrantIssued)
+        @if (Model.ArrestWarrantIssued)
         {
             <div class="form-group">
                 <label>Warrant Radius</label>
-                <InputSelect @bind-Value="model.ArrestWarrantRadius" class="form-control">
+                <InputSelect @bind-Value="Model.ArrestWarrantRadius" class="form-control">
                     <option value="">Select</option>
                     <option value="statewide">statewide</option>
                     <option value="county only">county only</option>
@@ -91,14 +88,14 @@
     <div class="form-section">
         <h4>Bond</h4>
         <div class="form-group">
-            <InputCheckbox @bind-Value="model.SetBond" @onclick="OnSetBondToggle" />
+            <InputCheckbox @bind-Value="Model.SetBond" @onclick="OnSetBondToggle" />
             Set bond
         </div>
-        @if (model.SetBond)
+        @if (Model.SetBond)
         {
             <div class="form-group">
                 <label>Bond Type</label>
-                <InputSelect @bind-Value="model.BondType" class="form-control">
+                <InputSelect @bind-Value="Model.BondType" class="form-control">
                     <option value="">Select</option>
                     <option value="Cash or Surety Bond">Cash or Surety Bond</option>
                     <option value="Own Recognizance Bond">Own Recognizance Bond</option>
@@ -108,23 +105,23 @@
             </div>
             <div class="form-group">
                 <label>Bond Amount</label>
-                <InputText @bind-Value="model.BondAmount" class="form-control" />
+                <InputText @bind-Value="Model.BondAmount" class="form-control" />
             </div>
         }
     </div>
 
     <div class="form-actions">
-        <button type="submit" class="btn btn-success" disabled="@isSubmitting">
-            @(isSubmitting ? "Generating..." : "Open Entry")
+        <button type="submit" class="btn btn-success" disabled="@IsSubmitting">
+            @(IsSubmitting ? "Generating..." : "Open Entry")
         </button>
         <button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
         <button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
         <button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
     </div>
 
-    @if (!string.IsNullOrEmpty(errorMessage))
+    @if (!string.IsNullOrEmpty(ErrorMessage))
     {
-        <div class="alert alert-danger mt-2">@errorMessage</div>
+        <div class="alert alert-danger mt-2">@ErrorMessage</div>
     }
 </EditForm>
 
@@ -132,58 +129,23 @@
 </div>
 
 @code {
-    [Parameter] public string? CaseNumber { get; set; }
+    protected override string ApiEndpoint => "failuretoappear";
 
-    private FailureToAppearDto model = new();
-    private bool isSubmitting = false;
-    private string? errorMessage;
-
-    protected override void OnParametersSet()
+    protected override Task PopulateFromCaseAsync(List<CaseSearchResultDto> results)
     {
-        if (!string.IsNullOrEmpty(CaseNumber))
-            model.CaseNumber = CaseNumber;
+        Model.CaseNumber = CaseNumber;
+        return Task.CompletedTask;
     }
 
     private void OnArrestWarrantToggle()
     {
-        model.ArrestWarrantIssued = !model.ArrestWarrantIssued;
-        if (!model.ArrestWarrantIssued) model.ArrestWarrantRadius = null;
+        Model.ArrestWarrantIssued = !Model.ArrestWarrantIssued;
+        if (!Model.ArrestWarrantIssued) Model.ArrestWarrantRadius = null;
     }
 
     private void OnSetBondToggle()
     {
-        model.SetBond = !model.SetBond;
-        if (!model.SetBond) { model.BondType = null; model.BondAmount = null; }
+        Model.SetBond = !Model.SetBond;
+        if (!Model.SetBond) { Model.BondType = null; Model.BondAmount = null; }
     }
-
-    private async Task HandleValidSubmit()
-    {
-        isSubmitting = true;
-        errorMessage = null;
-        try
-        {
-            var response = await Http.PostAsJsonAsync("/api/failuretooappear", model);
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsByteArrayAsync();
-                var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "FailureToAppear.docx";
-                await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
-            }
-            else
-            {
-                errorMessage = $"Server error: {response.StatusCode}";
-            }
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"Error generating entry: {ex.Message}";
-        }
-        finally
-        {
-            isSubmitting = false;
-        }
-    }
-
-    private void CloseOrCancel() => Navigation.NavigateTo("/");
-    private void ClearFields() { model = new(); if (!string.IsNullOrEmpty(CaseNumber)) model.CaseNumber = CaseNumber; }
 }

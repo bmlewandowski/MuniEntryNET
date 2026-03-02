@@ -1,45 +1,46 @@
-﻿@page "/scheduling/trial-to-court-notice-of-hearing"
+@page "/scheduling/trial-to-court-notice-of-hearing"
+@inherits FormPageBase<TrialToCourtNoticeDto>
 
 <div class="form-page">
 <div class="form-card">
 <h2>Hemmeter/Rohrer Trial to Court Notice of Hearing Dialog</h2>
 <!-- Legacy: trial_to_court_notice_of_hearing_dialog_ui.py -->
 
-<EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+    <FluentValidationValidator />
     <ValidationSummary />
     <div class="form-group">
         <label>Defendant First Name</label>
-        <InputText @bind-Value="formModel.DefendantFirstName" class="form-control" />
-        <ValidationMessage For="@(() => formModel.DefendantFirstName)" />
+        <InputText @bind-Value="Model.DefendantFirstName" class="form-control" />
+        <ValidationMessage For="@(() => Model.DefendantFirstName)" />
     </div>
     <div class="form-group">
         <label>Defendant Last Name</label>
-        <InputText @bind-Value="formModel.DefendantLastName" class="form-control" />
-        <ValidationMessage For="@(() => formModel.DefendantLastName)" />
+        <InputText @bind-Value="Model.DefendantLastName" class="form-control" />
+        <ValidationMessage For="@(() => Model.DefendantLastName)" />
     </div>
     <div class="form-group">
         <label>Case Number</label>
-        <InputText @bind-Value="formModel.CaseNumber" class="form-control" />
-        <ValidationMessage For="@(() => formModel.CaseNumber)" />
+        <InputText @bind-Value="Model.CaseNumber" class="form-control" />
+        <ValidationMessage For="@(() => Model.CaseNumber)" />
     </div>
     <div class="form-group">
         <label>Entry Date</label>
-        <InputDate @bind-Value="formModel.EntryDate" class="form-control" />
-        <ValidationMessage For="@(() => formModel.EntryDate)" />
+        <InputDate @bind-Value="Model.EntryDate" class="form-control" />
+        <ValidationMessage For="@(() => Model.EntryDate)" />
     </div>
     <div class="form-group">
         <label>Defense Counsel Name</label>
-        <InputText @bind-Value="formModel.DefenseCounselName" class="form-control" />
+        <InputText @bind-Value="Model.DefenseCounselName" class="form-control" />
     </div>
     <div class="form-group">
         <label>Trial To Court Date</label>
-        <InputDate @bind-Value="formModel.TrialToCourtDate" class="form-control" />
-        <ValidationMessage For="@(() => formModel.TrialToCourtDate)" />
+        <InputDate @bind-Value="Model.TrialToCourtDate" class="form-control" />
+        <ValidationMessage For="@(() => Model.TrialToCourtDate)" />
     </div>
     <div class="form-group">
         <label>Trial To Court Time</label>
-        <InputSelect @bind-Value="formModel.TrialToCourtTime" class="form-control">
+        <InputSelect @bind-Value="Model.TrialToCourtTime" class="form-control">
             <option value="">Select...</option>
             <option>9:30 AM</option>
             <option>10:00 AM</option>
@@ -52,83 +53,44 @@
             <option>2:30 PM</option>
             <option>3:00 PM</option>
         </InputSelect>
-        <ValidationMessage For="@(() => formModel.TrialToCourtTime)" />
+        <ValidationMessage For="@(() => Model.TrialToCourtTime)" />
     </div>
     <div class="form-group">
         <label>Assigned Courtroom</label>
-        <InputSelect @bind-Value="formModel.AssignedCourtroom" class="form-control">
+        <InputSelect @bind-Value="Model.AssignedCourtroom" class="form-control">
             <option value="">Select...</option>
             <option>Courtroom C</option>
             <option>Courtroom B</option>
             <option>Courtroom A</option>
         </InputSelect>
-        <ValidationMessage For="@(() => formModel.AssignedCourtroom)" />
+        <ValidationMessage For="@(() => Model.AssignedCourtroom)" />
     </div>
     <div class="form-group">
         <label>Interpreter Required</label>
-        <InputCheckbox @bind-Value="formModel.InterpreterRequired" />
+        <InputCheckbox @bind-Value="Model.InterpreterRequired" />
     </div>
     <div class="form-group">
         <label>Language Required</label>
-        <InputText @bind-Value="formModel.LanguageRequired" class="form-control" />
+        <InputText @bind-Value="Model.LanguageRequired" class="form-control" />
     </div>
     <div class="form-group">
         <label>Date Confirmed with Counsel</label>
-        <InputCheckbox @bind-Value="formModel.DateConfirmedWithCounsel" />
+        <InputCheckbox @bind-Value="Model.DateConfirmedWithCounsel" />
     </div>
     <div class="form-actions">
-        <button type="submit" class="btn btn-success" disabled="@isSubmitting">Generate DOCX</button>
+        <button type="submit" class="btn btn-success" disabled="@IsSubmitting">Generate DOCX</button>
         <button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
         <button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
         <button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
     </div>
-    @if (errorMessage != null)
+    @if (ErrorMessage != null)
     {
-        <div class="alert alert-danger mt-2">@errorMessage</div>
+        <div class="alert alert-danger mt-2">@ErrorMessage</div>
     }
 </EditForm>
 </div>
 </div>
 
 			@code {
-				private TrialToCourtNoticeDto formModel = new();
-				private bool isSubmitting = false;
-				private string? errorMessage;
-
-				private async Task HandleValidSubmit()
-				{
-					isSubmitting = true;
-					errorMessage = null;
-					try
-					{
-						var apiBase = ApiHelper.GetApiBaseUrl();
-						var http = new HttpClient { BaseAddress = new Uri(apiBase) };
-						var response = await http.PostAsJsonAsync("trialtocourt", formModel);
-						if (response.IsSuccessStatusCode)
-						{
-							var content = await response.Content.ReadAsByteArrayAsync();
-							var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "TrialToCourtNotice.docx";
-							await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
-						}
-						else
-						{
-							errorMessage = $"Error: {response.ReasonPhrase}";
-						}
-					}
-					catch (Exception ex)
-					{
-						errorMessage = ex.Message;
-					}
-					finally
-					{
-						isSubmitting = false;
-					}
-				}
-
-				private void CloseOrCancel() => NavigationManager.NavigateTo("/");
-				private void ClearFields() { formModel = new(); }
-
-				[Inject] NavigationManager NavigationManager { get; set; } = default!;
-				[Inject] IJSRuntime JS { get; set; } = default!;
-				[Inject] Munientry.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;
+				protected override string ApiEndpoint => "trialtocourt";
 			}

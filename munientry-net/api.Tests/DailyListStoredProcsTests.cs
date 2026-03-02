@@ -1,18 +1,18 @@
-ï»¿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
-using Munientry.Api.Data;
+using Munientry.Shared.Dtos;
 using Xunit;
 
 namespace Munientry.Api.Tests
 {
     /// <summary>
-    /// Pure unit tests for DailyListStoredProcs â€” no HTTP, no database.
-    /// Verifies the list-type â†’ stored procedure name mapping used by DailyListService.
+    /// Pure unit tests for DailyListStoredProcs — no HTTP, no database.
+    /// Verifies the list-type ? stored procedure name mapping used by DailyListService.
     /// </summary>
     public class DailyListStoredProcsTests
     {
         // -----------------------------------------------------------------------
-        // GetProcName â€” valid list types
+        // GetProcName — valid list types
         // -----------------------------------------------------------------------
 
         [Theory]
@@ -30,7 +30,7 @@ namespace Munientry.Api.Tests
         }
 
         // -----------------------------------------------------------------------
-        // GetProcName â€” case-insensitivity
+        // GetProcName — case-insensitivity
         // -----------------------------------------------------------------------
 
         [Theory]
@@ -47,14 +47,14 @@ namespace Munientry.Api.Tests
         }
 
         // -----------------------------------------------------------------------
-        // GetProcName â€” invalid / unknown list types
+        // GetProcName — invalid / unknown list types
         // -----------------------------------------------------------------------
 
         [Theory]
         [InlineData("bogus")]
         [InlineData("")]
         [InlineData("trial")]           // partial match should not resolve
-        [InlineData("arraignment")]     // singular â€” not a valid key
+        [InlineData("arraignment")]     // singular — not a valid key
         [InlineData("pcvh")]            // prefix only
         [InlineData(" arraignments")]   // leading space
         public void GetProcName_InvalidListType_ReturnsNull(string listType)
@@ -65,7 +65,7 @@ namespace Munientry.Api.Tests
         }
 
         // -----------------------------------------------------------------------
-        // ValidTypes â€” completeness
+        // ValidTypes — completeness
         // -----------------------------------------------------------------------
 
         [Fact]
@@ -101,7 +101,7 @@ namespace Munientry.Api.Tests
         }
 
         // -----------------------------------------------------------------------
-        // Proc name format â€” all names follow [schema].[name] convention
+        // Proc name format — all names follow [schema].[name] convention
         // -----------------------------------------------------------------------
 
         [Fact]

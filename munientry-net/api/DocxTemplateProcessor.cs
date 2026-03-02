@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.IO.Compression;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -76,6 +77,12 @@ namespace Munientry.Api;
 /// </remarks>
 public static class DocxTemplateProcessor
 {
+    // Template bytes are immutable after the first request — cache them once per path.
+    // Key is the absolute path (via Path.GetFullPath) so relative-path variants collapse
+    // to the same entry. byte[] is never mutated: ZipArchive reads it but each call
+    // wraps the cached array in a new MemoryStream.
+    private static readonly ConcurrentDictionary<string, byte[]> _templateCache = new();
+
     // Word XML parts that contain only structural/style data — skip them
     private static readonly string[] SkipPartSuffixes =
     [
@@ -96,8 +103,11 @@ public static class DocxTemplateProcessor
     /// </summary>
     public static byte[] FillTemplate(string templatePath, Dictionary<string, object> values)
     {
-        using var fs = File.OpenRead(templatePath);
-        return FillTemplate(fs, values);
+        var bytes = _templateCache.GetOrAdd(
+            Path.GetFullPath(templatePath),
+            static p => File.ReadAllBytes(p));
+        using var ms = new MemoryStream(bytes, writable: false);
+        return FillTemplate(ms, values);
     }
 
     /// <inheritdoc cref="FillTemplate(string,Dictionary{string,object})"/>

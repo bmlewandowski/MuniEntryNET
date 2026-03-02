@@ -1,0 +1,137 @@
+@page "/reports/not-guilty"
+@using Munientry.Client.Shared
+@inject ReportsApiClient ReportsSvc
+
+<PageTitle>Not Guilty Report</PageTitle>
+
+<div class="form-page">
+    <div class="form-card">
+        <h2>Not Guilty Report</h2>
+        <p class="form-subtitle">
+            Queries all cases set for arraignment on the selected date and returns cases that have a
+            Journal Entry for that same date containing a <strong>Not Guilty plea</strong> or a
+            <strong>Continuance</strong>. Equivalent to the legacy
+            <em>run_not_guilty_report()</em> in <code>daily_reports.py</code>.
+        </p>
+
+        <div class="daily-list-toolbar">
+            <div class="form-group">
+                <label>Report Date</label>
+                <input type="date"
+                       class="form-control"
+                       value="@ReportDate.ToString("yyyy-MM-dd")"
+                       @onchange="OnDateChanged" />
+            </div>
+            <button class="btn btn-primary" @onclick="LoadReportAsync" disabled="@IsLoading">
+                @(IsLoading ? "Loading…" : "Run Report")
+            </button>
+        </div>
+
+        @if (ErrorMessage is not null)
+        {
+            <div class="alert alert-danger mt-2">@ErrorMessage</div>
+        }
+
+        @if (_results is not null)
+        {
+            <div class="mt-3">
+                <h4>Not Guilty Events — @ReportDate.ToString("MMMM d, yyyy") — @_results.Count @(_results.Count == 1 ? "case" : "cases")</h4>
+
+                @if (_results.Count == 0)
+                {
+                    <p class="text-muted">No matching cases found for this date.</p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover report-table">
+                            <thead>
+                                <tr>
+                                    <th @onclick="() => SortBy(nameof(NotGuiltyReportResultDto.CaseNumber))"  class="sortable-header">
+                                        Case Number <span>@SortIndicator(nameof(NotGuiltyReportResultDto.CaseNumber))</span>
+                                    </th>
+                                    <th @onclick="() => SortBy(nameof(NotGuiltyReportResultDto.DefFullName))" class="sortable-header">
+                                        Defendant Name <span>@SortIndicator(nameof(NotGuiltyReportResultDto.DefFullName))</span>
+                                    </th>
+                                    <th @onclick="() => SortBy(nameof(NotGuiltyReportResultDto.Remark))"      class="sortable-header">
+                                        Docket Entry <span>@SortIndicator(nameof(NotGuiltyReportResultDto.Remark))</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var row in SortedResults)
+                                {
+                                    <tr>
+                                        <td class="text-nowrap">@(row.CaseNumber ?? "")</td>
+                                        <td>@(row.DefFullName ?? "")</td>
+                                        <td>@(row.Remark ?? "")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+
+    // ── State ────────────────────────────────────────────────────────────────────
+    private DateOnly ReportDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+    private bool IsLoading     { get; set; }
+    private string? ErrorMessage { get; set; }
+    private List<NotGuiltyReportResultDto>? _results;
+
+    // ── Sorting ──────────────────────────────────────────────────────────────────
+    private string _sortColumn  = nameof(NotGuiltyReportResultDto.CaseNumber);
+    private bool   _sortAsc     = true;
+
+    private IEnumerable<NotGuiltyReportResultDto> SortedResults =>
+        _results is null ? Enumerable.Empty<NotGuiltyReportResultDto>()
+        : _sortColumn switch
+        {
+            nameof(NotGuiltyReportResultDto.DefFullName) =>
+                _sortAsc ? _results.OrderBy(r => r.DefFullName) : _results.OrderByDescending(r => r.DefFullName),
+            nameof(NotGuiltyReportResultDto.Remark) =>
+                _sortAsc ? _results.OrderBy(r => r.Remark) : _results.OrderByDescending(r => r.Remark),
+            _ =>
+                _sortAsc ? _results.OrderBy(r => r.CaseNumber) : _results.OrderByDescending(r => r.CaseNumber),
+        };
+
+    private void SortBy(string column)
+    {
+        if (_sortColumn == column) _sortAsc = !_sortAsc;
+        else { _sortColumn = column; _sortAsc = true; }
+    }
+
+    private string SortIndicator(string column) =>
+        _sortColumn != column ? "" : _sortAsc ? "▲" : "▼";
+
+    // ── Event handlers ────────────────────────────────────────────────────────────
+    private void OnDateChanged(ChangeEventArgs e)
+    {
+        if (DateOnly.TryParse(e.Value?.ToString(), out var d)) ReportDate = d;
+    }
+
+    private async Task LoadReportAsync()
+    {
+        IsLoading = true;
+        ErrorMessage = null;
+        _results = null;
+
+        try
+        {
+            _results = await ReportsSvc.GetNotGuiltyReportAsync(ReportDate);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error running report: {ex.Message}";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+}

@@ -1,103 +1,99 @@
-﻿@page "/criminal/sentencing-only-already-plead"
+@page "/criminal/sentencing-only-already-plead"
 @page "/criminal/sentencing-only-already-plead/{CaseNumber}"
-@using Munientry.Client.Shared.Models
-@inject HttpClient Http
-@inject NavigationManager Navigation
-@inject IJSRuntime JS
-@using Microsoft.AspNetCore.Components
+@inherits FormPageBase<SentencingOnlyAlreadyPleadDto>
 
 <div class="form-page">
 <div class="form-card">
 <h2>Sentencing Only - Already Plead Dialog</h2>
 
-<EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+    <FluentValidationValidator />
     <ValidationSummary />
     <div class="form-group">
         <label>Defendant First Name</label>
-        <InputText class="form-control" @bind-Value="formModel.DefendantFirstName" />
-        <ValidationMessage For="@(() => formModel.DefendantFirstName)" />
+        <InputText class="form-control" @bind-Value="Model.DefendantFirstName" />
+        <ValidationMessage For="@(() => Model.DefendantFirstName)" />
     </div>
     <div class="form-group">
         <label>Defendant Last Name</label>
-        <InputText class="form-control" @bind-Value="formModel.DefendantLastName" />
-        <ValidationMessage For="@(() => formModel.DefendantLastName)" />
+        <InputText class="form-control" @bind-Value="Model.DefendantLastName" />
+        <ValidationMessage For="@(() => Model.DefendantLastName)" />
     </div>
     <div class="form-group">
         <label>Case Number</label>
-        <InputText class="form-control" @bind-Value="formModel.CaseNumber" />
-        <ValidationMessage For="@(() => formModel.CaseNumber)" />
+        <InputText class="form-control" @bind-Value="Model.CaseNumber" />
+        <ValidationMessage For="@(() => Model.CaseNumber)" />
     </div>
     <div class="form-group">
         <label>Defense Counsel Name</label>
-        <InputText class="form-control" @bind-Value="formModel.DefenseCounselName" />
+        <InputText class="form-control" @bind-Value="Model.DefenseCounselName" />
     </div>
     <div class="form-group">
         <label>Defense Counsel Type</label>
-        <InputText class="form-control" @bind-Value="formModel.DefenseCounselType" />
+        <InputText class="form-control" @bind-Value="Model.DefenseCounselType" />
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="formModel.DefenseCounselWaived" />
+        <InputCheckbox @bind-Value="Model.DefenseCounselWaived" />
         <label>Defendant waived right to counsel</label>
     </div>
     <div class="form-group">
         <label>Appearance Reason</label>
-        <InputText class="form-control" @bind-Value="formModel.AppearanceReason" />
+        <InputText class="form-control" @bind-Value="Model.AppearanceReason" />
     </div>
     <div class="form-group">
         <label>Sentencing Date</label>
-        <InputDate class="form-control" @bind-Value="formModel.SentencingDate" />
+        <InputDate class="form-control" @bind-Value="Model.SentencingDate" />
     </div>
     <div class="form-group">
         <label>Charges</label>
-        <InputText class="form-control" @bind-Value="formModel.Charges" />
+        <InputText class="form-control" @bind-Value="Model.Charges" />
     </div>
     <div class="form-group">
         <label>Court Costs</label>
-        <InputText class="form-control" @bind-Value="formModel.CourtCosts" />
+        <InputText class="form-control" @bind-Value="Model.CourtCosts" />
     </div>
     <div class="form-group">
         <label>Ability to Pay</label>
-        <InputText class="form-control" @bind-Value="formModel.AbilityToPay" />
+        <InputText class="form-control" @bind-Value="Model.AbilityToPay" />
     </div>
     <div class="form-group">
         <label>Balance Due Date</label>
-        <InputDate class="form-control" @bind-Value="formModel.BalanceDueDate" />
+        <InputDate class="form-control" @bind-Value="Model.BalanceDueDate" />
     </div>
     <div class="form-group">
         <label>Pay Today</label>
-        <InputText class="form-control" @bind-Value="formModel.PayToday" />
+        <InputText class="form-control" @bind-Value="Model.PayToday" />
     </div>
     <div class="form-group">
         <label>Monthly Pay</label>
-        <InputText class="form-control" @bind-Value="formModel.MonthlyPay" />
+        <InputText class="form-control" @bind-Value="Model.MonthlyPay" />
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="formModel.CreditForJail" />
+        <InputCheckbox @bind-Value="Model.CreditForJail" />
         <label>Credit for Jail</label>
     </div>
     <div class="form-group">
         <label>Jail Time Credit Days</label>
-        <InputText class="form-control" @bind-Value="formModel.JailTimeCreditDays" />
+        <InputText class="form-control" @bind-Value="Model.JailTimeCreditDays" />
     </div>
     <div class="form-group">
         <label>FRA in File</label>
-        <InputText class="form-control" @bind-Value="formModel.FraInFile" />
+        <InputText class="form-control" @bind-Value="Model.FraInFile" />
     </div>
     <div class="form-group">
         <label>FRA in Court</label>
-        <InputText class="form-control" @bind-Value="formModel.FraInCourt" />
+        <InputText class="form-control" @bind-Value="Model.FraInCourt" />
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="formModel.LicenseSuspension" />
+        <InputCheckbox @bind-Value="Model.LicenseSuspension" />
         <label>License Suspension</label>
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="formModel.CommunityService" />
+        <InputCheckbox @bind-Value="Model.CommunityService" />
         <label>Community Service</label>
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="formModel.OtherConditions" />
+        <InputCheckbox @bind-Value="Model.OtherConditions" />
         <label>Other Conditions</label>
     </div>
     <div class="form-actions">
@@ -108,44 +104,32 @@
     </div>
 </EditForm>
 
-@if (submitResult != null)
+@if (ErrorMessage != null)
 {
-    <div class="alert alert-info">@submitResult</div>
+    <div class="alert alert-danger">@ErrorMessage</div>
+}
+@if (SubmitResult != null)
+{
+    <div class="alert alert-success">@SubmitResult</div>
 }
 
 </div>
 </div>
 
 @code {
-    [Parameter]
-    public string? CaseNumber { get; set; }
-    private SentencingOnlyAlreadyPleadDto formModel = new();
-    private string? submitResult;
+    protected override string ApiEndpoint => "sentencingonlyalreadypead";
 
-    private async Task HandleValidSubmit()
+    protected override Task PopulateFromCaseAsync(List<CaseSearchResultDto> results)
     {
-        var response = await Http.PostAsJsonAsync("/api/sentencingonlyalreadypead", formModel);
-        if (response.IsSuccessStatusCode)
-        {
-            var content = await response.Content.ReadAsByteArrayAsync();
-            var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "SentencingOnly.docx";
-            await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
-        }
-        else
-        {
-            submitResult = "Error saving entry.";
-        }
-    }
-
-    private void CloseOrCancel() => Navigation.NavigateTo("/");
-    private void ClearFields() { formModel = new(); }
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (!string.IsNullOrWhiteSpace(CaseNumber))
-        {
-            // Comment out the next line to disable auto-load
-            //await LoadCaseDataAsync(CaseNumber);
-        }
+        var first = results[0];
+        Model.CaseNumber = CaseNumber;
+        Model.DefendantFirstName = first.DefFirstName;
+        Model.DefendantLastName = first.DefLastName;
+        Model.DefenseCounselName = first.DefenseCounsel;
+        Model.DefenseCounselType = first.PubDef ? "Public Defender" : "Private Counsel";
+        Model.Charges = string.Join("; ", results
+            .Where(r => r.Charge != null)
+            .Select(r => $"{r.Charge} ({r.Statute}) - {r.DegreeCode}"));
+        return Task.CompletedTask;
     }
 }

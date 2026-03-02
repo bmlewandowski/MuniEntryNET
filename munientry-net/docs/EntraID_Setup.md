@@ -58,10 +58,10 @@ In `client/Munientry.Client.csproj`, uncomment the MSAL package reference:
 
 ```xml
 <!-- Before -->
-<!-- <PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="9.0.0" /> -->
+<!-- <PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="10.0.0" /> -->
 
 <!-- After -->
-<PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="9.0.0" />
+<PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="10.0.0" />
 ```
 
 ---

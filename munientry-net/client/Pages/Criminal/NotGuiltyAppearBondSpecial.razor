@@ -1,107 +1,104 @@
-﻿
+
 @page "/criminal/not-guilty-appear-bond-special"
-@using Munientry.Client.Shared.Models
-@inject HttpClient Http
-@inject NavigationManager Navigation
-@inject IJSRuntime JS
+@inherits FormPageBase<NotGuiltyAppearBondSpecialDto>
 
 <div class="form-page">
 <div class="form-card">
 <h2>Not Guilty Plea / Appear on Warrant / Bond Modification Special Bond Conditions Dialog</h2>
 
-<EditForm Model="specialForm" OnValidSubmit="HandleValidSubmit">
-	<DataAnnotationsValidator />
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+	<FluentValidationValidator />
 	<ValidationSummary />
 	<div class="form-group">
 		<label>Defendant First Name</label>
-		<InputText class="form-control" @bind-Value="specialForm.DefendantFirstName" />
-		<ValidationMessage For="@(() => specialForm.DefendantFirstName)" />
+		<InputText class="form-control" @bind-Value="Model.DefendantFirstName" />
+		<ValidationMessage For="@(() => Model.DefendantFirstName)" />
 	</div>
 	<div class="form-group">
 		<label>Defendant Last Name</label>
-		<InputText class="form-control" @bind-Value="specialForm.DefendantLastName" />
-		<ValidationMessage For="@(() => specialForm.DefendantLastName)" />
+		<InputText class="form-control" @bind-Value="Model.DefendantLastName" />
+		<ValidationMessage For="@(() => Model.DefendantLastName)" />
 	</div>
 	<div class="form-group">
 		<label>Case Number</label>
-		<InputText class="form-control" @bind-Value="specialForm.CaseNumber" />
-		<ValidationMessage For="@(() => specialForm.CaseNumber)" />
+		<InputText class="form-control" @bind-Value="Model.CaseNumber" />
+		<ValidationMessage For="@(() => Model.CaseNumber)" />
 	</div>
 	<div class="form-group">
 		<label>Bond Type</label>
-		<InputText class="form-control" @bind-Value="specialForm.BondType" />
+		<InputText class="form-control" @bind-Value="Model.BondType" />
 	</div>
 	<div class="form-group">
 		<label>Bond Amount</label>
-		<InputText class="form-control" @bind-Value="specialForm.BondAmount" />
+		<InputText class="form-control" @bind-Value="Model.BondAmount" />
 	</div>
 	<div class="form-group">
 		<label>Bond Modification Decision</label>
-		<InputText class="form-control" @bind-Value="specialForm.BondModificationDecision" />
+		<InputText class="form-control" @bind-Value="Model.BondModificationDecision" />
 	</div>
 	<div class="form-group">
 		<label>No Contact Name</label>
-		<InputText class="form-control" @bind-Value="specialForm.NoContactName" />
+		<InputText class="form-control" @bind-Value="Model.NoContactName" />
 	</div>
 	<div class="form-group">
 		<label>Custodial Supervision Supervisor</label>
-		<InputText class="form-control" @bind-Value="specialForm.CustodialSupervisionSupervisor" />
+		<InputText class="form-control" @bind-Value="Model.CustodialSupervisionSupervisor" />
 	</div>
 	<div class="form-group">
 		<label>Admin License Suspension Objection</label>
-		<InputText class="form-control" @bind-Value="specialForm.AdminLicenseSuspensionObjection" />
+		<InputText class="form-control" @bind-Value="Model.AdminLicenseSuspensionObjection" />
 	</div>
 	<div class="form-group">
 		<label>Admin License Suspension Disposition</label>
-		<InputText class="form-control" @bind-Value="specialForm.AdminLicenseSuspensionDisposition" />
+		<InputText class="form-control" @bind-Value="Model.AdminLicenseSuspensionDisposition" />
 	</div>
 	<div class="form-group">
 		<label>Admin License Suspension Explanation</label>
-		<InputText class="form-control" @bind-Value="specialForm.AdminLicenseSuspensionExplanation" />
+		<InputText class="form-control" @bind-Value="Model.AdminLicenseSuspensionExplanation" />
 	</div>
 	<div class="form-group">
 		<label>Vehicle Make/Model</label>
-		<InputText class="form-control" @bind-Value="specialForm.VehicleMakeModel" />
+		<InputText class="form-control" @bind-Value="Model.VehicleMakeModel" />
 	</div>
 	<div class="form-group">
 		<label>Vehicle License Plate</label>
-		<InputText class="form-control" @bind-Value="specialForm.VehicleLicensePlate" />
+		<InputText class="form-control" @bind-Value="Model.VehicleLicensePlate" />
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="specialForm.TowToResidence" />
+		<InputCheckbox @bind-Value="Model.TowToResidence" />
 		<label>Tow to Residence</label>
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="specialForm.MotionToReturnVehicle" />
+		<InputCheckbox @bind-Value="Model.MotionToReturnVehicle" />
 		<label>Motion to Return Vehicle</label>
 	</div>
 	<div class="form-group">
 		<label>State Opposes</label>
-		<InputText class="form-control" @bind-Value="specialForm.StateOpposes" />
+		<InputText class="form-control" @bind-Value="Model.StateOpposes" />
 	</div>
 	<div class="form-group">
 		<label>Disposition Motion to Return</label>
-		<InputText class="form-control" @bind-Value="specialForm.DispositionMotionToReturn" />
+		<InputText class="form-control" @bind-Value="Model.DispositionMotionToReturn" />
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="specialForm.VacateResidence" />
+		<InputCheckbox @bind-Value="Model.VacateResidence" />
 		<label>Vacate Residence</label>
 	</div>
 	<div class="form-group">
 		<label>Residence Address</label>
-		<InputText class="form-control" @bind-Value="specialForm.ResidenceAddress" />
+		<InputText class="form-control" @bind-Value="Model.ResidenceAddress" />
 	</div>
 	<div class="form-group">
 		<label>Exclusive Possession To</label>
-		<InputText class="form-control" @bind-Value="specialForm.ExclusivePossessionTo" />
+		<InputText class="form-control" @bind-Value="Model.ExclusivePossessionTo" />
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="specialForm.SurrenderWeapons" />
+		<InputCheckbox @bind-Value="Model.SurrenderWeapons" />
 		<label>Surrender Weapons</label>
 	</div>
 	<div class="form-group">
 		<label>Surrender Weapons Date</label>
-		<InputText class="form-control" @bind-Value="specialForm.SurrenderWeaponsDate" />
+		<InputText class="form-control" @bind-Value="Model.SurrenderWeaponsDate" />
 	</div>
 	<div class="form-actions">
 		<button type="submit" class="btn btn-success">Open Entry</button>
@@ -111,27 +108,16 @@
 	</div>
 </EditForm>
 
-@if (submitResult != null)
+@if (ErrorMessage != null)
 {
-	<div class="alert alert-info">@submitResult</div>
+	<div class="alert alert-danger">@ErrorMessage</div>
+}
+@if (SubmitResult != null)
+{
+	<div class="alert alert-success">@SubmitResult</div>
 }
 </div>
 </div>
 @code {
-	private NotGuiltyAppearBondSpecialDto specialForm = new();
-	private string? submitResult;
-
-	private async Task HandleValidSubmit()
-	{
-		var response = await Http.PostAsJsonAsync("/api/notguiltyappearbondspecial", specialForm);
-		if (response.IsSuccessStatusCode)
-		{
-                        var content = await response.Content.ReadAsByteArrayAsync();
-                        var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "NotGuiltyAppearBondSpecial.docx";
-                        await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
-		}
-	}
-
-	private void CloseOrCancel() => Navigation.NavigateTo("/");
-	private void ClearFields() { specialForm = new(); }
+	protected override string ApiEndpoint => "notguiltyappearbondspecial";
 }

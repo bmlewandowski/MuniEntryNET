@@ -6,20 +6,8 @@
 <div class="form-card">
 <h2>Diversion Dialog</h2>
 
-<EditForm Model="diversionPlea" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
-    @if (IsLoadingCase)
-    {
-        <div class="alert alert-info">Loading case data...</div>
-    }
-    @if (IsLoadingCase)
-    {
-        <div class="alert alert-info">Loading case data...</div>
-    }
-    @if (IsLoadingCase)
-    {
-        <div class="alert alert-info">Loading case data...</div>
-    }
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+    <FluentValidationValidator />
     @if (IsLoadingCase)
     {
         <div class="alert alert-info">Loading case data...</div>
@@ -27,75 +15,75 @@
     <ValidationSummary />
     <div class="form-group">
         <label>Defendant First Name</label>
-        <InputText @bind-Value="diversionPlea.DefendantFirstName" class="form-control" />
+        <InputText @bind-Value="Model.DefendantFirstName" class="form-control" />
     </div>
     <div class="form-group">
         <label>Defendant Last Name</label>
-        <InputText @bind-Value="diversionPlea.DefendantLastName" class="form-control" />
+        <InputText @bind-Value="Model.DefendantLastName" class="form-control" />
     </div>
     <div class="form-group">
         <label>Case Number</label>
-        <InputText @bind-Value="diversionPlea.CaseNumber" class="form-control" />
+        <InputText @bind-Value="Model.CaseNumber" class="form-control" />
     </div>
     <div class="form-group">
         <label>Date</label>
-        <InputDate @bind-Value="diversionPlea.Date" class="form-control" />
+        <InputDate @bind-Value="Model.Date" class="form-control" />
     </div>
     <div class="form-group">
         <label>Defense Counsel Name</label>
-        <InputText @bind-Value="diversionPlea.DefenseCounselName" class="form-control" />
+        <InputText @bind-Value="Model.DefenseCounselName" class="form-control" />
     </div>
     <div class="form-group">
         <label>Defense Counsel Type</label>
-        <InputText @bind-Value="diversionPlea.DefenseCounselType" class="form-control" />
+        <InputText @bind-Value="Model.DefenseCounselType" class="form-control" />
     </div>
     <div class="form-group">
         <label>Defense Counsel Waived</label>
-        <InputCheckbox @bind-Value="diversionPlea.DefenseCounselWaived" />
+        <InputCheckbox @bind-Value="Model.DefenseCounselWaived" />
     </div>
     <div class="form-group">
         <label>Appearance Reason</label>
-        <InputText @bind-Value="diversionPlea.AppearanceReason" class="form-control" />
+        <InputText @bind-Value="Model.AppearanceReason" class="form-control" />
     </div>
     <div class="form-group">
         <label>Charges</label>
-        <InputText @bind-Value="diversionPlea.Charges" class="form-control" />
+        <InputText @bind-Value="Model.Charges" class="form-control" />
     </div>
     <div class="form-group">
         <label>Diversion Type</label>
-        <InputText @bind-Value="diversionPlea.DiversionType" class="form-control" />
+        <InputText @bind-Value="Model.DiversionType" class="form-control" />
     </div>
     <div class="form-group">
         <label>Diversion Completion Date</label>
-        <InputDate @bind-Value="diversionPlea.DiversionCompletionDate" class="form-control" />
+        <InputDate @bind-Value="Model.DiversionCompletionDate" class="form-control" />
     </div>
     <div class="form-group">
         <label>Diversion Fine Pay Date</label>
-        <InputDate @bind-Value="diversionPlea.DiversionFinePayDate" class="form-control" />
+        <InputDate @bind-Value="Model.DiversionFinePayDate" class="form-control" />
     </div>
     <div class="form-group">
         <label>Probation</label>
-        <InputCheckbox @bind-Value="diversionPlea.Probation" />
+        <InputCheckbox @bind-Value="Model.Probation" />
     </div>
     <div class="form-group">
         <label>Pay Restitution</label>
-        <InputCheckbox @bind-Value="diversionPlea.PayRestitution" />
+        <InputCheckbox @bind-Value="Model.PayRestitution" />
     </div>
     <div class="form-group">
         <label>Pay Restitution To</label>
-        <InputText @bind-Value="diversionPlea.PayRestitutionTo" class="form-control" />
+        <InputText @bind-Value="Model.PayRestitutionTo" class="form-control" />
     </div>
     <div class="form-group">
         <label>Pay Restitution Amount</label>
-        <InputNumber @bind-Value="diversionPlea.PayRestitutionAmount" class="form-control" />
+        <InputNumber @bind-Value="Model.PayRestitutionAmount" class="form-control" />
     </div>
     <div class="form-group">
         <label>Other Conditions</label>
-        <InputCheckbox @bind-Value="diversionPlea.OtherConditions" />
+        <InputCheckbox @bind-Value="Model.OtherConditions" />
     </div>
     <div class="form-group">
         <label>Other Conditions Text</label>
-        <InputText @bind-Value="diversionPlea.OtherConditionsText" class="form-control" />
+        <InputText @bind-Value="Model.OtherConditionsText" class="form-control" />
     </div>
     <div class="form-actions">
         <button type="submit" class="btn btn-success" disabled="@(IsSubmitting || IsLoadingCase)">Generate DOCX</button>
@@ -118,7 +106,6 @@
 </div>
 
 @code {
-    private DiversionPleaDto diversionPlea => Model;
 
     protected override string ApiEndpoint => "diversionplea";
 

@@ -1,16 +1,16 @@
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using Munientry.Api.Data;
+using Munientry.Shared.Dtos;
 using Xunit;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Munientry.Api.Tests.Infrastructure;
 
 namespace Munientry.Api.Tests
 {
-    public class PleaOnlyFutureSentencingApiTests : IClassFixture<WebApplicationFactory<Program>>
+    public class PleaOnlyFutureSentencingApiTests : IClassFixture<MuniEntryWebApplicationFactory>
     {
-        private readonly WebApplicationFactory<Program> _factory;
+        private readonly MuniEntryWebApplicationFactory _factory;
 
-        public PleaOnlyFutureSentencingApiTests(WebApplicationFactory<Program> factory)
+        public PleaOnlyFutureSentencingApiTests(MuniEntryWebApplicationFactory factory)
         {
             _factory = factory;
         }
@@ -28,7 +28,7 @@ namespace Munientry.Api.Tests
                 DefenseCounselType = "Public Defender",
                 DefenseCounselWaived = false,
                 AppearanceReason = "Plea",
-                PleaDate = System.DateTime.Today,
+                PleaDate = System.DateTime.Today.AddDays(-1),
                 SentencingDate = System.DateTime.Today.AddDays(30),
                 Charges = "M1",
                 CourtCosts = "Yes",

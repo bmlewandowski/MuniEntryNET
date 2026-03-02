@@ -2,14 +2,14 @@ using System;
 using System.Net;
 using System.Net.Http.Json;
 using Xunit;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Munientry.Api.Tests.Infrastructure;
 using System.Threading.Tasks;
-using Munientry.Api.Data;
+using Munientry.Shared.Dtos;
 
-public class GeneralNoticeOfHearingApiTests : IClassFixture<WebApplicationFactory<Program>>
+public class GeneralNoticeOfHearingApiTests : IClassFixture<MuniEntryWebApplicationFactory>
 {
-    private readonly WebApplicationFactory<Program> _factory;
-    public GeneralNoticeOfHearingApiTests(WebApplicationFactory<Program> factory)
+    private readonly MuniEntryWebApplicationFactory _factory;
+    public GeneralNoticeOfHearingApiTests(MuniEntryWebApplicationFactory factory)
     {
         _factory = factory;
     }

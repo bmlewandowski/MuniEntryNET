@@ -1,16 +1,16 @@
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using Munientry.Api.Data;
+using Munientry.Shared.Dtos;
 using Xunit;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Munientry.Api.Tests.Infrastructure;
 
 namespace Munientry.Api.Tests
 {
-    public class SchedulingEntryApiTests : IClassFixture<WebApplicationFactory<Program>>
+    public class SchedulingEntryApiTests : IClassFixture<MuniEntryWebApplicationFactory>
     {
-        private readonly WebApplicationFactory<Program> _factory;
+        private readonly MuniEntryWebApplicationFactory _factory;
 
-        public SchedulingEntryApiTests(WebApplicationFactory<Program> factory)
+        public SchedulingEntryApiTests(MuniEntryWebApplicationFactory factory)
         {
             _factory = factory;
         }

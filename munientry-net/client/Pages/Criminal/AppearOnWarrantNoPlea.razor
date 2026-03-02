@@ -6,8 +6,8 @@
 <div class="form-card">
 <h2>Appear on Warrant (No Plea) Dialog</h2>
 
-<EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
-<DataAnnotationsValidator />
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+<FluentValidationValidator />
 @if (IsLoadingCase)
 {
 <div class="alert alert-info">Loading case data...</div>
@@ -15,90 +15,90 @@
 	<ValidationSummary />
 	<div class="form-group">
 		<label>Defendant First Name</label>
-		<InputText class="form-control" @bind-Value="formModel.DefendantFirstName" />
-		<ValidationMessage For="@(() => formModel.DefendantFirstName)" />
+		<InputText class="form-control" @bind-Value="Model.DefendantFirstName" />
+		<ValidationMessage For="@(() => Model.DefendantFirstName)" />
 	</div>
 	<div class="form-group">
 		<label>Defendant Last Name</label>
-		<InputText class="form-control" @bind-Value="formModel.DefendantLastName" />
-		<ValidationMessage For="@(() => formModel.DefendantLastName)" />
+		<InputText class="form-control" @bind-Value="Model.DefendantLastName" />
+		<ValidationMessage For="@(() => Model.DefendantLastName)" />
 	</div>
 	<div class="form-group">
 		<label>Case Number</label>
-		<InputText class="form-control" @bind-Value="formModel.CaseNumber" />
-		<ValidationMessage For="@(() => formModel.CaseNumber)" />
+		<InputText class="form-control" @bind-Value="Model.CaseNumber" />
+		<ValidationMessage For="@(() => Model.CaseNumber)" />
 	</div>
 	<div class="form-group">
 		<label>Bond Type</label>
-		<InputText class="form-control" @bind-Value="formModel.BondType" />
+		<InputText class="form-control" @bind-Value="Model.BondType" />
 	</div>
 	<div class="form-group">
 		<label>Bond Amount</label>
-		<InputText class="form-control" @bind-Value="formModel.BondAmount" />
+		<InputText class="form-control" @bind-Value="Model.BondAmount" />
 	</div>
 	<div class="form-group">
 		<label>No Contact Name</label>
-		<InputText class="form-control" @bind-Value="formModel.NoContactName" />
+		<InputText class="form-control" @bind-Value="Model.NoContactName" />
 	</div>
 	<div class="form-group">
 		<label>Custodial Supervision Supervisor</label>
-		<InputText class="form-control" @bind-Value="formModel.CustodialSupervisionSupervisor" />
+		<InputText class="form-control" @bind-Value="Model.CustodialSupervisionSupervisor" />
 	</div>
 	<div class="form-group">
 		<label>Admin License Suspension Objection</label>
-		<InputText class="form-control" @bind-Value="formModel.AdminLicenseSuspensionObjection" />
+		<InputText class="form-control" @bind-Value="Model.AdminLicenseSuspensionObjection" />
 	</div>
 	<div class="form-group">
 		<label>Admin License Suspension Disposition</label>
-		<InputText class="form-control" @bind-Value="formModel.AdminLicenseSuspensionDisposition" />
+		<InputText class="form-control" @bind-Value="Model.AdminLicenseSuspensionDisposition" />
 	</div>
 	<div class="form-group">
 		<label>Admin License Suspension Explanation</label>
-		<InputText class="form-control" @bind-Value="formModel.AdminLicenseSuspensionExplanation" />
+		<InputText class="form-control" @bind-Value="Model.AdminLicenseSuspensionExplanation" />
 	</div>
 	<div class="form-group">
 		<label>Vehicle Make/Model</label>
-		<InputText class="form-control" @bind-Value="formModel.VehicleMakeModel" />
+		<InputText class="form-control" @bind-Value="Model.VehicleMakeModel" />
 	</div>
 	<div class="form-group">
 		<label>Vehicle License Plate</label>
-		<InputText class="form-control" @bind-Value="formModel.VehicleLicensePlate" />
+		<InputText class="form-control" @bind-Value="Model.VehicleLicensePlate" />
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="formModel.TowToResidence" />
+		<InputCheckbox @bind-Value="Model.TowToResidence" />
 		<label>Tow to Residence</label>
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="formModel.MotionToReturnVehicle" />
+		<InputCheckbox @bind-Value="Model.MotionToReturnVehicle" />
 		<label>Motion to Return Vehicle</label>
 	</div>
 	<div class="form-group">
 		<label>State Opposes</label>
-		<InputText class="form-control" @bind-Value="formModel.StateOpposes" />
+		<InputText class="form-control" @bind-Value="Model.StateOpposes" />
 	</div>
 	<div class="form-group">
 		<label>Disposition Motion to Return</label>
-		<InputText class="form-control" @bind-Value="formModel.DispositionMotionToReturn" />
+		<InputText class="form-control" @bind-Value="Model.DispositionMotionToReturn" />
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="formModel.VacateResidence" />
+		<InputCheckbox @bind-Value="Model.VacateResidence" />
 		<label>Vacate Residence</label>
 	</div>
 	<div class="form-group">
 		<label>Residence Address</label>
-		<InputText class="form-control" @bind-Value="formModel.ResidenceAddress" />
+		<InputText class="form-control" @bind-Value="Model.ResidenceAddress" />
 	</div>
 	<div class="form-group">
 		<label>Exclusive Possession To</label>
-		<InputText class="form-control" @bind-Value="formModel.ExclusivePossessionTo" />
+		<InputText class="form-control" @bind-Value="Model.ExclusivePossessionTo" />
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="formModel.SurrenderWeapons" />
+		<InputCheckbox @bind-Value="Model.SurrenderWeapons" />
 		<label>Surrender Weapons</label>
 	</div>
 	<div class="form-group">
 		<label>Surrender Weapons Date</label>
-		<InputText class="form-control" @bind-Value="formModel.SurrenderWeaponsDate" />
+		<InputText class="form-control" @bind-Value="Model.SurrenderWeaponsDate" />
 	</div>
 	<div class="form-actions">
 		<button type="submit" class="btn btn-success" disabled="@(IsSubmitting || IsLoadingCase)">Open Entry</button>
@@ -119,7 +119,6 @@
 </div>
 </div>
 @code {
-	private AppearOnWarrantNoPleaDto formModel => Model;
 
 	protected override string ApiEndpoint => "appearonwarrantnoplea";
 

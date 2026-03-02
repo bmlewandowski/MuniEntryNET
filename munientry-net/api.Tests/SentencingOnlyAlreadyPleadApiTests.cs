@@ -1,16 +1,16 @@
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using Munientry.Api.Data;
+using Munientry.Shared.Dtos;
 using Xunit;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Munientry.Api.Tests.Infrastructure;
 
 namespace Munientry.Api.Tests
 {
-    public class SentencingOnlyAlreadyPleadApiTests : IClassFixture<WebApplicationFactory<Program>>
+    public class SentencingOnlyAlreadyPleadApiTests : IClassFixture<MuniEntryWebApplicationFactory>
     {
-        private readonly WebApplicationFactory<Program> _factory;
+        private readonly MuniEntryWebApplicationFactory _factory;
 
-        public SentencingOnlyAlreadyPleadApiTests(WebApplicationFactory<Program> factory)
+        public SentencingOnlyAlreadyPleadApiTests(MuniEntryWebApplicationFactory factory)
         {
             _factory = factory;
         }
@@ -28,7 +28,7 @@ namespace Munientry.Api.Tests
                 DefenseCounselType = "Public Defender",
                 DefenseCounselWaived = false,
                 AppearanceReason = "Sentencing",
-                SentencingDate = System.DateTime.Today,
+                SentencingDate = System.DateTime.Today.AddDays(-1),
                 Charges = "M1",
                 CourtCosts = "Yes",
                 AbilityToPay = "forthwith",
@@ -43,7 +43,7 @@ namespace Munientry.Api.Tests
                 CommunityService = false,
                 OtherConditions = false
             };
-            var response = await client.PostAsJsonAsync("/api/v1/sentencingonlyalreadypead", dto);
+            var response = await client.PostAsJsonAsync("/api/v1/sentencingonlyalreadyplead", dto);
             response.EnsureSuccessStatusCode();
             Assert.Equal(
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",

@@ -1,223 +1,173 @@
-﻿@page "/criminal/not-guilty-plea"
+@page "/criminal/not-guilty-plea"
 @page "/criminal/not-guilty-plea/{CaseNumber}"
-@using Munientry.Client.Shared.Models
-@inject HttpClient Http
-@inject NavigationManager Navigation
-@using Microsoft.AspNetCore.Components
+@inherits FormPageBase<NotGuiltyPleaDto>
 
 <div class="form-page">
 <div class="form-card">
 <h2>Not Guilty Plea Dialog</h2>
 
-<EditForm Model="pleaForm" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+    <FluentValidationValidator />
     <ValidationSummary />
     <div class="form-group">
         <label>Defendant First Name</label>
-        <InputText class="form-control" @bind-Value="pleaForm.DefendantFirstName" />
-        <ValidationMessage For="@(() => pleaForm.DefendantFirstName)" />
+        <InputText class="form-control" @bind-Value="Model.DefendantFirstName" />
+        <ValidationMessage For="@(() => Model.DefendantFirstName)" />
     </div>
     <div class="form-group">
         <label>Defendant Last Name</label>
-        <InputText class="form-control" @bind-Value="pleaForm.DefendantLastName" />
-        <ValidationMessage For="@(() => pleaForm.DefendantLastName)" />
+        <InputText class="form-control" @bind-Value="Model.DefendantLastName" />
+        <ValidationMessage For="@(() => Model.DefendantLastName)" />
     </div>
     <div class="form-group">
         <label>Case Number</label>
-        <InputText class="form-control" @bind-Value="pleaForm.CaseNumber" />
-        <ValidationMessage For="@(() => pleaForm.CaseNumber)" />
+        <InputText class="form-control" @bind-Value="Model.CaseNumber" />
+        <ValidationMessage For="@(() => Model.CaseNumber)" />
     </div>
     <div class="form-group">
         <label>Defense Counsel Name</label>
-        <InputText class="form-control" @bind-Value="pleaForm.DefenseCounselName" />
+        <InputText class="form-control" @bind-Value="Model.DefenseCounselName" />
     </div>
     <div class="form-group">
         <label>Defense Counsel Type</label>
-        <InputText class="form-control" @bind-Value="pleaForm.DefenseCounselType" />
+        <InputText class="form-control" @bind-Value="Model.DefenseCounselType" />
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="pleaForm.DefenseCounselWaived" />
+        <InputCheckbox @bind-Value="Model.DefenseCounselWaived" />
         <label>Defendant waived right to counsel</label>
     </div>
     <div class="form-group">
         <label>Appearance Reason</label>
-        <InputText class="form-control" @bind-Value="pleaForm.AppearanceReason" />
+        <InputText class="form-control" @bind-Value="Model.AppearanceReason" />
     </div>
     <div class="form-group">
         <label>Plea Date</label>
-        <InputDate class="form-control" @bind-Value="pleaForm.PleaDate" />
+        <InputDate class="form-control" @bind-Value="Model.PleaDate" />
     </div>
     <div class="form-group">
         <label>Charges</label>
-        <InputText class="form-control" @bind-Value="pleaForm.Charges" />
+        <InputText class="form-control" @bind-Value="Model.Charges" />
     </div>
     <div class="form-group">
         <label>Court Costs</label>
-        <InputText class="form-control" @bind-Value="pleaForm.CourtCosts" />
+        <InputText class="form-control" @bind-Value="Model.CourtCosts" />
     </div>
     <div class="form-group">
         <label>Ability to Pay</label>
-        <InputText class="form-control" @bind-Value="pleaForm.AbilityToPay" />
+        <InputText class="form-control" @bind-Value="Model.AbilityToPay" />
     </div>
     <div class="form-group">
         <label>Balance Due Date</label>
-        <InputDate class="form-control" @bind-Value="pleaForm.BalanceDueDate" />
+        <InputDate class="form-control" @bind-Value="Model.BalanceDueDate" />
     </div>
     <div class="form-group">
         <label>Pay Today</label>
-        <InputText class="form-control" @bind-Value="pleaForm.PayToday" />
+        <InputText class="form-control" @bind-Value="Model.PayToday" />
     </div>
     <div class="form-group">
         <label>Monthly Pay</label>
-        <InputText class="form-control" @bind-Value="pleaForm.MonthlyPay" />
+        <InputText class="form-control" @bind-Value="Model.MonthlyPay" />
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="pleaForm.CreditForJail" />
+        <InputCheckbox @bind-Value="Model.CreditForJail" />
         <label>Credit for Jail</label>
     </div>
     <div class="form-group">
         <label>Jail Time Credit Days</label>
-        <InputText class="form-control" @bind-Value="pleaForm.JailTimeCreditDays" />
+        <InputText class="form-control" @bind-Value="Model.JailTimeCreditDays" />
     </div>
     <div class="form-group">
         <label>FRA in File</label>
-        <InputText class="form-control" @bind-Value="pleaForm.FraInFile" />
+        <InputText class="form-control" @bind-Value="Model.FraInFile" />
     </div>
     <div class="form-group">
         <label>FRA in Court</label>
-        <InputText class="form-control" @bind-Value="pleaForm.FraInCourt" />
+        <InputText class="form-control" @bind-Value="Model.FraInCourt" />
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="pleaForm.LicenseSuspension" />
+        <InputCheckbox @bind-Value="Model.LicenseSuspension" />
         <label>License Suspension</label>
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="pleaForm.CommunityService" />
+        <InputCheckbox @bind-Value="Model.CommunityService" />
         <label>Community Service</label>
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="pleaForm.OtherConditions" />
+        <InputCheckbox @bind-Value="Model.OtherConditions" />
         <label>Other Conditions</label>
     </div>
     <div class="form-group">
         <label>Bond Type</label>
-        <InputText class="form-control" @bind-Value="pleaForm.BondType" />
+        <InputText class="form-control" @bind-Value="Model.BondType" />
     </div>
     <div class="form-group">
         <label>Bond Amount</label>
-        <InputText class="form-control" @bind-Value="pleaForm.BondAmount" />
+        <InputText class="form-control" @bind-Value="Model.BondAmount" />
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="pleaForm.NoContact" />
+        <InputCheckbox @bind-Value="Model.NoContact" />
         <label>No Contact</label>
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="pleaForm.NoAlcoholDrugs" />
+        <InputCheckbox @bind-Value="Model.NoAlcoholDrugs" />
         <label>No Alcohol/Drugs</label>
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="pleaForm.AlcoholDrugsAssessment" />
+        <InputCheckbox @bind-Value="Model.AlcoholDrugsAssessment" />
         <label>Alcohol/Drugs Assessment</label>
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="pleaForm.MentalHealthAssessment" />
+        <InputCheckbox @bind-Value="Model.MentalHealthAssessment" />
         <label>Mental Health Assessment</label>
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="pleaForm.FingerprintInCourt" />
+        <InputCheckbox @bind-Value="Model.FingerprintInCourt" />
         <label>Fingerprint in Court</label>
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="pleaForm.SpecializedDocket" />
+        <InputCheckbox @bind-Value="Model.SpecializedDocket" />
         <label>Specialized Docket</label>
     </div>
     <div class="form-group">
         <label>Specialized Docket Type</label>
-        <InputText class="form-control" @bind-Value="pleaForm.SpecializedDocketType" />
+        <InputText class="form-control" @bind-Value="Model.SpecializedDocketType" />
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="pleaForm.Monitoring" />
+        <InputCheckbox @bind-Value="Model.Monitoring" />
         <label>Monitoring</label>
     </div>
     <div class="form-group">
         <label>Monitoring Type</label>
-        <InputText class="form-control" @bind-Value="pleaForm.MonitoringType" />
+        <InputText class="form-control" @bind-Value="Model.MonitoringType" />
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="pleaForm.ComplyProtectionOrder" />
+        <InputCheckbox @bind-Value="Model.ComplyProtectionOrder" />
         <label>Comply with Protection Order</label>
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="pleaForm.PublicSafetySuspension" />
+        <InputCheckbox @bind-Value="Model.PublicSafetySuspension" />
         <label>Public Safety Suspension</label>
     </div>
     <div class="form-actions">
-        <button type="submit" class="btn btn-success" disabled="@isSubmitting">Generate DOCX</button>
+        <button type="submit" class="btn btn-success" disabled="@IsSubmitting">Generate DOCX</button>
         <button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
         <button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
         <button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
     </div>
 </EditForm>
 
-@if (submitResult != null)
+@if (ErrorMessage != null)
 {
-    <div class="alert alert-info">@submitResult</div>
+    <div class="alert alert-danger">@ErrorMessage</div>
+}
+@if (SubmitResult != null)
+{
+    <div class="alert alert-success">@SubmitResult</div>
 }
 
 </div>
 </div>
 
 @code {
-    [Parameter]
-    public string? CaseNumber { get; set; }
-    private NotGuiltyPleaDto pleaForm = new();
-    private string? submitResult;
-    private bool isSubmitting = false;
-    private string? errorMessage;
-
-    private async Task HandleValidSubmit()
-    {
-        isSubmitting = true;
-        errorMessage = null;
-        try
-        {
-            var apiBase = ApiHelper.GetApiBaseUrl();
-            var http = new HttpClient { BaseAddress = new Uri(apiBase) };
-            var response = await http.PostAsJsonAsync("notguiltyplea", pleaForm);
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsByteArrayAsync();
-                var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "NotGuiltyPlea.docx";
-                await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
-                submitResult = "Not Guilty Plea DOCX generated.";
-            }
-            else
-            {
-                errorMessage = $"Error: {response.ReasonPhrase}";
-            }
-        }
-        catch (Exception ex)
-        {
-            errorMessage = ex.Message;
-        }
-        finally
-        {
-            isSubmitting = false;
-        }
-    }
-
-    private void CloseOrCancel() => Navigation.NavigateTo("/");
-    private void ClearFields() { pleaForm = new(); }
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (!string.IsNullOrWhiteSpace(CaseNumber))
-        {
-            // Comment out the next line to disable auto-load
-            //await LoadCaseDataAsync(CaseNumber);
-        }
-    }
-
-    [Inject] IJSRuntime JS { get; set; } = default!;
-    [Inject] Munientry.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;
+    protected override string ApiEndpoint => "notguiltyplea";
 }

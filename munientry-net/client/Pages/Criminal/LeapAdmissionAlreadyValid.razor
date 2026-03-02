@@ -6,8 +6,8 @@
     <div class="form-card">
         <h2>LEAP Admission - Already Valid Dialog</h2>
         <!-- Legacy: leap_plea_valid_dialog_ui.py -->
-        <EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
-            <DataAnnotationsValidator />
+        <EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+            <FluentValidationValidator />
     @if (IsLoadingCase)
     {
         <div class="alert alert-info">Loading case data...</div>
@@ -27,33 +27,33 @@
             <ValidationSummary />
             <div class="form-group">
                 <label>Defendant First Name</label>
-                <InputText class="form-control" @bind-Value="formModel.DefendantFirstName" />
-                <ValidationMessage For="@(() => formModel.DefendantFirstName)" />
+                <InputText class="form-control" @bind-Value="Model.DefendantFirstName" />
+                <ValidationMessage For="@(() => Model.DefendantFirstName)" />
             </div>
             <div class="form-group">
                 <label>Defendant Last Name</label>
-                <InputText class="form-control" @bind-Value="formModel.DefendantLastName" />
-                <ValidationMessage For="@(() => formModel.DefendantLastName)" />
+                <InputText class="form-control" @bind-Value="Model.DefendantLastName" />
+                <ValidationMessage For="@(() => Model.DefendantLastName)" />
             </div>
             <div class="form-group">
                 <label>Case Number</label>
-                <InputText class="form-control" @bind-Value="formModel.CaseNumber" />
-                <ValidationMessage For="@(() => formModel.CaseNumber)" />
+                <InputText class="form-control" @bind-Value="Model.CaseNumber" />
+                <ValidationMessage For="@(() => Model.CaseNumber)" />
             </div>
             <div class="form-group">
                 <label>Defense Counsel Name</label>
-                <InputText class="form-control" @bind-Value="formModel.DefenseCounselName" />
+                <InputText class="form-control" @bind-Value="Model.DefenseCounselName" />
             </div>
             <div class="form-group">
-                <CheckboxInline Value="formModel.DefenseCounselWaived" ValueChanged="@(v => formModel.DefenseCounselWaived = v)" ValueExpression="@(() => formModel.DefenseCounselWaived)" Label="Defendant waived right to counsel" />
+                <CheckboxInline Value="Model.DefenseCounselWaived" ValueChanged="@(v => Model.DefenseCounselWaived = v)" ValueExpression="@(() => Model.DefenseCounselWaived)" Label="Defendant waived right to counsel" />
             </div>
             <div class="form-group">
                 <label>Appearance Reason</label>
-                <InputText class="form-control" @bind-Value="formModel.AppearanceReason" />
+                <InputText class="form-control" @bind-Value="Model.AppearanceReason" />
             </div>
             <div class="form-group">
                 <label>Admission Date</label>
-                <InputDate class="form-control" @bind-Value="formModel.AdmissionDate" />
+                <InputDate class="form-control" @bind-Value="Model.AdmissionDate" />
             </div>
             <div class="form-group" style="max-width:100%;">
                 <label>Charges</label>
@@ -107,35 +107,35 @@
             </div>
             <div class="form-group">
                 <label>Court Costs</label>
-                <InputText class="form-control" @bind-Value="formModel.CourtCosts" />
+                <InputText class="form-control" @bind-Value="Model.CourtCosts" />
             </div>
             <div class="form-group">
                 <label>Ability to Pay</label>
-                <InputText class="form-control" @bind-Value="formModel.AbilityToPay" />
+                <InputText class="form-control" @bind-Value="Model.AbilityToPay" />
             </div>
             <div class="form-group">
                 <label>Balance Due Date</label>
-                <InputDate class="form-control" @bind-Value="formModel.BalanceDueDate" />
+                <InputDate class="form-control" @bind-Value="Model.BalanceDueDate" />
             </div>
             <div class="form-group">
-                <CheckboxInline @bind-Value="formModel.CreditForJail" Label="Credit for Jail" />
+                <CheckboxInline @bind-Value="Model.CreditForJail" Label="Credit for Jail" />
             </div>
             <div class="form-group">
                 <label>Monthly Pay</label>
-                <InputText class="form-control" @bind-Value="formModel.MonthlyPay" />
+                <InputText class="form-control" @bind-Value="Model.MonthlyPay" />
             </div>
             <div class="form-group">
                 <label>Jail Time Credit Days</label>
-                <InputText class="form-control" @bind-Value="formModel.JailTimeCreditDays" />
+                <InputText class="form-control" @bind-Value="Model.JailTimeCreditDays" />
             </div>
             <div class="form-group">
-                <CheckboxInline @bind-Value="formModel.LicenseSuspension" Label="License Suspension" />
+                <CheckboxInline @bind-Value="Model.LicenseSuspension" Label="License Suspension" />
             </div>
             <div class="form-group">
-                <CheckboxInline @bind-Value="formModel.CommunityService" Label="Community Service" />
+                <CheckboxInline @bind-Value="Model.CommunityService" Label="Community Service" />
             </div>
             <div class="form-group">
-                <CheckboxInline @bind-Value="formModel.OtherConditions" Label="Other Conditions" />
+                <CheckboxInline @bind-Value="Model.OtherConditions" Label="Other Conditions" />
             </div>
             <div class="form-actions">
                 <button type="submit" class="btn btn-success me-2" disabled="@(IsSubmitting || IsLoadingCase)">Generate DOCX</button>
@@ -156,7 +156,6 @@
 </div>
 
 @code {
-    private LeapAdmissionAlreadyValidDto formModel => Model;
 
     // Charge grid (separate from the main DTO charge summary field)
     private List<ChargeDto> Charges { get; set; } = new();
@@ -165,8 +164,8 @@
 
     protected override async Task HandleValidSubmit()
     {
-        formModel.ChargeItems = Charges
-            .Select(c => new Munientry.Client.Shared.Models.ChargeItemDto
+        Model.ChargeItems = Charges
+            .Select(c => new ChargeItemDto
             {
                 Offense = c.Offense,
                 Statute = c.Statute,

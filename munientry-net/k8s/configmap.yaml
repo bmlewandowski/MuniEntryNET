@@ -8,5 +8,7 @@ metadata:
 data:
   # ASP.NET Core runtime environment
   ASPNETCORE_ENVIRONMENT: "Development"
-  # API base URL used by the Blazor WASM client (resolved in browser, so use the ingress hostname)
-  API_BASE_URL: "http://munientry.local/api"
+  # ApiBaseUrl consumed by the Blazor WASM client (resolved in the browser, so use the public
+  # ingress hostname + versioned path prefix).  Must match the MapGroup("/api/v1") prefix in
+  # api/Program.cs and the ApiBaseUrl key in client/wwwroot/appsettings.json.
+  API_BASE_URL: "http://munientry.local/api/v1/"

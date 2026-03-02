@@ -37,7 +37,7 @@ This document summarizes the migration status of legacy Python forms to Blazor, 
 | Trial Sentencing Judgment Entry                 | Yes                  | Yes           | /criminal/trial-sentencing                      | trialsentencing                 | Migrated  |
 | Trial To Court / Final Jury Notice Of Hearing   | Yes                  | Yes           | /scheduling/trial-to-court-notice-of-hearing    | trialtocourt                    | Migrated  |
 | Criminal Sealing / Deny Privileges Entry        | Yes                  | Yes           | /criminal/criminal-sealing (alias: /criminal/sealing-deny-privileges) | criminalsealing | Migrated  |
-| Failure To Appear Entry                         | Yes                  | Yes           | /criminal/failure-to-appear                     | failuretooappear                | Migrated  |
+| Failure To Appear Entry                         | Yes                  | Yes           | /criminal/failure-to-appear                     | failuretoappear                 | Migrated  |
 | Competency Evaluation Entry                     | Yes                  | Yes           | /criminal/competency-evaluation                 | competencyevaluation            | Migrated  |
 | Criminal Freeform Entry                         | Yes                  | Yes           | /criminal/freeform-entry                        | freeformentry                   | Migrated  |
 | Scheduling Entry (Rohrer / Fowler / Hemmeter)   | Yes                  | Yes           | /scheduling/scheduling-entry                    | schedulingentry                 | Migrated  |

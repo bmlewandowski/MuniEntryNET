@@ -1,7 +1,5 @@
-﻿@page "/scheduling/scheduling-entry"
-@using Munientry.Client.Shared.Models
-@using System.Net.Http.Json
-@inject IJSRuntime JS
+@page "/scheduling/scheduling-entry"
+@inherits FormPageBase<SchedulingEntryDto>
 
 <!-- Legacy: munientry.builders.scheduling.sched_entry_dialogs -->
 
@@ -9,8 +7,8 @@
 <div class="form-card">
 <h2>Scheduling Entry</h2>
 
-<EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+    <FluentValidationValidator />
     <ValidationSummary />
 
     <!-- Judge Selection -->
@@ -22,7 +20,7 @@
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="judgeRadio"
                            id="judge_@judge" value="@judge"
-                           checked="@(formModel.JudicialOfficer == judge)"
+                           checked="@(Model.JudicialOfficer == judge)"
                            @onchange="() => OnJudgeChanged(judge)" />
                     <label class="form-check-label" for="judge_@judge">@judge</label>
                 </div>
@@ -33,31 +31,31 @@
     <!-- Defendant / Case -->
     <div class="form-group">
         <label>Case Number</label>
-        <InputText @bind-Value="formModel.CaseNumber" class="form-control" />
+        <InputText @bind-Value="Model.CaseNumber" class="form-control" />
     </div>
     <div class="form-group">
         <label>Defendant First Name</label>
-        <InputText @bind-Value="formModel.DefendantFirstName" class="form-control" />
+        <InputText @bind-Value="Model.DefendantFirstName" class="form-control" />
     </div>
     <div class="form-group">
         <label>Defendant Last Name</label>
-        <InputText @bind-Value="formModel.DefendantLastName" class="form-control" />
+        <InputText @bind-Value="Model.DefendantLastName" class="form-control" />
     </div>
     <div class="form-group">
         <label>Defense Counsel</label>
-        <InputText @bind-Value="formModel.DefenseCounsel" class="form-control" />
+        <InputText @bind-Value="Model.DefenseCounsel" class="form-control" />
     </div>
 
     <!-- Speedy Trial Inputs -->
     <div class="form-group">
         <label>Arrest / Summons Date</label>
-        <InputDate @bind-Value="formModel.ArrestSummonsDate"
+        <InputDate @bind-Value="Model.ArrestSummonsDate"
                    class="form-control"
                    @oninput="RecalcSpeedyTrialDate" />
     </div>
     <div class="form-group">
         <label>Highest Charge</label>
-        <InputSelect @bind-Value="formModel.HighestCharge"
+        <InputSelect @bind-Value="Model.HighestCharge"
                      class="form-control"
                      @oninput="RecalcSpeedyTrialDate">
             @foreach (var charge in SpeedyTrialDict.Keys)
@@ -67,22 +65,22 @@
         </InputSelect>
     </div>
     <div class="form-group form-check">
-        <InputCheckbox id="inJailCheck" @bind-Value="formModel.InJail"
+        <InputCheckbox id="inJailCheck" @bind-Value="Model.InJail"
                        @oninput="RecalcSpeedyTrialDate" class="form-check-input" />
         <label class="form-check-label" for="inJailCheck">Defendant Is In Jail</label>
     </div>
-    @if (formModel.InJail == true)
+    @if (Model.InJail == true)
     {
         <div class="form-group">
             <label>Days In Jail</label>
-            <InputNumber @bind-Value="formModel.DaysInJail"
+            <InputNumber @bind-Value="Model.DaysInJail"
                          class="form-control"
                          @oninput="RecalcSpeedyTrialDate" />
         </div>
     }
     <div class="form-group">
         <label>Continuance Days</label>
-        <InputNumber @bind-Value="formModel.ContinuanceDays"
+        <InputNumber @bind-Value="Model.ContinuanceDays"
                      class="form-control"
                      @oninput="RecalcSpeedyTrialDate" />
     </div>
@@ -101,21 +99,21 @@
             <div class="form-check">
                 <input class="form-check-input" type="radio" name="pretrialRadio"
                        id="pretrial_@opt.Key"
-                       checked="@(formModel.PretrialOption == opt.Key)"
+                       checked="@(Model.PretrialOption == opt.Key)"
                        @onchange="() => OnPretrialOptionChanged(opt.Key)" />
                 <label class="form-check-label" for="pretrial_@opt.Key">@opt.Key</label>
             </div>
         }
     </div>
     <div class="form-group">
-        <label>Final Pretrial Date <small class="text-muted">(anchor — recalculates trial &amp; pretrial)</small></label>
-        <InputDate @bind-Value="formModel.FinalPretrialDate"
+        <label>Final Pretrial Date <small class="text-muted">(anchor ? recalculates trial &amp; pretrial)</small></label>
+        <InputDate @bind-Value="Model.FinalPretrialDate"
                    class="form-control"
                    @oninput="OnFinalPretrialDateChanged" />
     </div>
     <div class="form-group">
         <label>Final Pretrial Time</label>
-        <InputSelect @bind-Value="formModel.FinalPretrialTime" class="form-control">
+        <InputSelect @bind-Value="Model.FinalPretrialTime" class="form-control">
             <option>8:00 AM</option>
             <option>8:30 AM</option>
             <option>9:00 AM</option>
@@ -124,70 +122,55 @@
             <option>3:00 PM</option>
         </InputSelect>
     </div>
-    @if (formModel.PretrialOption != "No Pretrial")
+    @if (Model.PretrialOption != "No Pretrial")
     {
         <div class="form-group">
             <label>Pretrial Date <small class="text-muted">(auto-calculated)</small></label>
-            <InputDate @bind-Value="formModel.PretrialDate" class="form-control" />
+            <InputDate @bind-Value="Model.PretrialDate" class="form-control" />
         </div>
     }
     <div class="form-group">
         <label>Jury Trial Date <small class="text-muted">(auto-calculated)</small></label>
-        <InputDate @bind-Value="formModel.JuryTrialDate" class="form-control" />
+        <InputDate @bind-Value="Model.JuryTrialDate" class="form-control" />
     </div>
 
     <!-- Interpreter -->
     <hr />
     <div class="form-group form-check">
-        <InputCheckbox id="interpreterCheck" @bind-Value="formModel.InterpreterRequired"
+        <InputCheckbox id="interpreterCheck" @bind-Value="Model.InterpreterRequired"
                        class="form-check-input" />
         <label class="form-check-label" for="interpreterCheck">Interpreter Required</label>
     </div>
-    @if (formModel.InterpreterRequired)
+    @if (Model.InterpreterRequired)
     {
         <div class="form-group">
             <label>Language Required</label>
-            <InputText @bind-Value="formModel.LanguageRequired" class="form-control" />
+            <InputText @bind-Value="Model.LanguageRequired" class="form-control" />
         </div>
     }
     <div class="form-group form-check">
-        <InputCheckbox id="datesConfirmedCheck" @bind-Value="formModel.DatesConfirmedWithCounsel"
+        <InputCheckbox id="datesConfirmedCheck" @bind-Value="Model.DatesConfirmedWithCounsel"
                        class="form-check-input" />
         <label class="form-check-label" for="datesConfirmedCheck">Dates Confirmed With Counsel</label>
     </div>
 
     <div class="form-actions">
-        <button type="submit" class="btn btn-success" disabled="@isSubmitting">Open Entry</button>
+        <button type="submit" class="btn btn-success" disabled="@IsSubmitting">Open Entry</button>
         <button type="button" class="btn btn-danger" @onclick="ClearFields">Clear Fields</button>
     </div>
-    @if (errorMessage != null)
+    @if (ErrorMessage != null)
     {
-        <div class="alert alert-danger mt-2">@errorMessage</div>
+        <div class="alert alert-danger mt-2">@ErrorMessage</div>
     }
 </EditForm>
 </div>
 </div>
 
 @code {
-    [Inject] Munientry.Client.Shared.ApiHelper ApiHelper { get; set; } = default!;
-
-    private SchedulingEntryDto formModel = new()
-    {
-        JudicialOfficer    = "Rohrer",
-        HighestCharge      = "M1",
-        PretrialOption     = "Pretrial 4 weeks before trial",
-        FinalPretrialTime  = "1:00 PM",
-        ArrestSummonsDate  = DateTime.Today,
-        FinalPretrialDate  = DateTime.Today,
-        JuryTrialDate      = DateTime.Today,
-        PretrialDate       = DateTime.Today,
-    };
-
-    private bool isSubmitting = false;
-    private string? errorMessage;
+    protected override string ApiEndpoint => "schedulingentry";
     private string speedyTrialDateDisplay = "";
 
-    // ── Business constants (mirrors munientry.settings.business_constants) ─────
+    // -- Business constants (mirrors munientry.settings.business_constants) -----
 
     private static readonly Dictionary<string, int> SpeedyTrialDict = new()
     {
@@ -200,7 +183,7 @@
         ["UCM - 3rd OVI"] = 90,
     };
 
-    // DayOfWeek values for each judge (matches Python DAY_DICT 1=Mon … 4=Thu)
+    // DayOfWeek values for each judge (matches Python DAY_DICT 1=Mon ? 4=Thu)
     private static readonly Dictionary<string, (DayOfWeek Trial, DayOfWeek FinalPretrial, DayOfWeek Pretrial)> JudgeDays = new()
     {
         ["Rohrer"]   = (DayOfWeek.Tuesday,  DayOfWeek.Thursday, DayOfWeek.Monday),
@@ -216,22 +199,22 @@
         ["No Pretrial"]                   = 0,
     };
 
-    // ── Speedy trial calculation ───────────────────────────────────────────────
+    // -- Speedy trial calculation -----------------------------------------------
     // Mirrors SchedulingEntryDialogSlotFunctions.get_speedy_trial_date()
 
     private DateTime CalcSpeedyTrialDate()
     {
-        if (formModel.ArrestSummonsDate is null || string.IsNullOrEmpty(formModel.HighestCharge))
+        if (Model.ArrestSummonsDate is null || string.IsNullOrEmpty(Model.HighestCharge))
             return DateTime.Today;
 
-        int days = SpeedyTrialDict.GetValueOrDefault(formModel.HighestCharge, 90);
-        if (formModel.InJail == true)
+        int days = SpeedyTrialDict.GetValueOrDefault(Model.HighestCharge, 90);
+        if (Model.InJail == true)
             days = days / 3;  // accelerated speedy trial (integer division matches Python int())
 
-        int daysInJailAdjust = (formModel.DaysInJail ?? 0) * 3;
-        int continuance     = formModel.ContinuanceDays ?? 0;
+        int daysInJailAdjust = (Model.DaysInJail ?? 0) * 3;
+        int continuance     = Model.ContinuanceDays ?? 0;
         int adjusted        = (days + continuance) - daysInJailAdjust;
-        return formModel.ArrestSummonsDate.Value.AddDays(adjusted);
+        return Model.ArrestSummonsDate.Value.AddDays(adjusted);
     }
 
     private void RecalcSpeedyTrialDate()
@@ -240,27 +223,27 @@
         RecalcSchedulingDates();
     }
 
-    // ── Scheduling date auto-calculation ──────────────────────────────────────
+    // -- Scheduling date auto-calculation --------------------------------------
     // Mirrors SchedulingEntryDialogSlotFunctions.update_trial_and_pretrial_only()
-    // Anchor: FinalPretrialDate → derive JuryTrialDate and PretrialDate.
+    // Anchor: FinalPretrialDate ? derive JuryTrialDate and PretrialDate.
 
     private void RecalcSchedulingDates()
     {
-        if (formModel.FinalPretrialDate is null) return;
+        if (Model.FinalPretrialDate is null) return;
 
-        var anchor = formModel.FinalPretrialDate.Value;
-        string judge = formModel.JudicialOfficer ?? "Rohrer";
+        var anchor = Model.FinalPretrialDate.Value;
+        string judge = Model.JudicialOfficer ?? "Rohrer";
         if (!JudgeDays.TryGetValue(judge, out var days)) return;
 
         // Trial date: finalPretrial + 2 days, snap forward to judge's trial day
-        formModel.JuryTrialDate  = SnapForward(anchor.AddDays(2), days.Trial);
+        Model.JuryTrialDate  = SnapForward(anchor.AddDays(2), days.Trial);
 
         // Pretrial date: trialDate - pretrialDays, snap backward to judge's pretrial day
-        int pretrialDays = PretrialOptions.GetValueOrDefault(formModel.PretrialOption ?? "", 28);
+        int pretrialDays = PretrialOptions.GetValueOrDefault(Model.PretrialOption ?? "", 28);
         if (pretrialDays > 0)
-            formModel.PretrialDate = SnapBackward(formModel.JuryTrialDate!.Value.AddDays(-pretrialDays), days.Pretrial);
+            Model.PretrialDate = SnapBackward(Model.JuryTrialDate!.Value.AddDays(-pretrialDays), days.Pretrial);
         else
-            formModel.PretrialDate = null;
+            Model.PretrialDate = null;
     }
 
     /// <summary>Advance date forward until it lands on the target weekday.</summary>
@@ -277,11 +260,11 @@
         return date;
     }
 
-    // ── Event handlers ─────────────────────────────────────────────────────────
+    // -- Event handlers ---------------------------------------------------------
 
     private void OnJudgeChanged(string judge)
     {
-        formModel.JudicialOfficer = judge;
+        Model.JudicialOfficer = judge;
         RecalcSchedulingDates();
     }
 
@@ -289,45 +272,44 @@
 
     private void OnPretrialOptionChanged(string option)
     {
-        formModel.PretrialOption = option;
+        Model.PretrialOption = option;
         RecalcSchedulingDates();
     }
 
-    // ── Submission ─────────────────────────────────────────────────────────────
+    // -- Submit override (custom filename) ---------------------------------------
 
-    private async Task HandleValidSubmit()
+    protected override async Task HandleValidSubmit()
     {
-        isSubmitting = true;
-        errorMessage = null;
+        IsSubmitting = true;
+        ErrorMessage = null;
         try
         {
-            var http = new HttpClient { BaseAddress = new Uri(ApiHelper.GetApiBaseUrl()) };
-            var response = await http.PostAsJsonAsync("schedulingentry", formModel);
+            var response = await ApiClient.PostAsync(ApiEndpoint, Model);
             if (response.IsSuccessStatusCode)
             {
                 var bytes    = await response.Content.ReadAsByteArrayAsync();
-                var fileName = $"SchedulingEntry_{formModel.JudicialOfficer}_{formModel.CaseNumber}.docx";
+                var fileName = $"SchedulingEntry_{Model.JudicialOfficer}_{Model.CaseNumber}.docx";
                 await JS.InvokeVoidAsync("downloadFile", fileName,
                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document", bytes);
             }
             else
             {
-                errorMessage = $"Error: {response.StatusCode}";
+                ErrorMessage = $"Error: {response.StatusCode}";
             }
         }
         catch (Exception ex)
         {
-            errorMessage = ex.Message;
+            ErrorMessage = ex.Message;
         }
         finally
         {
-            isSubmitting = false;
+            IsSubmitting = false;
         }
     }
 
-    private void ClearFields()
+    protected override void ClearFields()
     {
-        formModel              = new SchedulingEntryDto
+        Model = new SchedulingEntryDto
         {
             JudicialOfficer   = "Rohrer",
             HighestCharge     = "M1",
@@ -339,11 +321,22 @@
             PretrialDate      = DateTime.Today,
         };
         speedyTrialDateDisplay = "";
-        errorMessage           = null;
+        ErrorMessage           = null;
     }
 
     protected override void OnInitialized()
     {
+        Model = new SchedulingEntryDto
+        {
+            JudicialOfficer   = "Rohrer",
+            HighestCharge     = "M1",
+            PretrialOption    = "Pretrial 4 weeks before trial",
+            FinalPretrialTime = "1:00 PM",
+            ArrestSummonsDate = DateTime.Today,
+            FinalPretrialDate = DateTime.Today,
+            JuryTrialDate     = DateTime.Today,
+            PretrialDate      = DateTime.Today,
+        };
         RecalcSpeedyTrialDate();
     }
 }

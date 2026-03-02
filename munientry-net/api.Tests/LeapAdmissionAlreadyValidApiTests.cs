@@ -1,16 +1,16 @@
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using Munientry.Api.Data;
+using Munientry.Shared.Dtos;
 using Xunit;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Munientry.Api.Tests.Infrastructure;
 
 namespace Munientry.Api.Tests
 {
-    public class LeapAdmissionAlreadyValidApiTests : IClassFixture<WebApplicationFactory<Program>>
+    public class LeapAdmissionAlreadyValidApiTests : IClassFixture<MuniEntryWebApplicationFactory>
     {
-        private readonly WebApplicationFactory<Program> _factory;
+        private readonly MuniEntryWebApplicationFactory _factory;
 
-        public LeapAdmissionAlreadyValidApiTests(WebApplicationFactory<Program> factory)
+        public LeapAdmissionAlreadyValidApiTests(MuniEntryWebApplicationFactory factory)
         {
             _factory = factory;
         }
@@ -28,7 +28,7 @@ namespace Munientry.Api.Tests
                 DefenseCounselType = "Public Defender",
                 DefenseCounselWaived = false,
                 AppearanceReason = "LEAP admission",
-                AdmissionDate = System.DateTime.Today,
+                AdmissionDate = System.DateTime.Today.AddDays(-1),
                 Charges = "OVI Alcohol / Drugs 1st",
                 ChargeStatute = "4511.19A1A",
                 ChargeDegree = "Misdemeanor",

@@ -6,8 +6,8 @@
 <div class="form-card">
 <h2>Plea of Guilty - Fine Only</h2>
 
-<EditForm Model="fineOnlyModel" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+    <FluentValidationValidator />
     @if (IsLoadingCase)
     {
         <div class="alert alert-info">Loading case data...</div>
@@ -27,42 +27,42 @@
     <ValidationSummary />
     <div class="form-group">
         <label>Defendant First Name</label>
-        <InputText @bind-Value="fineOnlyModel.DefendantFirstName" class="form-control" />
-        <ValidationMessage For="() => fineOnlyModel.DefendantFirstName" />
+        <InputText @bind-Value="Model.DefendantFirstName" class="form-control" />
+        <ValidationMessage For="() => Model.DefendantFirstName" />
     </div>
     <div class="form-group">
         <label>Defendant Last Name</label>
-        <InputText @bind-Value="fineOnlyModel.DefendantLastName" class="form-control" />
-        <ValidationMessage For="() => fineOnlyModel.DefendantLastName" />
+        <InputText @bind-Value="Model.DefendantLastName" class="form-control" />
+        <ValidationMessage For="() => Model.DefendantLastName" />
     </div>
     <div class="form-group">
         <label>Case Number</label>
-        <InputText @bind-Value="fineOnlyModel.CaseNumber" class="form-control" />
-        <ValidationMessage For="() => fineOnlyModel.CaseNumber" />
+        <InputText @bind-Value="Model.CaseNumber" class="form-control" />
+        <ValidationMessage For="() => Model.CaseNumber" />
     </div>
     <div class="form-group">
         <label>Date</label>
-        <InputDate @bind-Value="fineOnlyModel.Date" class="form-control" />
-        <ValidationMessage For="() => fineOnlyModel.Date" />
+        <InputDate @bind-Value="Model.Date" class="form-control" />
+        <ValidationMessage For="() => Model.Date" />
     </div>
     <div class="form-group">
         <label>Defense Counsel Name</label>
-        <InputText @bind-Value="fineOnlyModel.DefenseCounselName" class="form-control" />
+        <InputText @bind-Value="Model.DefenseCounselName" class="form-control" />
     </div>
     <div class="form-group">
         <label>Defense Counsel Type</label>
-        <InputSelect @bind-Value="fineOnlyModel.DefenseCounselType" class="form-control">
+        <InputSelect @bind-Value="Model.DefenseCounselType" class="form-control">
             <option value="">Select...</option>
             <option>Public Defender</option>
             <option>Private Counsel</option>
         </InputSelect>
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="fineOnlyModel.DefenseCounselWaived" /> Defendant waived right to counsel
+        <InputCheckbox @bind-Value="Model.DefenseCounselWaived" /> Defendant waived right to counsel
     </div>
     <div class="form-group">
         <label>Appearance Reason</label>
-        <InputSelect @bind-Value="fineOnlyModel.AppearanceReason" class="form-control">
+        <InputSelect @bind-Value="Model.AppearanceReason" class="form-control">
             <option value="">Select...</option>
             <option>arraignment</option>
             <option>a change of plea</option>
@@ -71,7 +71,7 @@
     </div>
     <div class="form-group">
         <label>Court Costs</label>
-        <InputSelect @bind-Value="fineOnlyModel.CourtCosts" class="form-control">
+        <InputSelect @bind-Value="Model.CourtCosts" class="form-control">
             <option value="">Select...</option>
             <option>Yes</option>
             <option>Waived</option>
@@ -81,7 +81,7 @@
     </div>
     <div class="form-group">
         <label>Time to Pay</label>
-        <InputSelect @bind-Value="fineOnlyModel.TimeToPay" class="form-control">
+        <InputSelect @bind-Value="Model.TimeToPay" class="form-control">
             <option value="">Select...</option>
             <option>forthwith</option>
             <option>monthly pay</option>
@@ -90,15 +90,15 @@
     </div>
     <div class="form-group">
         <label>Due Date</label>
-        <InputDate @bind-Value="fineOnlyModel.DueDate" class="form-control" />
+        <InputDate @bind-Value="Model.DueDate" class="form-control" />
     </div>
     <div class="form-group">
         <label>Pay Today</label>
-        <InputNumber @bind-Value="fineOnlyModel.PayToday" class="form-control" />
+        <InputNumber @bind-Value="Model.PayToday" class="form-control" />
     </div>
     <div class="form-group">
         <label>Monthly Pay</label>
-        <InputNumber @bind-Value="fineOnlyModel.MonthlyPay" class="form-control" />
+        <InputNumber @bind-Value="Model.MonthlyPay" class="form-control" />
     </div>
     <div class="form-group" style="max-width:100%;">
         <label>Charges</label>
@@ -151,27 +151,27 @@
         <button type="button" class="btn btn-secondary btn-sm" @onclick="GuiltyAll">Guilty All</button>
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="fineOnlyModel.CreditForJail" /> Credit $50/day in jail
+        <InputCheckbox @bind-Value="Model.CreditForJail" /> Credit $50/day in jail
     </div>
     <div class="form-group">
         <label>Jail Time Credit Days</label>
-        <InputNumber @bind-Value="fineOnlyModel.JailTimeCreditDays" class="form-control" />
+        <InputNumber @bind-Value="Model.JailTimeCreditDays" class="form-control" />
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="fineOnlyModel.LicenseSuspension" /> License Suspension
+        <InputCheckbox @bind-Value="Model.LicenseSuspension" /> License Suspension
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="fineOnlyModel.CommunityService" /> Community Service
+        <InputCheckbox @bind-Value="Model.CommunityService" /> Community Service
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="fineOnlyModel.OtherConditions" /> Other Conditions
+        <InputCheckbox @bind-Value="Model.OtherConditions" /> Other Conditions
     </div>
     <div class="form-group">
-        <InputCheckbox @bind-Value="fineOnlyModel.DistractedDriving" /> Add Distracted Driving Course Language
+        <InputCheckbox @bind-Value="Model.DistractedDriving" /> Add Distracted Driving Course Language
     </div>
     <div class="form-group">
         <label>FRA shown in complaint</label>
-        <InputSelect @bind-Value="fineOnlyModel.FraInFile" class="form-control">
+        <InputSelect @bind-Value="Model.FraInFile" class="form-control">
             <option value="">Select...</option>
             <option>N/A</option>
             <option>Yes</option>
@@ -180,7 +180,7 @@
     </div>
     <div class="form-group">
         <label>FRA shown in court</label>
-        <InputSelect @bind-Value="fineOnlyModel.FraInCourt" class="form-control">
+        <InputSelect @bind-Value="Model.FraInCourt" class="form-control">
             <option value="">Select...</option>
             <option>N/A</option>
             <option>Yes</option>
@@ -199,7 +199,6 @@
 </div>
 
 @code {
-    private FineOnlyPleaDto fineOnlyModel => Model;
     private List<ChargeGridRow> Charges { get; set; } = new();
 
     protected override string ApiEndpoint => "fineonlyplea";
@@ -209,13 +208,13 @@
         if (Charges.Count > 0)
         {
             var first = Charges[0];
-            fineOnlyModel.Charges = first.Offense;
-            fineOnlyModel.ChargeStatute = first.Statute;
-            fineOnlyModel.ChargeDegree = first.Degree;
-            fineOnlyModel.ChargePlea = first.Plea;
-            fineOnlyModel.ChargeFinding = first.Finding;
-            fineOnlyModel.ChargeFinesAmount = first.FinesAmount;
-            fineOnlyModel.ChargeFinesSuspended = first.FinesSuspended;
+            Model.Charges = first.Offense;
+            Model.ChargeStatute = first.Statute;
+            Model.ChargeDegree = first.Degree;
+            Model.ChargePlea = first.Plea;
+            Model.ChargeFinding = first.Finding;
+            Model.ChargeFinesAmount = first.FinesAmount;
+            Model.ChargeFinesSuspended = first.FinesSuspended;
         }
         await base.HandleValidSubmit();
     }

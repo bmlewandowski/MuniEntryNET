@@ -1,5 +1,7 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Munientry.Api.Middleware;
+using Munientry.Api.Options;
 using Munientry.Api.Services;
 
 namespace Munientry.Api;
@@ -10,8 +12,19 @@ namespace Munientry.Api;
 /// </summary>
 internal static class ServiceRegistration
 {
-    internal static IServiceCollection AddMuniEntryServices(this IServiceCollection services)
-    {        // ── Exception handling (item #5) ──────────────────────────────────────────
+    internal static IServiceCollection AddMuniEntryServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        // ── Strongly-typed options ────────────────────────────────────────────
+        // AuthorityCourtOptions — the key name and null-guard are written once here;
+        // all 7 SQL-querying services inject IOptions<AuthorityCourtOptions> instead
+        // of IConfiguration, keeping the coupling to the config graph in one place.
+        services.Configure<AuthorityCourtOptions>(opts =>
+            opts.ConnectionString = configuration.GetConnectionString("AuthorityCourt")
+                ?? throw new InvalidOperationException("Missing connection string 'AuthorityCourt'."));
+        services.Configure<DailyListOptions>(configuration.GetSection("DailyList"));
+        services.Configure<SchedulingOptions>(configuration.GetSection("Scheduling"));
+
+        // ── Exception handling (item #5) ──────────────────────────────────────────
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
         // ── Audit middleware (item #20) ───────────────────────────────────────
@@ -21,6 +34,10 @@ internal static class ServiceRegistration
         services.AddScoped<ICaseSearchService, CaseSearchService>();
         services.AddScoped<IDailyListService, DailyListService>();
         services.AddScoped<IDrivingCaseService, DrivingCaseService>();
+        services.AddScoped<ICaseDocketService, CaseDocketService>();
+        services.AddScoped<IEventReportService, EventReportService>();
+        services.AddScoped<IFtaReportService, FtaReportService>();
+        services.AddScoped<INotGuiltyReportService, NotGuiltyReportService>();
         services.AddScoped<ICommunityControlTermsService, CommunityControlTermsService>();
         services.AddScoped<ILeapSentencingService, LeapSentencingService>();
         services.AddScoped<IFiscalJournalEntryService, FiscalJournalEntryService>();
@@ -54,6 +71,11 @@ internal static class ServiceRegistration
         services.AddScoped<IGeneralNoticeOfHearingService, GeneralNoticeOfHearingService>();
         services.AddScoped<ISchedulingEntryService, SchedulingEntryService>();
         services.AddScoped<IJailCcPleaService, JailCcPleaService>();
+        services.AddScoped<ICriminalSealingEntryService, CriminalSealingEntryService>();
+        services.AddScoped<ICompetencyEvaluationService, CompetencyEvaluationService>();
+        services.AddScoped<IFailureToAppearService, FailureToAppearService>();
+        services.AddScoped<ICriminalFreeformEntryService, CriminalFreeformEntryService>();
+        services.AddScoped<ITrialSentencingService, TrialSentencingService>();
 
         return services;
     }

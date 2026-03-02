@@ -1,55 +1,52 @@
-
 @page "/criminal/community-service-secondary"
-@inject HttpClient Http
-@inject NavigationManager Navigation
-@inject IJSRuntime JS
+@inherits FormPageBase<CommunityServiceSecondaryDto>
 
 <div class="form-page">
 <div class="form-card">
 <h2>Community Service, License Suspension, Fingerprinting &amp; Victim Notification, Immobilize/Impound and other Conditions Secondary Dialogs</h2>
 
-<EditForm Model="secondaryForm" OnValidSubmit="HandleValidSubmit">
-	<DataAnnotationsValidator />
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+	<FluentValidationValidator />
 	<ValidationSummary />
 	<div class="form-group">
-		<InputCheckbox @bind-Value="secondaryForm.CommunityServiceOrdered" />
+		<InputCheckbox @bind-Value="Model.CommunityServiceOrdered" />
 		<label>Community Service Ordered</label>
 	</div>
 	<div class="form-group">
 		<label>Community Service Hours</label>
-		<InputText class="form-control" @bind-Value="secondaryForm.CommunityServiceHours" />
+		<InputText class="form-control" @bind-Value="Model.CommunityServiceHours" />
 	</div>
 	<div class="form-group">
 		<label>Community Service Days to Complete</label>
-		<InputText class="form-control" @bind-Value="secondaryForm.CommunityServiceDaysToComplete" />
+		<InputText class="form-control" @bind-Value="Model.CommunityServiceDaysToComplete" />
 	</div>
 	<div class="form-group">
 		<label>Community Service Due Date</label>
-		<InputDate class="form-control" @bind-Value="secondaryForm.CommunityServiceDueDate" />
+		<InputDate class="form-control" @bind-Value="Model.CommunityServiceDueDate" />
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="secondaryForm.LicenseSuspensionOrdered" />
+		<InputCheckbox @bind-Value="Model.LicenseSuspensionOrdered" />
 		<label>License Suspension Ordered</label>
 	</div>
 	<div class="form-group">
 		<label>License Suspension Length</label>
-		<InputText class="form-control" @bind-Value="secondaryForm.LicenseSuspensionLength" />
+		<InputText class="form-control" @bind-Value="Model.LicenseSuspensionLength" />
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="secondaryForm.FingerprintingOrdered" />
+		<InputCheckbox @bind-Value="Model.FingerprintingOrdered" />
 		<label>Fingerprinting Ordered</label>
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="secondaryForm.VictimNotificationOrdered" />
+		<InputCheckbox @bind-Value="Model.VictimNotificationOrdered" />
 		<label>Victim Notification Ordered</label>
 	</div>
 	<div class="form-group">
-		<InputCheckbox @bind-Value="secondaryForm.ImmobilizeImpoundOrdered" />
+		<InputCheckbox @bind-Value="Model.ImmobilizeImpoundOrdered" />
 		<label>Immobilize/Impound Ordered</label>
 	</div>
 	<div class="form-group">
 		<label>Other Conditions</label>
-		<InputText class="form-control" @bind-Value="secondaryForm.OtherConditions" />
+		<InputText class="form-control" @bind-Value="Model.OtherConditions" />
 	</div>
 	<div class="form-actions">
 		<button type="submit" class="btn btn-success">Open Entry</button>
@@ -59,27 +56,16 @@
 	</div>
 </EditForm>
 
-@if (submitResult != null)
+@if (ErrorMessage != null)
 {
-	<div class="alert alert-info">@submitResult</div>
+	<div class="alert alert-danger">@ErrorMessage</div>
+}
+@if (SubmitResult != null)
+{
+	<div class="alert alert-success">@SubmitResult</div>
 }
 </div>
 </div>
 @code {
-	private CommunityServiceSecondaryDto secondaryForm = new();
-	private string? submitResult;
-
-	private async Task HandleValidSubmit()
-	{
-		var response = await Http.PostAsJsonAsync("/api/communityservicesecondary", secondaryForm);
-		if (response.IsSuccessStatusCode)
-		{
-                        var content = await response.Content.ReadAsByteArrayAsync();
-                        var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "CommunityServiceSecondary.docx";
-                        await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
-		}
-	}
-
-	private void CloseOrCancel() => Navigation.NavigateTo("/");
-	private void ClearFields() { secondaryForm = new(); }
+	protected override string ApiEndpoint => "communityservicesecondary";
 }

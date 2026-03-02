@@ -1,10 +1,7 @@
-﻿@page "/criminal/sealing-deny-privileges"
+@page "/criminal/sealing-deny-privileges"
 @page "/criminal/criminal-sealing"
 @page "/criminal/criminal-sealing/{CaseNumber}"
-@using Munientry.Client.Shared.Models
-@inject HttpClient Http
-@inject NavigationManager Navigation
-@inject IJSRuntime JS
+@inherits FormPageBase<CriminalSealingEntryDto>
 
 <PageTitle>Criminal Sealing Entry</PageTitle>
 
@@ -12,42 +9,42 @@
 <div class="form-card">
 <h3>Criminal Sealing Entry</h3>
 
-<EditForm Model="model" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+    <FluentValidationValidator />
     <ValidationSummary />
 
     <div class="form-section">
         <h4>Case Information</h4>
         <div class="form-group">
             <label>Defendant First Name</label>
-            <InputText @bind-Value="model.DefendantFirstName" class="form-control" />
+            <InputText @bind-Value="Model.DefendantFirstName" class="form-control" />
         </div>
         <div class="form-group">
             <label>Defendant Last Name</label>
-            <InputText @bind-Value="model.DefendantLastName" class="form-control" />
+            <InputText @bind-Value="Model.DefendantLastName" class="form-control" />
         </div>
         <div class="form-group">
             <label>Case Number</label>
-            <InputText @bind-Value="model.CaseNumber" class="form-control" />
+            <InputText @bind-Value="Model.CaseNumber" class="form-control" />
         </div>
         <div class="form-group">
             <label>Entry Date</label>
-            <InputDate @bind-Value="model.EntryDate" class="form-control" />
+            <InputDate @bind-Value="Model.EntryDate" class="form-control" />
         </div>
         <div class="form-group">
             <label>Defense Counsel Name</label>
-            <InputText @bind-Value="model.DefenseCounselName" class="form-control" />
+            <InputText @bind-Value="Model.DefenseCounselName" class="form-control" />
         </div>
         <div class="form-group">
             <label>Defense Counsel Type</label>
-            <InputSelect @bind-Value="model.DefenseCounselType" class="form-control">
+            <InputSelect @bind-Value="Model.DefenseCounselType" class="form-control">
                 <option value="">Select</option>
                 <option value="Public Defender">Public Defender</option>
                 <option value="Private Counsel">Private Counsel</option>
             </InputSelect>
         </div>
         <div class="form-group">
-            <InputCheckbox @bind-Value="model.CounselWaived" /> Defendant appeared without counsel
+            <InputCheckbox @bind-Value="Model.CounselWaived" /> Defendant appeared without counsel
         </div>
     </div>
 
@@ -55,39 +52,39 @@
         <h4>Sealing Details</h4>
         <div class="form-group">
             <label>BCI Number</label>
-            <InputText @bind-Value="model.BciNumber" class="form-control" />
+            <InputText @bind-Value="Model.BciNumber" class="form-control" />
         </div>
         <div class="form-group">
             <label>Seal Decision</label>
-            <InputSelect @bind-Value="model.SealDecision" class="form-control">
+            <InputSelect @bind-Value="Model.SealDecision" class="form-control">
                 <option value="">Select</option>
                 <option value="Granted">Granted</option>
                 <option value="Denied">Denied</option>
                 <option value="Denied - with reason">Denied - with reason</option>
             </InputSelect>
         </div>
-        @if (model.SealDecision == "Denied - with reason")
+        @if (Model.SealDecision == "Denied - with reason")
         {
             <div class="form-group">
                 <label>Denial Reasons</label>
-                <InputTextArea @bind-Value="model.DenialReasons" class="form-control" rows="4"
+                <InputTextArea @bind-Value="Model.DenialReasons" class="form-control" rows="4"
                     placeholder="Enter the reasons for denial..." />
             </div>
         }
     </div>
 
     <div class="form-actions">
-        <button type="submit" class="btn btn-success" disabled="@isSubmitting">
-            @(isSubmitting ? "Generating..." : "Open Entry")
+        <button type="submit" class="btn btn-success" disabled="@IsSubmitting">
+            @(IsSubmitting ? "Generating..." : "Open Entry")
         </button>
         <button type="button" class="btn btn-danger" @onclick="CloseOrCancel">Close Dialog</button>
         <button type="button" class="btn btn-secondary" @onclick="CloseOrCancel">Cancel</button>
         <button type="button" class="btn btn-warning" @onclick="ClearFields">Clear Fields</button>
     </div>
 
-    @if (!string.IsNullOrEmpty(errorMessage))
+    @if (!string.IsNullOrEmpty(ErrorMessage))
     {
-        <div class="alert alert-danger mt-2">@errorMessage</div>
+        <div class="alert alert-danger mt-2">@ErrorMessage</div>
     }
 </EditForm>
 
@@ -95,46 +92,11 @@
 </div>
 
 @code {
-    [Parameter] public string? CaseNumber { get; set; }
+    protected override string ApiEndpoint => "criminalsealing";
 
-    private CriminalSealingEntryDto model = new();
-    private bool isSubmitting = false;
-    private string? errorMessage;
-
-    protected override void OnParametersSet()
+    protected override Task PopulateFromCaseAsync(List<CaseSearchResultDto> results)
     {
-        if (!string.IsNullOrEmpty(CaseNumber))
-            model.CaseNumber = CaseNumber;
+        Model.CaseNumber = CaseNumber;
+        return Task.CompletedTask;
     }
-
-    private async Task HandleValidSubmit()
-    {
-        isSubmitting = true;
-        errorMessage = null;
-        try
-        {
-            var response = await Http.PostAsJsonAsync("/api/criminalsealing", model);
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsByteArrayAsync();
-                var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "CriminalSealingEntry.docx";
-                await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
-            }
-            else
-            {
-                errorMessage = $"Server error: {response.StatusCode}";
-            }
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"Error generating entry: {ex.Message}";
-        }
-        finally
-        {
-            isSubmitting = false;
-        }
-    }
-
-    private void CloseOrCancel() => Navigation.NavigateTo("/");
-    private void ClearFields() { model = new(); if (!string.IsNullOrEmpty(CaseNumber)) model.CaseNumber = CaseNumber; }
 }

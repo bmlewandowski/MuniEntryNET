@@ -1,3 +1,5 @@
+using Munientry.Shared.Dtos;
+
 using Munientry.Api.Services;
 
 namespace Munientry.Api.Endpoints;
@@ -43,46 +45,14 @@ internal static class CaseDataEndpoints
             return result is not null ? Results.Ok(result) : Results.NotFound();
         });
 
-        // ── Stub GET endpoints (return mock data; replace with DB fetch) ─────
-
-        app.MapGet("/case/{id}", (string id) => Results.Ok(new
+        // Case docket — chronological docket entries (date + remark) for a case.
+        // Calls [reports].[DMCMuniEntryCaseDocket].
+        // Replaces the legacy get_case_docket_query used by CrimCaseDocket.get_docket().
+        app.MapGet("/case/docket/{caseNumber}", async (string caseNumber, ICaseDocketService service) =>
         {
-            caseNumber = id,
-            defendant = "John Doe",
-            charges = new[] { new { charge = "Speeding", statute = "S-101" } }
-        }));
-
-        app.MapGet("/diversion/{id}", (string id) => Results.Ok(new
-        {
-            caseNumber = id,
-            defendantFirstName = "Jane",
-            defendantLastName = "Roe",
-            diversionCompletionDate = DateTime.UtcNow.AddDays(90).ToString("yyyy-MM-dd"),
-            diversionFinePayDate = DateTime.UtcNow.AddDays(120).ToString("yyyy-MM-dd"),
-            charges = new[] {
-                new { charge = "Speeding", statute = "S-101" },
-                new { charge = "No Insurance", statute = "I-202" }
-            }
-        }));
-
-        app.MapGet("/fineonly/{caseNumber}", (string caseNumber) => Results.Ok(new
-        {
-            CaseNumber = caseNumber,
-            DefendantName = "Jane Doe",
-            Charge = "Speeding",
-            FineAmount = 150.00m
-        }));
-
-        app.MapGet("/civilfreeformentry/{caseNumber}", (string caseNumber) =>
-            Results.Ok(new Data.CivilFreeformEntryDto
-            {
-                EntryDate = DateTime.Today,
-                Plaintiff = "Sample Plaintiff",
-                Defendant = "Sample Defendant",
-                CaseNumber = caseNumber,
-                AppearanceReason = "Sample Reason",
-                EntryContent = "Sample entry content."
-            }));
+            var result = await service.GetCaseDocketAsync(caseNumber);
+            return result.Count > 0 ? Results.Ok(result) : Results.NotFound();
+        });
 
         return app;
     }

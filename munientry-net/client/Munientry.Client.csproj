@@ -9,7 +9,13 @@
     <BlazorEnableCompression>false</BlazorEnableCompression>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\shared\Munientry.Shared.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Blazored.FluentValidation" Version="2.2.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
     <!-- ENTRA ID - Step 1: Uncomment the line below to add the MSAL package, then follow the remaining steps. -->
     <!-- <PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="10.0.0" /> -->
   </ItemGroup>

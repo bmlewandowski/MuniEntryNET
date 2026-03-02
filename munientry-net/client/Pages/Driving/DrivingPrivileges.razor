@@ -6,8 +6,8 @@
 <h2>Driving Privileges / CrimTraffic Helpers</h2>
 
 
-<EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
-	<DataAnnotationsValidator />
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+	<FluentValidationValidator />
 	@if (IsLoadingCase)
 	{
 		<div class="alert alert-info">Loading case data...</div>
@@ -15,103 +15,103 @@
 	<ValidationSummary />
 	<div class="form-group">
 		<label>Defendant First Name</label>
-		<InputText class="form-control" @bind-Value="formModel.DefendantFirstName" />
+		<InputText class="form-control" @bind-Value="Model.DefendantFirstName" />
 	</div>
 	<div class="form-group">
 		<label>Defendant Last Name</label>
-		<InputText class="form-control" @bind-Value="formModel.DefendantLastName" />
+		<InputText class="form-control" @bind-Value="Model.DefendantLastName" />
 	</div>
 	<div class="form-group">
 		<label>Case Number</label>
-		<InputText class="form-control" @bind-Value="formModel.CaseNumber" />
+		<InputText class="form-control" @bind-Value="Model.CaseNumber" />
 	</div>
 	<div class="form-group">
 		<label>Plea/Trial Date</label>
-		<InputDate class="form-control" @bind-Value="formModel.PleaTrialDate" />
+		<InputDate class="form-control" @bind-Value="Model.PleaTrialDate" />
 	</div>
 	<div class="form-group">
 		<label>Appearance Reason</label>
-		<InputText class="form-control" @bind-Value="formModel.AppearanceReason" />
+		<InputText class="form-control" @bind-Value="Model.AppearanceReason" />
 	</div>
 	<div class="form-group">
 		<label>Defense Counsel Name</label>
-		<InputText class="form-control" @bind-Value="formModel.DefenseCounselName" />
+		<InputText class="form-control" @bind-Value="Model.DefenseCounselName" />
 	</div>
 	<div class="form-group">
 		<label>Defense Counsel Type</label>
-		<InputText class="form-control" @bind-Value="formModel.DefenseCounselType" />
+		<InputText class="form-control" @bind-Value="Model.DefenseCounselType" />
 	</div>
 	<div class="form-group">
 		<label>Defense Counsel Waived</label>
-		<InputCheckbox @bind-Value="formModel.DefenseCounselWaived" />
+		<InputCheckbox @bind-Value="Model.DefenseCounselWaived" />
 	</div>
 	<div class="form-group">
 		<label>Offense</label>
-		<InputText class="form-control" @bind-Value="formModel.Offense" />
+		<InputText class="form-control" @bind-Value="Model.Offense" />
 	</div>
 	<div class="form-group">
 		<label>Statute</label>
-		<InputText class="form-control" @bind-Value="formModel.Statute" />
+		<InputText class="form-control" @bind-Value="Model.Statute" />
 	</div>
 	<div class="form-group">
 		<label>Degree</label>
-		<InputText class="form-control" @bind-Value="formModel.Degree" />
+		<InputText class="form-control" @bind-Value="Model.Degree" />
 	</div>
 	<div class="form-group">
 		<label>Plea</label>
-		<InputText class="form-control" @bind-Value="formModel.Plea" />
+		<InputText class="form-control" @bind-Value="Model.Plea" />
 	</div>
 	<div class="form-group">
 		<label>Finding</label>
-		<InputText class="form-control" @bind-Value="formModel.Finding" />
+		<InputText class="form-control" @bind-Value="Model.Finding" />
 	</div>
 	<div class="form-group">
 		<label>Fines</label>
-		<InputNumber class="form-control" @bind-Value="formModel.Fines" />
+		<InputNumber class="form-control" @bind-Value="Model.Fines" />
 	</div>
 	<div class="form-group">
 		<label>Fines Suspended</label>
-		<InputNumber class="form-control" @bind-Value="formModel.FinesSuspended" />
+		<InputNumber class="form-control" @bind-Value="Model.FinesSuspended" />
 	</div>
 	<div class="form-group">
 		<label>Court Costs</label>
-		<InputText class="form-control" @bind-Value="formModel.CourtCosts" />
+		<InputText class="form-control" @bind-Value="Model.CourtCosts" />
 	</div>
 	<div class="form-group">
 		<label>Ability to Pay</label>
-		<InputText class="form-control" @bind-Value="formModel.AbilityToPay" />
+		<InputText class="form-control" @bind-Value="Model.AbilityToPay" />
 	</div>
 	<div class="form-group">
 		<label>Balance Due Date</label>
-		<InputDate class="form-control" @bind-Value="formModel.BalanceDueDate" />
+		<InputDate class="form-control" @bind-Value="Model.BalanceDueDate" />
 	</div>
 	<div class="form-group">
 		<label>Pay Today</label>
-		<InputNumber class="form-control" @bind-Value="formModel.PayToday" />
+		<InputNumber class="form-control" @bind-Value="Model.PayToday" />
 	</div>
 	<div class="form-group">
 		<label>Monthly Pay</label>
-		<InputNumber class="form-control" @bind-Value="formModel.MonthlyPay" />
+		<InputNumber class="form-control" @bind-Value="Model.MonthlyPay" />
 	</div>
 	<div class="form-group">
 		<label>Credit for Jail</label>
-		<InputCheckbox @bind-Value="formModel.CreditForJail" />
+		<InputCheckbox @bind-Value="Model.CreditForJail" />
 	</div>
 	<div class="form-group">
 		<label>Jail Time Credit</label>
-		<InputNumber class="form-control" @bind-Value="formModel.JailTimeCredit" />
+		<InputNumber class="form-control" @bind-Value="Model.JailTimeCredit" />
 	</div>
 	<div class="form-group">
 		<label>License Suspension</label>
-		<InputCheckbox @bind-Value="formModel.LicenseSuspension" />
+		<InputCheckbox @bind-Value="Model.LicenseSuspension" />
 	</div>
 	<div class="form-group">
 		<label>Community Service</label>
-		<InputCheckbox @bind-Value="formModel.CommunityService" />
+		<InputCheckbox @bind-Value="Model.CommunityService" />
 	</div>
 	<div class="form-group">
 		<label>Other Conditions</label>
-		<InputCheckbox @bind-Value="formModel.OtherConditions" />
+		<InputCheckbox @bind-Value="Model.OtherConditions" />
 	</div>
 	<div class="form-actions">
 		<button type="submit" class="btn btn-success" disabled="@(IsSubmitting || IsLoadingCase)">Generate DOCX</button>
@@ -130,9 +130,12 @@
 </div>
 
 @code {
-	private DrivingPrivilegesDto formModel => Model;
 
 	protected override string ApiEndpoint => "drivingprivileges";
+
+	// Injected here (not in FormPageBase) because this is the only form that
+	// needs the API base URL for a custom GET request to /api/drivingcase/.
+	[Inject] private ApiHelper ApiHelper { get; set; } = default!;
 
 	/// <summary>
 	/// Overrides base to use the dedicated /api/drivingcase/ endpoint instead of CaseSearchApiClient.
@@ -145,7 +148,7 @@
 		{
 			using var http = new HttpClient { BaseAddress = new Uri(ApiHelper.GetApiBaseUrl()) };
 			var info = await http.GetFromJsonAsync<DrivingCaseInfoDto>(
-				$"api/drivingcase/{Uri.EscapeDataString(caseNumber)}");
+				$"drivingcase/{Uri.EscapeDataString(caseNumber)}");
 			if (info == null) return;
 			Model.CaseNumber = caseNumber;
 			Model.DefendantFirstName = info.DefFirstName;

@@ -6,8 +6,8 @@
 <div class="form-card">
 <h2>Terms of Community Control / Notice of Community Control Violation Hearing Dialog</h2>
 
-<EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
-<DataAnnotationsValidator />
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+<FluentValidationValidator />
 @if (IsLoadingCase)
 {
 <div class="alert alert-info">Loading case data...</div>
@@ -15,47 +15,47 @@
 	<ValidationSummary />
 	<div class="form-group">
 		<label>Case Number</label>
-		<InputText class="form-control" @bind-Value="formModel.CaseNumber" />
+		<InputText class="form-control" @bind-Value="Model.CaseNumber" />
 	</div>
 	<div class="form-group">
 		<label>Entry Date</label>
-		<InputDate class="form-control" @bind-Value="formModel.EntryDate" />
+		<InputDate class="form-control" @bind-Value="Model.EntryDate" />
 	</div>
 	<div class="form-group">
 		<label>Defendant First Name</label>
-		<InputText class="form-control" @bind-Value="formModel.DefendantFirstName" />
+		<InputText class="form-control" @bind-Value="Model.DefendantFirstName" />
 	</div>
 	<div class="form-group">
 		<label>Defendant Last Name</label>
-		<InputText class="form-control" @bind-Value="formModel.DefendantLastName" />
+		<InputText class="form-control" @bind-Value="Model.DefendantLastName" />
 	</div>
 	<div class="form-group">
 		<label>Hearing Date</label>
-		<InputDate class="form-control" @bind-Value="formModel.HearingDate" />
+		<InputDate class="form-control" @bind-Value="Model.HearingDate" />
 	</div>
 	<div class="form-group">
 		<label>Hearing Time</label>
-		<InputText class="form-control" @bind-Value="formModel.HearingTime" />
+		<InputText class="form-control" @bind-Value="Model.HearingTime" />
 	</div>
 	<div class="form-group">
 		<label>Assigned Courtroom</label>
-		<InputText class="form-control" @bind-Value="formModel.AssignedCourtroom" />
+		<InputText class="form-control" @bind-Value="Model.AssignedCourtroom" />
 	</div>
 	<div class="form-group">
 		<label>Defense Counsel Name</label>
-		<InputText class="form-control" @bind-Value="formModel.DefenseCounselName" />
+		<InputText class="form-control" @bind-Value="Model.DefenseCounselName" />
 	</div>
 	<div class="form-group">
 		<label>Violation Type</label>
-		<InputText class="form-control" @bind-Value="formModel.ViolationType" />
+		<InputText class="form-control" @bind-Value="Model.ViolationType" />
 	</div>
 	<div class="form-group">
 		<label>Interpreter Required</label>
-		<InputCheckbox class="form-check-input" @bind-Value="formModel.InterpreterRequired" />
+		<InputCheckbox class="form-check-input" @bind-Value="Model.InterpreterRequired" />
 	</div>
 	<div class="form-group">
 		<label>Language Required</label>
-		<InputText class="form-control" @bind-Value="formModel.LanguageRequired" />
+		<InputText class="form-control" @bind-Value="Model.LanguageRequired" />
 	</div>
 	<div class="form-actions">
 		<button type="submit" class="btn btn-success" disabled="@(IsSubmitting || IsLoadingCase)">Generate DOCX</button>
@@ -69,7 +69,6 @@
 </div>
 
 @code {
-	private CommunityControlTermsNoticesDto formModel => Model;
 
 	protected override string ApiEndpoint => "communitycontroltermsnotices";
 

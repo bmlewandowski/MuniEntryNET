@@ -1,4 +1,4 @@
-﻿@page "/admin/time-to-pay-order"
+@page "/admin/time-to-pay-order"
 @page "/admin/time-to-pay-order/{CaseNumber}"
 <div class="form-page">
 <div class="form-card">
@@ -6,7 +6,7 @@
 <!-- Legacy: time_to_pay_dialog_ui.py -->
 
 <EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
+    <FluentValidationValidator />
     <ValidationSummary />
     <div class="form-group">
         <label>Case Number</label>

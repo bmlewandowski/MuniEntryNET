@@ -1,5 +1,6 @@
-﻿using System.Net.Http.Json;
-using Munientry.Client.Shared.Models;
+using System.Net.Http.Json;
+using Microsoft.Extensions.Logging;
+using Munientry.Shared.Dtos;
 
 namespace Munientry.Client.Shared
 {
@@ -13,25 +14,26 @@ namespace Munientry.Client.Shared
     /// </summary>
     public class DailyListApiClient
     {
-        private readonly ApiHelper _apiHelper;
+        private readonly HttpClient _http;
+        private readonly ILogger<DailyListApiClient> _logger;
 
-        public DailyListApiClient(ApiHelper apiHelper)
+        public DailyListApiClient(HttpClient http, ILogger<DailyListApiClient> logger)
         {
-            _apiHelper = apiHelper;
+            _http = http;
+            _logger = logger;
         }
 
         public async Task<List<DailyListResultDto>> GetDailyListAsync(string listType, DateOnly date)
         {
             try
             {
-                var apiBase = _apiHelper.GetApiBaseUrl();
-                using var http = new HttpClient { BaseAddress = new Uri(apiBase) };
-                var result = await http.GetFromJsonAsync<List<DailyListResultDto>>(
-                    $"dailylist/{listType}/{date:yyyy-MM-dd}");;
+                var result = await _http.GetFromJsonAsync<List<DailyListResultDto>>(
+                    $"dailylist/{listType}/{date:yyyy-MM-dd}");
                 return result ?? new List<DailyListResultDto>();
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "DailyListApiClient.GetDailyListAsync failed for {ListType} on {Date}.", listType, date);
                 return new List<DailyListResultDto>();
             }
         }

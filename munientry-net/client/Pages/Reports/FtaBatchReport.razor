@@ -1,0 +1,179 @@
+@page "/reports/fta"
+@using Munientry.Client.Shared
+@inject ReportsApiClient ReportsSvc
+@inject IJSRuntime JS
+
+<PageTitle>Batch FTA Entries</PageTitle>
+
+<div class="form-page">
+    <div class="form-card">
+        <h2>Batch Failure To Appear Entries</h2>
+        <p class="form-subtitle">
+            Queries AuthorityCourt for all cases eligible for Failure To Appear warrants from a
+            given arraignment date — the same eligibility rules as the legacy
+            <em>run_batch_fta_process()</em> in <code>batch_menu.py</code>. Preview the case list,
+            then generate all entries as a ZIP download containing one DOCX per case.
+        </p>
+        <p class="form-subtitle">
+            <strong>Template:</strong> <code>Batch_Failure_To_Appear_Arraignment_Template.docx</code><br />
+            <strong>Fields filled:</strong> case number, defendant name, event date, warrant rule
+            (Criminal Rule 4 for CRB cases; Traffic Rule 7 for all others).
+        </p>
+
+        <!-- Date + action bar -->
+        <div class="daily-list-toolbar">
+            <div class="form-group">
+                <label>Arraignment Date</label>
+                <input type="date"
+                       class="form-control"
+                       value="@ArraignmentDate.ToString("yyyy-MM-dd")"
+                       @onchange="OnDateChanged" />
+            </div>
+            <button class="btn btn-secondary" @onclick="GetFtaCasesAsync" disabled="@IsLoadingList">
+                @(IsLoadingList ? "Loading…" : "Get FTA Cases")
+            </button>
+            @if (_cases is not null && _cases.Count > 0)
+            {
+                <button class="btn btn-primary" @onclick="GenerateBatchAsync" disabled="@IsGenerating">
+                    @(IsGenerating ? "Generating…" : $"⬇ Generate All Entries ({_cases.Count})")
+                </button>
+            }
+        </div>
+
+        @if (ListError is not null)
+        {
+            <div class="alert alert-danger mt-2">@ListError</div>
+        }
+        @if (GenerateError is not null)
+        {
+            <div class="alert alert-danger mt-2">@GenerateError</div>
+        }
+        @if (GenerateSuccess)
+        {
+            <div class="alert alert-success mt-2">
+                ZIP downloaded — @_cases!.Count @(_cases.Count == 1 ? "entry" : "entries") generated
+                for @ArraignmentDate.ToString("MMMM d, yyyy").
+            </div>
+        }
+
+        <!-- Case preview list -->
+        @if (_cases is not null)
+        {
+            <div class="mt-3">
+                <h4>FTA-Eligible Cases — @ArraignmentDate.ToString("MMMM d, yyyy")</h4>
+
+                @if (_cases.Count == 0)
+                {
+                    <p class="text-muted">No FTA-eligible cases found for this date.</p>
+                }
+                else
+                {
+                    <p class="text-muted small">
+                        @_cases.Count @(_cases.Count == 1 ? "case" : "cases") found.
+                        Click <strong>Generate All Entries</strong> to download the ZIP.
+                        Each DOCX will be named <code>{CaseNumber}_FTA_Arraignment.docx</code>.
+                    </p>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover report-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:200px">Case Number</th>
+                                    <th>Single Entry</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var c in _cases)
+                                {
+                                    <tr>
+                                        <td class="text-nowrap">@(c.CaseNumber ?? "")</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary"
+                                                    @onclick="() => DownloadSingleAsync(c.CaseNumber!)">
+                                                ⬇ Download
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+
+    // ── State ──────────────────────────────────────────────────────────────────
+    private DateOnly ArraignmentDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+    private bool     IsLoadingList   { get; set; }
+    private bool     IsGenerating    { get; set; }
+    private bool     GenerateSuccess { get; set; }
+    private string?  ListError       { get; set; }
+    private string?  GenerateError   { get; set; }
+    private List<FtaReportResultDto>? _cases;
+
+    // ── Event handlers ─────────────────────────────────────────────────────────
+    private void OnDateChanged(ChangeEventArgs e)
+    {
+        if (DateOnly.TryParse(e.Value?.ToString(), out var d))
+        {
+            ArraignmentDate = d;
+            _cases = null;
+            ListError = null;
+            GenerateError = null;
+            GenerateSuccess = false;
+        }
+    }
+
+    /// <summary>Fetches the FTA-eligible case list — mirrors get_fta_arraignment_cases().</summary>
+    private async Task GetFtaCasesAsync()
+    {
+        IsLoadingList = true;
+        ListError = null;
+        GenerateError = null;
+        GenerateSuccess = false;
+        _cases = null;
+
+        try
+        {
+            _cases = await ReportsSvc.GetFtaReportAsync(ArraignmentDate);
+            if (_cases.Count == 0)
+                ListError = "No FTA-eligible cases found for this date. " +
+                            "The case list comes from [reports].[DMCMuniEntryFTAReport].";
+        }
+        catch (Exception ex)
+        {
+            ListError = $"Error retrieving FTA cases: {ex.Message}";
+        }
+        finally
+        {
+            IsLoadingList = false;
+        }
+    }
+
+    /// <summary>
+    /// Downloads all FTA entries as a ZIP — mirrors create_fta_entries() / open_entries_folder().
+    /// The server generates one DOCX per case using Batch_Failure_To_Appear_Arraignment_Template.docx.
+    /// </summary>
+    private async Task GenerateBatchAsync()
+    {
+        IsGenerating = true;
+        GenerateError = null;
+        GenerateSuccess = false;
+
+        var (success, error) = await ReportsSvc.DownloadFtaBatchAsync(ArraignmentDate, JS);
+
+        GenerateSuccess = success;
+        GenerateError   = error;
+        IsGenerating    = false;
+    }
+
+    /// <summary>Downloads a single FTA DOCX for one case number.</summary>
+    private async Task DownloadSingleAsync(string caseNumber)
+    {
+        var (_, error) = await ReportsSvc.DownloadFtaEntryAsync(caseNumber, ArraignmentDate, JS);
+        if (error is not null) GenerateError = error;
+    }
+}

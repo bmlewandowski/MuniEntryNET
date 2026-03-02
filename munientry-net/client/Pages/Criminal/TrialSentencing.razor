@@ -1,7 +1,5 @@
-﻿@page "/criminal/trial-sentencing"
-@using Munientry.Client.Shared.Models
-@inject HttpClient Http
-@inject NavigationManager Navigation
+@page "/criminal/trial-sentencing"
+@inherits FormPageBase<FinalJuryNoticeDto>
 
 <PageTitle>Sentencing Only - Already Plead Dialog</PageTitle>
 
@@ -9,41 +7,41 @@
 <div class="form-card">
 <h3>Sentencing Only - Already Plead Dialog</h3>
 
-<EditForm Model="notice" OnValidSubmit="HandleValidSubmit">
-	<DataAnnotationsValidator />
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+	<FluentValidationValidator />
 	<ValidationSummary />
 	<div class="form-section">
 		<h4>Case Information</h4>
 		<div class="form-group">
 			<label>Defendant First Name</label>
-			<InputText @bind-Value="notice.DefendantFirstName" class="form-control" />
+			<InputText @bind-Value="Model.DefendantFirstName" class="form-control" />
 		</div>
 		<div class="form-group">
 			<label>Defendant Last Name</label>
-			<InputText @bind-Value="notice.DefendantLastName" class="form-control" />
+			<InputText @bind-Value="Model.DefendantLastName" class="form-control" />
 		</div>
 		<div class="form-group">
 			<label>Case Number</label>
-			<InputText @bind-Value="notice.CaseNumber" class="form-control" />
+			<InputText @bind-Value="Model.CaseNumber" class="form-control" />
 		</div>
 		<div class="form-group">
 			<label>Entry Date</label>
-			<InputDate @bind-Value="notice.EntryDate" class="form-control" />
+			<InputDate @bind-Value="Model.EntryDate" class="form-control" />
 		</div>
 		<div class="form-group">
 			<label>Defense Counsel Name</label>
-			<InputText @bind-Value="notice.DefenseCounselName" class="form-control" />
+			<InputText @bind-Value="Model.DefenseCounselName" class="form-control" />
 		</div>
 	</div>
 	<div class="form-section">
 		<h4>Speedy Trial Calculator</h4>
 		<div class="form-group">
 			<label>Arrest/Summons Date</label>
-			<InputDate @bind-Value="notice.ArrestSummonsDate" class="form-control" />
+			<InputDate @bind-Value="Model.ArrestSummonsDate" class="form-control" />
 		</div>
 		<div class="form-group">
 			<label>Highest Charge Degree of Offense</label>
-			<InputSelect @bind-Value="notice.HighestCharge" class="form-control">
+			<InputSelect @bind-Value="Model.HighestCharge" class="form-control">
 				<option value="">Select</option>
 				<option value="MM">MM</option>
 				<option value="UCM">UCM</option>
@@ -51,22 +49,22 @@
 		</div>
 		<div class="form-group">
 			<label>Days Spent in Jail</label>
-			<InputNumber @bind-Value="notice.DaysInJail" class="form-control" />
+			<InputNumber @bind-Value="Model.DaysInJail" class="form-control" />
 		</div>
 		<div class="form-group">
 			<label>Continuance Days</label>
-			<InputNumber @bind-Value="notice.ContinuanceDays" class="form-control" />
+			<InputNumber @bind-Value="Model.ContinuanceDays" class="form-control" />
 		</div>
 	</div>
 	<div class="form-section">
 		<h4>Hearing Scheduling</h4>
 		<div class="form-group">
 			<label>Trial To Court Date</label>
-			<InputDate @bind-Value="notice.TrialToCourtDate" class="form-control" />
+			<InputDate @bind-Value="Model.TrialToCourtDate" class="form-control" />
 		</div>
 		<div class="form-group">
 			<label>Trial To Court Time</label>
-			<InputSelect @bind-Value="notice.TrialToCourtTime" class="form-control">
+			<InputSelect @bind-Value="Model.TrialToCourtTime" class="form-control">
 				<option value="">Select</option>
 				<option value="9:30 AM">9:30 AM</option>
 				<option value="10:00 AM">10:00 AM</option>
@@ -82,7 +80,7 @@
 		</div>
 		<div class="form-group">
 			<label>Assigned Courtroom</label>
-			<InputSelect @bind-Value="notice.AssignedCourtroom" class="form-control">
+			<InputSelect @bind-Value="Model.AssignedCourtroom" class="form-control">
 				<option value="">Select</option>
 				<option value="Courtroom C">Courtroom C</option>
 				<option value="Courtroom B">Courtroom B</option>
@@ -93,14 +91,14 @@
 	<div class="form-section">
 		<h4>Additional Options</h4>
 		<div class="form-group">
-			<InputCheckbox @bind-Value="notice.InterpreterRequired" /> Interpreter Required
+			<InputCheckbox @bind-Value="Model.InterpreterRequired" /> Interpreter Required
 		</div>
 		<div class="form-group">
 			<label>Language Required</label>
-			<InputText @bind-Value="notice.LanguageRequired" class="form-control" placeholder="Language Required" />
+			<InputText @bind-Value="Model.LanguageRequired" class="form-control" placeholder="Language Required" />
 		</div>
 		<div class="form-group">
-			<InputCheckbox @bind-Value="notice.DateConfirmedWithCounsel" /> Date Confirmed with Counsel
+			<InputCheckbox @bind-Value="Model.DateConfirmedWithCounsel" /> Date Confirmed with Counsel
 		</div>
 	</div>
 	<div class="form-actions">
@@ -115,46 +113,5 @@
 </div>
 
 @code {
-	private FinalJuryNoticeDto notice = new();
-
-	private bool isSubmitting = false;
-	private string? errorMessage;
-
-	private async Task HandleValidSubmit()
-	{
-		isSubmitting = true;
-		errorMessage = null;
-		try
-		{
-			var apiBase = "";
-			if (ApiHelper != null)
-				apiBase = ApiHelper.GetApiBaseUrl();
-			var http = new HttpClient { BaseAddress = new Uri(apiBase) };
-			var response = await http.PostAsJsonAsync("trialsentencing", notice);
-			if (response.IsSuccessStatusCode)
-			{
-				var content = await response.Content.ReadAsByteArrayAsync();
-				var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"') ?? "TrialSentencing.docx";
-				await JS.InvokeVoidAsync("downloadFile", fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", content);
-				errorMessage = null;
-			}
-			else
-			{
-				errorMessage = $"Error: {response.ReasonPhrase}";
-			}
-		}
-		catch (Exception ex)
-		{
-			errorMessage = ex.Message;
-		}
-		finally
-		{
-			isSubmitting = false;
-		}
-	}
-	[Inject] Munientry.Client.Shared.ApiHelper? ApiHelper { get; set; }
-	[Inject] IJSRuntime JS { get; set; } = default!;
-
-	private void CloseOrCancel() => Navigation.NavigateTo("/");
-	private void ClearFields() { notice = new(); }
+	protected override string ApiEndpoint => "trialsentencing";
 }

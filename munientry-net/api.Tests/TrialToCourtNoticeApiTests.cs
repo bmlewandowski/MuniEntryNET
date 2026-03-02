@@ -2,14 +2,14 @@ using System;
 using System.Net;
 using System.Net.Http.Json;
 using Xunit;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Munientry.Api.Tests.Infrastructure;
 using System.Threading.Tasks;
-using Munientry.Api.Data;
+using Munientry.Shared.Dtos;
 
-public class TrialToCourtNoticeApiTests : IClassFixture<WebApplicationFactory<Program>>
+public class TrialToCourtNoticeApiTests : IClassFixture<MuniEntryWebApplicationFactory>
 {
-    private readonly WebApplicationFactory<Program> _factory;
-    public TrialToCourtNoticeApiTests(WebApplicationFactory<Program> factory)
+    private readonly MuniEntryWebApplicationFactory _factory;
+    public TrialToCourtNoticeApiTests(MuniEntryWebApplicationFactory factory)
     {
         _factory = factory;
     }

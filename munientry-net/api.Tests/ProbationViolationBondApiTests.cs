@@ -1,16 +1,16 @@
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using Munientry.Api.Data;
+using Munientry.Shared.Dtos;
 using Xunit;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Munientry.Api.Tests.Infrastructure;
 
 namespace Munientry.Api.Tests
 {
-    public class ProbationViolationBondApiTests : IClassFixture<WebApplicationFactory<Program>>
+    public class ProbationViolationBondApiTests : IClassFixture<MuniEntryWebApplicationFactory>
     {
-        private readonly WebApplicationFactory<Program> _factory;
+        private readonly MuniEntryWebApplicationFactory _factory;
 
-        public ProbationViolationBondApiTests(WebApplicationFactory<Program> factory)
+        public ProbationViolationBondApiTests(MuniEntryWebApplicationFactory factory)
         {
             _factory = factory;
         }

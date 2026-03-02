@@ -8,8 +8,8 @@
 <div class="form-card">
 <h3>Community Control Terms</h3>
 
-<EditForm Model="communityControlModel" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+    <FluentValidationValidator />
     @if (IsLoadingCase)
     {
         <div class="alert alert-info">Loading case data...</div>
@@ -31,26 +31,26 @@
         <legend>Case/Defendant Information</legend>
         <div class="form-row">
             <label>Defendant First Name:</label>
-            <InputText @bind-Value="communityControlModel.DefendantFirstName" class="form-control" />
+            <InputText @bind-Value="Model.DefendantFirstName" class="form-control" />
         </div>
         <div class="form-row">
             <label>Defendant Last Name:</label>
-            <InputText @bind-Value="communityControlModel.DefendantLastName" class="form-control" />
+            <InputText @bind-Value="Model.DefendantLastName" class="form-control" />
         </div>
         <div class="form-row">
             <label>Case Number:</label>
-            <InputText @bind-Value="communityControlModel.CaseNumber" class="form-control" />
+            <InputText @bind-Value="Model.CaseNumber" class="form-control" />
         </div>
         <div class="form-row">
             <label>Entry Date:</label>
-            <InputDate @bind-Value="communityControlModel.EntryDate" class="form-control" />
+            <InputDate @bind-Value="Model.EntryDate" class="form-control" />
         </div>
     </fieldset>
     <fieldset>
         <legend>Community Control Terms</legend>
         <div class="form-row">
             <label>Term of Control:</label>
-            <InputSelect @bind-Value="communityControlModel.TermOfControl" class="form-control">
+            <InputSelect @bind-Value="Model.TermOfControl" class="form-control">
                 <option>1 year</option>
                 <option>6 months</option>
                 <option>18 months</option>
@@ -62,7 +62,7 @@
         </div>
         <div class="form-row">
             <label>Report Frequency:</label>
-            <InputSelect @bind-Value="communityControlModel.ReportFrequency" class="form-control">
+            <InputSelect @bind-Value="Model.ReportFrequency" class="form-control">
                 <option>daily (Monday through Friday)</option>
                 <option>every Monday</option>
                 <option>once a week (as ordered)</option>
@@ -70,35 +70,35 @@
         </div>
         <div class="form-row">
             <label>Report to Jail:</label>
-            <InputCheckbox @bind-Value="communityControlModel.ReportToJail" />
+            <InputCheckbox @bind-Value="Model.ReportToJail" />
         </div>
         <div class="form-row">
             <label>Jail Report Date:</label>
-            <InputDate @bind-Value="communityControlModel.JailReportDate" class="form-control" />
+            <InputDate @bind-Value="Model.JailReportDate" class="form-control" />
         </div>
         <div class="form-row">
             <label>Jail Report Time:</label>
-            <InputText @bind-Value="communityControlModel.JailReportTime" class="form-control" />
+            <InputText @bind-Value="Model.JailReportTime" class="form-control" />
         </div>
         <div class="form-row">
             <label>Jail Days to Serve:</label>
-            <InputText @bind-Value="communityControlModel.JailDaysToServe" class="form-control" />
+            <InputText @bind-Value="Model.JailDaysToServe" class="form-control" />
         </div>
     </fieldset>
     <fieldset>
         <legend>Conditions</legend>
         <div class="form-row">
-            <label><InputCheckbox @bind-Value="communityControlModel.InterlockVehicles" /> Only operate vehicles with certified ignition interlock</label>
+            <label><InputCheckbox @bind-Value="Model.InterlockVehicles" /> Only operate vehicles with certified ignition interlock</label>
         </div>
         <div class="form-row">
-            <label><InputCheckbox @bind-Value="communityControlModel.NoAlcoholOrdered" /> No Alcohol Conditions</label>
+            <label><InputCheckbox @bind-Value="Model.NoAlcoholOrdered" /> No Alcohol Conditions</label>
         </div>
         <div class="form-row">
-            <label><InputCheckbox @bind-Value="communityControlModel.GpsExclusion" /> Comply with court ordered GPS Exclusion Zone</label>
+            <label><InputCheckbox @bind-Value="Model.GpsExclusion" /> Comply with court ordered GPS Exclusion Zone</label>
         </div>
         <div class="form-row">
-            <label><InputCheckbox @bind-Value="communityControlModel.ScramOrdered" /> Submit to continuous alcohol monitoring (SCRAM) for:</label>
-            <InputSelect @bind-Value="communityControlModel.ScramDays" class="form-control">
+            <label><InputCheckbox @bind-Value="Model.ScramOrdered" /> Submit to continuous alcohol monitoring (SCRAM) for:</label>
+            <InputSelect @bind-Value="Model.ScramDays" class="form-control">
                 <option>15 days</option>
                 <option>30 days</option>
                 <option>45 days</option>
@@ -109,30 +109,30 @@
             </InputSelect>
         </div>
         <div class="form-row">
-            <label><InputCheckbox @bind-Value="communityControlModel.NoContact" /> No Contact with:</label>
-            <InputText @bind-Value="communityControlModel.NoContactWith" class="form-control" placeholder="No Contact Person(s) Name(s)" />
+            <label><InputCheckbox @bind-Value="Model.NoContact" /> No Contact with:</label>
+            <InputText @bind-Value="Model.NoContactWith" class="form-control" placeholder="No Contact Person(s) Name(s)" />
         </div>
         <div class="form-row">
-            <label><InputCheckbox @bind-Value="communityControlModel.Antitheft" /> Complete Anti-theft/Shoplifting Program</label>
+            <label><InputCheckbox @bind-Value="Model.Antitheft" /> Complete Anti-theft/Shoplifting Program</label>
         </div>
         <div class="form-row">
-            <label><InputCheckbox @bind-Value="communityControlModel.AlcoholTreatment" /> Comply with Alcohol/Drug Dependency Counseling and Treatment</label>
+            <label><InputCheckbox @bind-Value="Model.AlcoholTreatment" /> Comply with Alcohol/Drug Dependency Counseling and Treatment</label>
         </div>
         <div class="form-row">
-            <label><InputCheckbox @bind-Value="communityControlModel.DomesticViolenceProgram" /> Complete Domestic Violence Offender Program</label>
+            <label><InputCheckbox @bind-Value="Model.DomesticViolenceProgram" /> Complete Domestic Violence Offender Program</label>
         </div>
         <div class="form-row">
-            <label><InputCheckbox @bind-Value="communityControlModel.AngerManagement" /> Complete Anger Management Class</label>
+            <label><InputCheckbox @bind-Value="Model.AngerManagement" /> Complete Anger Management Class</label>
         </div>
         <div class="form-row">
-            <label><InputCheckbox @bind-Value="communityControlModel.MentalHealthTreatment" /> Comply with Mental Health Counseling and Treatment</label>
+            <label><InputCheckbox @bind-Value="Model.MentalHealthTreatment" /> Comply with Mental Health Counseling and Treatment</label>
         </div>
         <div class="form-row">
-            <label><InputCheckbox @bind-Value="communityControlModel.DriverInterventionProgram" /> Complete Driver Intervention Program</label>
+            <label><InputCheckbox @bind-Value="Model.DriverInterventionProgram" /> Complete Driver Intervention Program</label>
         </div>
         <div class="form-row">
-            <label><InputCheckbox @bind-Value="communityControlModel.CommunityService" /> Community Service required</label>
-            <InputSelect @bind-Value="communityControlModel.CommunityServiceHours" class="form-control">
+            <label><InputCheckbox @bind-Value="Model.CommunityService" /> Community Service required</label>
+            <InputSelect @bind-Value="Model.CommunityServiceHours" class="form-control">
                 <option>25 hours</option>
                 <option>50 hours</option>
                 <option>100 hours</option>
@@ -141,11 +141,11 @@
             </InputSelect>
         </div>
         <div class="form-row">
-            <label><InputCheckbox @bind-Value="communityControlModel.PayRestitution" /> Pay Restitution as ordered by the Court</label>
+            <label><InputCheckbox @bind-Value="Model.PayRestitution" /> Pay Restitution as ordered by the Court</label>
         </div>
         <div class="form-row">
-            <label><InputCheckbox @bind-Value="communityControlModel.SpecializedDocket" /> Agree to comply with terms of specialized docket:</label>
-            <InputSelect @bind-Value="communityControlModel.SpecializedDocketType" class="form-control">
+            <label><InputCheckbox @bind-Value="Model.SpecializedDocket" /> Agree to comply with terms of specialized docket:</label>
+            <InputSelect @bind-Value="Model.SpecializedDocketType" class="form-control">
                 <option>OVI Docket</option>
                 <option>Mental Health Docket</option>
                 <option>Mission (Veteran's) Court</option>
@@ -164,9 +164,8 @@
 </div>
 
 @code {
-    private CommunityControlTermsDto communityControlModel => Model;
 
-    // ApiEndpoint empty â€” submit not yet implemented
+    // ApiEndpoint empty — submit not yet implemented
     protected override string ApiEndpoint => "communitycontrolterms";
 
     protected override Task PopulateFromCaseAsync(List<CaseSearchResultDto> results)

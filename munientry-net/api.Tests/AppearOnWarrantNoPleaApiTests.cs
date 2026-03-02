@@ -1,16 +1,16 @@
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Xunit;
-using Munientry.Api.Data;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Munientry.Shared.Dtos;
+using Munientry.Api.Tests.Infrastructure;
 
 namespace api.Tests
 {
-    public class AppearOnWarrantNoPleaApiTests : IClassFixture<WebApplicationFactory<Program>>
+    public class AppearOnWarrantNoPleaApiTests : IClassFixture<MuniEntryWebApplicationFactory>
     {
-        private readonly WebApplicationFactory<Program> _factory;
+        private readonly MuniEntryWebApplicationFactory _factory;
 
-        public AppearOnWarrantNoPleaApiTests(WebApplicationFactory<Program> factory)
+        public AppearOnWarrantNoPleaApiTests(MuniEntryWebApplicationFactory factory)
         {
             _factory = factory;
         }

@@ -1,41 +1,27 @@
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Xunit;
-using Munientry.Api.Data;
-using Munientry.Api.Services;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Munientry.Shared.Dtos;
+using Munientry.Api.Tests.Infrastructure;
 
 namespace Munientry.Api.Tests
 {
     /// <summary>
-    /// No-op stub that satisfies the IFiscalJournalEntryService contract without
-    /// requiring a real SQL Server connection during tests.
+    /// Integration tests for POST /api/v1/fiscaljournalentry.
+    /// FiscalJournalEntryService is a pure DOCX service (no SQL) — no stub needed;
+    /// MuniEntryWebApplicationFactory is used unchanged.
     /// </summary>
-    internal sealed class FiscalJournalEntryServiceStub : IFiscalJournalEntryService
+    public class FiscalJournalEntryTests : IClassFixture<MuniEntryWebApplicationFactory>
     {
-        public void InsertFiscalJournalEntry(FiscalJournalEntryDto dto) { /* no-op */ }
-    }
+        private readonly MuniEntryWebApplicationFactory _factory;
 
-    public class FiscalJournalEntryTests
-    {
-        private readonly WebApplicationFactory<Program> _factory;
-
-        public FiscalJournalEntryTests()
+        public FiscalJournalEntryTests(MuniEntryWebApplicationFactory factory)
         {
-            _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
-            {
-                builder.ConfigureServices(services =>
-                {
-                    // Replace the real service (which connects to SQL Server) with a stub.
-                    services.AddScoped<IFiscalJournalEntryService, FiscalJournalEntryServiceStub>();
-                });
-            });
+            _factory = factory;
         }
 
         [Fact]
-        public async Task FiscalJournalEntry_Post_ReturnsOk()
+        public async Task FiscalJournalEntry_Post_ReturnsDocx()
         {
             var client = _factory.CreateClient();
             var dto = new FiscalJournalEntryDto
@@ -52,6 +38,11 @@ namespace Munientry.Api.Tests
             };
             var response = await client.PostAsJsonAsync("/api/v1/fiscaljournalentry", dto);
             response.EnsureSuccessStatusCode();
+            Assert.Equal(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                response.Content.Headers.ContentType?.MediaType);
+            var bytes = await response.Content.ReadAsByteArrayAsync();
+            Assert.True(bytes.Length > 0, "Response body should contain DOCX content.");
         }
     }
 }

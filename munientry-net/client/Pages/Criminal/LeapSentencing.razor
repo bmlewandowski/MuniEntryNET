@@ -8,8 +8,8 @@
 <div class="form-card">
 <h3>LEAP Sentencing</h3>
 
-<EditForm Model="leapSentencingModel" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+    <FluentValidationValidator />
     @if (IsLoadingCase)
     {
         <div class="alert alert-info">Loading case data...</div>
@@ -19,44 +19,44 @@
         <legend>Case/Defendant Information</legend>
         <div class="form-group">
             <label>Defendant First Name</label>
-            <InputText @bind-Value="leapSentencingModel.DefendantFirstName" class="form-control" />
+            <InputText @bind-Value="Model.DefendantFirstName" class="form-control" />
         </div>
         <div class="form-group">
             <label>Defendant Last Name</label>
-            <InputText @bind-Value="leapSentencingModel.DefendantLastName" class="form-control" />
+            <InputText @bind-Value="Model.DefendantLastName" class="form-control" />
         </div>
         <div class="form-group">
             <label>Case Number</label>
-            <InputText @bind-Value="leapSentencingModel.CaseNumber" class="form-control" />
+            <InputText @bind-Value="Model.CaseNumber" class="form-control" />
         </div>
         <div class="form-group">
             <label>Defense Counsel Name</label>
-            <InputText @bind-Value="leapSentencingModel.DefenseCounselName" class="form-control" />
+            <InputText @bind-Value="Model.DefenseCounselName" class="form-control" />
         </div>
         <div class="form-group">
             <label>Defense Counsel Type</label>
-            <InputSelect @bind-Value="leapSentencingModel.DefenseCounselType" class="form-control">
+            <InputSelect @bind-Value="Model.DefenseCounselType" class="form-control">
                 <option value="">Select...</option>
                 <option>Public Defender</option>
                 <option>Private Counsel</option>
             </InputSelect>
         </div>
         <div class="form-group">
-            <label><InputCheckbox @bind-Value="leapSentencingModel.DefenseCounselWaived" /> Defendant waived right to counsel</label>
+            <label><InputCheckbox @bind-Value="Model.DefenseCounselWaived" /> Defendant waived right to counsel</label>
         </div>
         <div class="form-group">
             <label>Appearance Reason</label>
-            <InputSelect @bind-Value="leapSentencingModel.AppearanceReason" class="form-control">
+            <InputSelect @bind-Value="Model.AppearanceReason" class="form-control">
                 <option>LEAP sentencing</option>
             </InputSelect>
         </div>
         <div class="form-group">
             <label>LEAP Plea Date</label>
-            <InputDate @bind-Value="leapSentencingModel.LeapPleaDate" class="form-control" />
+            <InputDate @bind-Value="Model.LeapPleaDate" class="form-control" />
         </div>
         <div class="form-group">
             <label>Plea/Trial Date</label>
-            <InputDate @bind-Value="leapSentencingModel.PleaTrialDate" class="form-control" />
+            <InputDate @bind-Value="Model.PleaTrialDate" class="form-control" />
         </div>
     </fieldset>
     <fieldset>
@@ -116,7 +116,7 @@
         <legend>Financial</legend>
         <div class="form-group">
             <label>Court Costs</label>
-            <InputSelect @bind-Value="leapSentencingModel.CourtCosts" class="form-control">
+            <InputSelect @bind-Value="Model.CourtCosts" class="form-control">
                 <option>Yes</option>
                 <option>Waived</option>
                 <option>Imposed in companion case</option>
@@ -125,7 +125,7 @@
         </div>
         <div class="form-group">
             <label>Ability to Pay</label>
-            <InputSelect @bind-Value="leapSentencingModel.AbilityToPay" class="form-control">
+            <InputSelect @bind-Value="Model.AbilityToPay" class="form-control">
                 <option>forthwith</option>
                 <option>monthly pay</option>
                 <option>partial forthwith then monthly pay</option>
@@ -133,19 +133,19 @@
         </div>
         <div class="form-group">
             <label>Due Date</label>
-            <InputDate @bind-Value="leapSentencingModel.BalanceDueDate" class="form-control" />
+            <InputDate @bind-Value="Model.BalanceDueDate" class="form-control" />
         </div>
         <div class="form-group">
             <label>Pay Today</label>
-            <InputText @bind-Value="leapSentencingModel.PayToday" class="form-control" />
+            <InputText @bind-Value="Model.PayToday" class="form-control" />
         </div>
         <div class="form-group">
             <label>Monthly Pay</label>
-            <InputText @bind-Value="leapSentencingModel.MonthlyPay" class="form-control" />
+            <InputText @bind-Value="Model.MonthlyPay" class="form-control" />
         </div>
         <div class="form-group">
-            <label><InputCheckbox @bind-Value="leapSentencingModel.CreditForJail" /> Credit $50/day in jail</label>
-            <InputText @bind-Value="leapSentencingModel.JailTimeCreditDays" class="form-control" placeholder="Days in jail" />
+            <label><InputCheckbox @bind-Value="Model.CreditForJail" /> Credit $50/day in jail</label>
+            <InputText @bind-Value="Model.JailTimeCreditDays" class="form-control" placeholder="Days in jail" />
         </div>
         <button type="button" class="btn btn-info">Show Costs/Fines</button>
     </fieldset>
@@ -153,7 +153,7 @@
         <legend>FRA (Financial Responsibility Act)</legend>
         <div class="form-group">
             <label>FRA shown in complaint</label>
-            <InputSelect @bind-Value="leapSentencingModel.FraInFile" class="form-control">
+            <InputSelect @bind-Value="Model.FraInFile" class="form-control">
                 <option>N/A</option>
                 <option>Yes</option>
                 <option>No</option>
@@ -161,7 +161,7 @@
         </div>
         <div class="form-group">
             <label>FRA shown in court</label>
-            <InputSelect @bind-Value="leapSentencingModel.FraInCourt" class="form-control">
+            <InputSelect @bind-Value="Model.FraInCourt" class="form-control">
                 <option>N/A</option>
                 <option>Yes</option>
                 <option>No</option>
@@ -171,13 +171,13 @@
     <fieldset>
         <legend>Additional Conditions</legend>
         <div class="form-row">
-            <label><InputCheckbox @bind-Value="leapSentencingModel.LicenseSuspension" /> License Suspension</label>
+            <label><InputCheckbox @bind-Value="Model.LicenseSuspension" /> License Suspension</label>
         </div>
         <div class="form-row">
-            <label><InputCheckbox @bind-Value="leapSentencingModel.CommunityService" /> Community Service</label>
+            <label><InputCheckbox @bind-Value="Model.CommunityService" /> Community Service</label>
         </div>
         <div class="form-row">
-            <label><InputCheckbox @bind-Value="leapSentencingModel.OtherConditions" /> Other</label>
+            <label><InputCheckbox @bind-Value="Model.OtherConditions" /> Other</label>
         </div>
         <button type="button" class="btn btn-primary">Add Conditions</button>
     </fieldset>
@@ -193,15 +193,14 @@
 </div>
 
 @code {
-    private LeapSentencingDto leapSentencingModel => Model;
     private List<ChargeGridRow> Charges { get; set; } = new();
 
     protected override string ApiEndpoint => "leapsentencing";
 
     protected override async Task HandleValidSubmit()
     {
-        leapSentencingModel.ChargeItems = Charges
-            .Select(c => new Munientry.Client.Shared.Models.SentencingChargeItemDto
+        Model.ChargeItems = Charges
+            .Select(c => new SentencingChargeItemDto
             {
                 Offense        = c.Offense,
                 Statute        = c.Statute,

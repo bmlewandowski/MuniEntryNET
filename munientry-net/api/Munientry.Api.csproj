@@ -5,6 +5,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\shared\Munientry.Shared.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4" />
     <!-- ENTRA ID - Step 1: Uncomment the package reference below, then run 'dotnet restore'. -->
@@ -13,5 +18,9 @@
   <ItemGroup>
     <!-- Source templates (Jinja2 {{ }} format) — filled at runtime by DocxTemplateProcessor -->
     <Content Include="Templates\source\*.docx" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Allow api.Tests to reach internal types (e.g. CourtDataCleaner) directly -->
+    <InternalsVisibleTo Include="Munientry.Api.Tests" />
   </ItemGroup>
 </Project>

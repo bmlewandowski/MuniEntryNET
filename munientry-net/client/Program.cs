@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
-using Microsoft.Extensions.Configuration;
 using Munientry.Client.Shared;
+using Munientry.Shared.Validation;
 // Bring the generated App component into scope
 using Munientry.Client;
 
@@ -10,30 +11,33 @@ using Munientry.Client;
 // using Microsoft.Authentication.WebAssembly.Msal;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
+// appsettings.json is loaded automatically by CreateDefault from wwwroot/.
+// Load Docker environment overrides when present (also served from wwwroot/).
+builder.Configuration.AddJsonFile("appsettings.Docker.json", optional: true);
 builder.RootComponents.Add<App>("#app");
 builder.Services.AddScoped<ApiHelper>();
-builder.Services.AddScoped<DenyPrivilegesPermitRetestService>();
-builder.Services.AddScoped<CaseSearchApiClient>();
-builder.Services.AddScoped<DailyListApiClient>();
 
-// Load config for API base URL
-var config = new ConfigurationBuilder()
-    .AddJsonFile("wwwroot/appsettings.json", optional: true, reloadOnChange: true)
-    .AddJsonFile("wwwroot/appsettings.Docker.json", optional: true, reloadOnChange: true)
-    .Build();
-builder.Services.AddSingleton<IConfiguration>(config);
+// All four API clients are registered as typed HTTP clients so that the underlying
+// BrowserHttpHandler (Blazor WASM) / SocketsHttpHandler (server) is managed by
+// IHttpClientFactory rather than a new HttpClient being allocated on every API call.
+// BaseAddress is resolved once from configuration when the client is first constructed.
+builder.Services.AddHttpClient<CaseSearchApiClient>((sp, client) =>
+    client.BaseAddress = new Uri(sp.GetRequiredService<ApiHelper>().GetApiBaseUrl()));
+builder.Services.AddHttpClient<DailyListApiClient>((sp, client) =>
+    client.BaseAddress = new Uri(sp.GetRequiredService<ApiHelper>().GetApiBaseUrl()));
+builder.Services.AddHttpClient<ReportsApiClient>((sp, client) =>
+    client.BaseAddress = new Uri(sp.GetRequiredService<ApiHelper>().GetApiBaseUrl()));
+builder.Services.AddHttpClient<IEntryFormApiClient, EntryFormApiClient>((sp, client) =>
+    client.BaseAddress = new Uri(sp.GetRequiredService<ApiHelper>().GetApiBaseUrl()));
 
 // Shared HttpClient for direct usage (e.g. forms that inject HttpClient Http)
 builder.Services.AddScoped(sp => new HttpClient());
 
-// Typed API client used by FormPageBase<T> for form submissions.
-// Base address is resolved at runtime so Docker / local environments are handled correctly.
-builder.Services.AddScoped<ICriminalFormApiClient>(sp =>
-{
-    var helper = sp.GetRequiredService<ApiHelper>();
-    var http = new HttpClient { BaseAddress = new Uri(helper.GetApiBaseUrl()) };
-    return new CriminalFormApiClient(http);
-});
+// Register FluentValidation validators from the shared assembly so
+// <FluentValidationValidator /> in each EditForm can enforce rules client-side.
+// These are the same validators the API uses server-side (FluentValidationFilter),
+// meaning validation rules are defined and enforced in exactly one place.
+builder.Services.AddValidatorsFromAssemblyContaining<NotGuiltyPleaValidator>(lifetime: ServiceLifetime.Singleton);
 
 // =====================================================================
 // ENTRA ID AUTHENTICATION — cityofdelawareoh.gov accounts (@cityofdelawareoh.gov)
