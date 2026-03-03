@@ -95,12 +95,19 @@ for full connection string documentation.
 
 ### .NET Documentation
 
+See [`munientry-net/docs/README.md`](munientry-net/docs/README.md) for the full index with a quick decision tree and current blocker summary.
+
 | File | Contents |
 |---|---|
-| [`munientry-net/docs/StoredProcedureIntegration.md`](munientry-net/docs/StoredProcedureIntegration.md) | SQL Server stored procedures, connection strings, case search & daily list endpoints |
+| [`munientry-net/docs/README.md`](munientry-net/docs/README.md) | **Documentation index** — doc map, decision tree, blocker summary |
+| [`munientry-net/docs/Blazor_DOCX_Migration.md`](munientry-net/docs/Blazor_DOCX_Migration.md) | Form → SP → DOCX template → legacy Python mapping table |
 | [`munientry-net/docs/DTO_Reference.md`](munientry-net/docs/DTO_Reference.md) | DTO inventory, namespace conventions, `FormPageBase<TDto>` pattern |
-| [`munientry-net/docs/Blazor_DOCX_Migration.md`](munientry-net/docs/Blazor_DOCX_Migration.md) | Form-by-form migration status: Python → Blazor DOCX generation |
-| [`munientry-net/docs/EntraID_Setup.md`](munientry-net/docs/EntraID_Setup.md) | Step-by-step guide to enable Microsoft Entra ID (Azure AD) authentication |
+| [`munientry-net/docs/StoredProcedureIntegration.md`](munientry-net/docs/StoredProcedureIntegration.md) | SQL Server stored procedures, connection strings, test database |
+| [`munientry-net/docs/EntraID_Setup.md`](munientry-net/docs/EntraID_Setup.md) | Step-by-step guide to enable Entra ID auth (client and API) |
+| [`munientry-net/docs/SECURITY_ARCHITECTURE_REVIEW.md`](munientry-net/docs/SECURITY_ARCHITECTURE_REVIEW.md) | Security, dependency & architecture review — open blockers and resolved items |
+| [`munientry-net/docs/Legacy_Save_Paths_And_Batch_FTA.md`](munientry-net/docs/Legacy_Save_Paths_And_Batch_FTA.md) | Legacy Python save paths and batch FTA behavior — migration reference |
+| [`munientry-net/docs/Pseudo_User_Analysis.md`](munientry-net/docs/Pseudo_User_Analysis.md) | Simulated court staff UX analysis across the Python → Blazor transition |
+| [`munientry-net/docs/Pseudo_User_Response.md`](munientry-net/docs/Pseudo_User_Response.md) | Tiered engineering improvement plan (pre-launch hardening) |
 
 ---
 

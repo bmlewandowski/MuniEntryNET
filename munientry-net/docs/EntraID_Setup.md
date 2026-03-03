@@ -4,6 +4,8 @@ This document describes how to enable Microsoft Entra ID (formerly Azure AD) aut
 
 Authentication is fully wired up in the codebase but **disabled by default**. All code is present and commented out so the app builds and runs without authentication. Enabling it requires only the steps below.
 
+> **⚠️ Important:** These steps enable authentication on the **Blazor client only**. The API has its own parallel commented-out scaffolding (`Munientry.Api.csproj` package reference, `api/Program.cs` middleware, `api/appsettings.json` config block) that **must also be uncommented** for the API to validate bearer tokens. An authenticated client sending tokens to an unguarded API is not secure. See [SECURITY_ARCHITECTURE_REVIEW.md](SECURITY_ARCHITECTURE_REVIEW.md) item 2 for the API-side steps.
+
 ---
 
 ## Prerequisites
@@ -141,3 +143,19 @@ Pages **without** `[Authorize]` remain publicly accessible.
 | `client/_Imports.razor` | Auth-related global using directives (Step 4) |
 | `client/App.razor` | Router swap from `RouteView` to `AuthorizeRouteView` (Step 6) |
 | `client/Pages/Authentication.razor` | MSAL login/logout redirect callback page (Step 7) |
+
+---
+
+## API-Side Auth (Required — Not in Steps Above)
+
+After completing Steps 1–7 above, the client will request and receive Entra ID tokens. The API must independently validate those tokens or it remains unguarded.
+
+The API already has all scaffolding in place in commented-out form. To enable:
+
+1. **`api/Munientry.Api.csproj`** — uncomment the `Microsoft.Identity.Web` package reference and run `dotnet restore`.
+2. **`api/appsettings.json`** — uncomment the `AzureAd` config block and fill in the same `TenantId` and `ClientId` from Step 1 above. Set `Audience` to `api://YOUR_CLIENT_ID`.
+3. **`api/Program.cs`** — uncomment the `using Microsoft.Identity.Web;` directive, the `AddAuthentication().AddMicrosoftIdentityWebApi(...)` call, the fallback authorization policy (`RequireAuthenticatedUser`), and `app.UseAuthentication()` / `app.UseAuthorization()`.
+
+The fallback authorization policy protects all endpoints globally — no `[Authorize]` attribute is needed on individual endpoints.
+
+See [SECURITY_ARCHITECTURE_REVIEW.md](SECURITY_ARCHITECTURE_REVIEW.md) items 1–2 for full context and remaining role/claim design work.

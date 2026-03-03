@@ -3,6 +3,8 @@
 ## Purpose
 All Data Transfer Objects (DTOs) used by both the Blazor client and the API live in a single shared library: `shared/Munientry.Shared.csproj`. This eliminates the client/server drift that existed when each project maintained its own copy.
 
+> **See also:** [Blazor_DOCX_Migration.md](Blazor_DOCX_Migration.md) — maps each form to its DTO, API endpoint, SP, and legacy Python equivalent.
+
 ## Structure
 - All DTOs use the namespace: `Munientry.Shared.Dtos`
 - Source location: `shared/Dtos/*.cs`

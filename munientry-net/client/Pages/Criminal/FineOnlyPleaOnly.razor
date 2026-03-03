@@ -10,21 +10,21 @@
 <EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
 	<FluentValidationValidator />
 	<ValidationSummary />
-	<div>
-		<label>Case Number</label><br />
-		<InputText @bind-Value="Model.CaseNumber" />
+	<div class="form-group">
+		<label>Case Number</label>
+		<InputText @bind-Value="Model.CaseNumber" class="form-control" />
 	</div>
-	<div>
-		<label>Defendant Name</label><br />
-		<InputText @bind-Value="Model.DefendantName" />
+	<div class="form-group">
+		<label>Defendant Name</label>
+		<InputText @bind-Value="Model.DefendantName" class="form-control" />
 	</div>
-	<div>
-		<label>Charge</label><br />
-		<InputText @bind-Value="Model.Charge" />
+	<div class="form-group">
+		<label>Charge</label>
+		<InputText @bind-Value="Model.Charge" class="form-control" />
 	</div>
-	<div>
-		<label>Fine Amount</label><br />
-		<InputNumber @bind-Value="Model.FineAmount" TValue="decimal?" />
+	<div class="form-group">
+		<label>Fine Amount</label>
+		<InputNumber @bind-Value="Model.FineAmount" TValue="decimal?" class="form-control" />
 	</div>
 	<div class="form-actions">
 		<button type="submit" class="btn btn-success" disabled="@(IsSubmitting || IsLoadingCase)">Open Entry</button>

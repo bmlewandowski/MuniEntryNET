@@ -1,59 +1,159 @@
-# .NET build artifacts
+# ============================================================
+# Python
+# ============================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.sage.py
+__pypackages__/
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Environments
+.env
+.env.*
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Sphinx documentation
+docs_storage/_build/
+
+# PyBuilder
+target/
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# Django
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask
+instance/
+.webassets-cache
+
+# Scrapy
+.scrapy
+
+# ============================================================
+# MuniEntry specific
+# ============================================================
+db/charges.sqlite
+db/daily_case_lists.sqlite
+resources/Saved
+/tests/resources/Saved/
+/tests/db/
+*.bat
+*.cfg
+
+# ============================================================
+# .NET / C#
+# ============================================================
 bin/
 obj/
 TestResults/
 *.user
 *.suo
-.vs/
-
-# Docker
-*.tar
-*.log
-docker-compose.override.yml
-
-# VS Code
-.vscode/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Node/npm (if ever used)
-node_modules/
-
-# Python (if ever used)
-__pycache__/
-*.pyc
-
-# Misc
-.env
-.env.*
-secrets.json
-
-# NuGet and package artifacts
 packages/
 *.nupkg
 .nuget/
-
-# Publish output
 publish/
 **/publish/
 
-# Rider/JetBrains IDE
-.idea/
+# ============================================================
+# Docker
+# ============================================================
+*.tar
+docker-compose.override.yml
 
-# User-specific cache
-*.userosscache
-
-# LibMan output (optional, uncomment if used)
-# wwwroot/lib/
-
-# Kubernetes — prevent committing files with real values
-# Local overrides (any *.local.yaml / *.local.yml under k8s/)
+# ============================================================
+# Kubernetes
+# ============================================================
+# Local overrides
 k8s/**/*.local.yaml
 k8s/**/*.local.yml
 
-# Generated/rendered manifests (e.g. from `kustomize build` or `helm template`)
+# Generated/rendered manifests
 k8s/**/rendered/
 k8s/**/*.generated.yaml
 k8s/**/*.generated.yml
@@ -63,8 +163,37 @@ k8s/**/charts/
 k8s/**/*-values.local.yaml
 k8s/**/*-values.local.yml
 
-# Kubeconfig files that may get dropped in the repo
+# Kubeconfig files
 kubeconfig
 kubeconfig.*
 .kubeconfig
 *.kubeconfig
+
+# ============================================================
+# Secrets
+# ============================================================
+secrets.json
+
+# ============================================================
+# IDE / Editor
+# ============================================================
+.vs/
+.vscode/
+.idea/
+*.userosscache
+
+# ============================================================
+# OS
+# ============================================================
+.DS_Store
+Thumbs.db
+
+# ============================================================
+# Logs
+# ============================================================
+*.log
+
+# ============================================================
+# Node / npm
+# ============================================================
+node_modules/

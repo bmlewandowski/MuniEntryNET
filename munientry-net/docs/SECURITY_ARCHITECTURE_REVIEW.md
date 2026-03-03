@@ -11,7 +11,7 @@
 ### Critical — Not Ready for Production
 
 **1. Authentication is fully disabled.**  
-The Entra ID wiring is commented out at every layer — the MSAL NuGet reference in `Munientry.Client.csproj`, the `using` directive and `AddMsalAuthentication` block in `client/Program.cs`, and `AuthorizeRouteView` in `App.razor`. Every form and every route is publicly accessible today.
+The Entra ID wiring is commented out at every layer — the MSAL NuGet reference in `Munientry.Client.csproj`, the `using` directive and `AddMsalAuthentication` block in `client/Program.cs`, and `AuthorizeRouteView` in `App.razor`. Every form and every route is publicly accessible today. See **[EntraID_Setup.md](EntraID_Setup.md)** for the step-by-step enablement procedure (client and API).
 
 **2. The API has zero authorization middleware — scaffolding now in place.**  
 Even after the client enables MSAL and users receive tokens, the API must validate the bearer token independently. The full auth wiring has been added to the API in commented-out form, mirroring the client's prepared-but-disabled pattern:

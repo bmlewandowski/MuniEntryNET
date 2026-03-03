@@ -3,7 +3,9 @@
 ## Overview
 
 The API uses SQL Server stored procedures for all read operations against the `AuthorityCourt`
-database. **There are no write operations — the system is read-only by design.** The legacy Python
+database. **There are no write operations — the system is read-only by design.**
+
+> **See also:** [Blazor_DOCX_Migration.md](Blazor_DOCX_Migration.md) — maps each SP to the Blazor form(s) that consume it. The legacy Python
 application was read-only, and the client has confirmed this remains the design for the new
 application. No SP, endpoint, or service for any write operation will be added unless the design
 decision is explicitly changed.
