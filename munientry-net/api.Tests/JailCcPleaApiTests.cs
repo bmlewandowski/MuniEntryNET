@@ -55,7 +55,10 @@ namespace Munientry.Api.Tests
                 DueDate = System.DateTime.Today.AddDays(30),
                 FraInFile = "N/A",
                 FraInCourt = "N/A",
-                DistractedDriving = false
+                DistractedDriving = false,
+                JudicialOfficerFirstName = "John",
+                JudicialOfficerLastName  = "Doe",
+                JudicialOfficerType      = "Judge",
             };
             var response = await client.PostAsJsonAsync("/api/v1/jailccplea", dto);
             response.EnsureSuccessStatusCode();

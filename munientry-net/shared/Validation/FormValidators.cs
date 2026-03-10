@@ -53,6 +53,24 @@ file static class Rules
             .WithMessage("Defense counsel name is required, or check 'Counsel Waived'.");
     }
 
+    /// check_judicial_officer — split-field DTOs must carry both first and last name.
+    /// Called by every validator whose DTO exposes JudicialOfficerFirstName / JudicialOfficerLastName.
+    /// Defense-in-depth against FormPageBase.HandleValidSubmit bypasses (e.g. API called directly).
+    /// The client-side primary guard lives in FormPageBase.HandleValidSubmit.
+    internal static void AddJudicialOfficerRule<T>(
+        AbstractValidator<T> v,
+        Expression<Func<T, string?>> firstNameExpr,
+        Expression<Func<T, string?>> lastNameExpr)
+    {
+        v.RuleFor(firstNameExpr)
+            .NotEmpty()
+            .WithMessage("A judicial officer must be set before submitting an entry.");
+
+        v.RuleFor(lastNameExpr)
+            .NotEmpty()
+            .WithMessage("A judicial officer must be set before submitting an entry.");
+    }
+
     /// Plea / admission date must be prior to today.
     internal static IRuleBuilderOptions<T, DateTime?> MustBeInPast<T>(
         this IRuleBuilder<T, DateTime?> rule) =>
@@ -81,6 +99,7 @@ public sealed class NotGuiltyPleaValidator : AbstractValidator<NotGuiltyPleaDto>
     {
         Rules.AddDefenseCounselRule(this, x => x.DefenseCounselName, x => x.DefenseCounselWaived);
         Rules.AddBondRules(this, x => x.BondType, x => x.BondAmount);
+        Rules.AddJudicialOfficerRule(this, x => x.JudicialOfficerFirstName, x => x.JudicialOfficerLastName);
     }
 }
 
@@ -94,6 +113,7 @@ public sealed class JailCcPleaValidator : AbstractValidator<JailCcPleaDto>
     public JailCcPleaValidator()
     {
         Rules.AddDefenseCounselRule(this, x => x.DefenseCounselName, x => x.DefenseCounselWaived);
+        Rules.AddJudicialOfficerRule(this, x => x.JudicialOfficerFirstName, x => x.JudicialOfficerLastName);
 
         // check_if_jail_suspended_more_than_imposed — suspended days must not exceed imposed days.
         RuleForEach(x => x.ChargeItems)
@@ -116,6 +136,7 @@ public sealed class FineOnlyPleaValidator : AbstractValidator<FineOnlyPleaDto>
     public FineOnlyPleaValidator()
     {
         Rules.AddDefenseCounselRule(this, x => x.DefenseCounselName, x => x.DefenseCounselWaived);
+        Rules.AddJudicialOfficerRule(this, x => x.JudicialOfficerFirstName, x => x.JudicialOfficerLastName);
     }
 }
 
@@ -137,6 +158,7 @@ public sealed class DiversionPleaValidator : AbstractValidator<DiversionPleaDto>
             .WithMessage("A diversion program must be selected.");
 
         Rules.AddDefenseCounselRule(this, x => x.DefenseCounselName, x => x.DefenseCounselWaived);
+        Rules.AddJudicialOfficerRule(this, x => x.JudicialOfficerFirstName, x => x.JudicialOfficerLastName);
     }
 }
 
@@ -149,6 +171,7 @@ public sealed class DiversionDialogValidator : AbstractValidator<DiversionDialog
     public DiversionDialogValidator()
     {
         Rules.AddDefenseCounselRule(this, x => x.DefenseCounselName, x => x.DefenseCounselWaived);
+        Rules.AddJudicialOfficerRule(this, x => x.JudicialOfficerFirstName, x => x.JudicialOfficerLastName);
     }
 }
 
@@ -172,6 +195,7 @@ public sealed class BondHearingValidator : AbstractValidator<BondHearingDto>
             .WithMessage("A bond modification decision is required.");
 
         Rules.AddBondRules(this, x => x.BondType, x => x.BondAmount);
+        Rules.AddJudicialOfficerRule(this, x => x.JudicialOfficerFirstName, x => x.JudicialOfficerLastName);
     }
 }
 
@@ -188,6 +212,7 @@ public sealed class LeapAdmissionPleaValidator : AbstractValidator<LeapAdmission
     public LeapAdmissionPleaValidator()
     {
         Rules.AddDefenseCounselRule(this, x => x.DefenseCounselName, x => x.DefenseCounselWaived);
+        Rules.AddJudicialOfficerRule(this, x => x.JudicialOfficerFirstName, x => x.JudicialOfficerLastName);
     }
 }
 
@@ -200,6 +225,7 @@ public sealed class LeapAdmissionAlreadyValidValidator : AbstractValidator<LeapA
     public LeapAdmissionAlreadyValidValidator()
     {
         Rules.AddDefenseCounselRule(this, x => x.DefenseCounselName, x => x.DefenseCounselWaived);
+        Rules.AddJudicialOfficerRule(this, x => x.JudicialOfficerFirstName, x => x.JudicialOfficerLastName);
     }
 }
 
@@ -210,6 +236,7 @@ public sealed class LeapSentencingValidator : AbstractValidator<LeapSentencingDt
     {
         RuleFor(x => x.LeapPleaDate).NotNull().MustBeInPast();
         Rules.AddDefenseCounselRule(this, x => x.DefenseCounselName, x => x.DefenseCounselWaived);
+        Rules.AddJudicialOfficerRule(this, x => x.JudicialOfficerFirstName, x => x.JudicialOfficerLastName);
     }
 }
 
@@ -222,6 +249,7 @@ public sealed class LeapValidSentencingValidator : AbstractValidator<LeapValidSe
     public LeapValidSentencingValidator()
     {
         Rules.AddDefenseCounselRule(this, x => x.DefenseCounselName, x => x.DefenseCounselWaived);
+        Rules.AddJudicialOfficerRule(this, x => x.JudicialOfficerFirstName, x => x.JudicialOfficerLastName);
     }
 }
 
@@ -245,5 +273,10 @@ public sealed class SchedulingEntryValidator : AbstractValidator<SchedulingEntry
         {
             RuleFor(x => x.FinalPretrialDate).MustBeInFuture();
         });
+
+        // SchedulingEntryDto uses the single-field JudicialOfficer pattern (judge last name only).
+        RuleFor(x => x.JudicialOfficer)
+            .NotEmpty()
+            .WithMessage("A judicial officer must be set before submitting an entry.");
     }
 }

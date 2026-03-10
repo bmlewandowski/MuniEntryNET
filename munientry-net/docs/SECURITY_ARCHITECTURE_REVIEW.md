@@ -227,6 +227,59 @@ Changes made:
 
 Build: 0 errors. 123/123 tests pass.
 
+**P13. ~~No retry policy on SQL connections — all seven SQL services fail immediately on transient faults~~ — RESOLVED.**  
+All seven SQL-querying services (`CaseSearchService`, `DailyListService`, `CaseDocketService`, `DrivingCaseService`, `EventReportService`, `FtaReportService`, `NotGuiltyReportService`) opened a raw `SqlConnection`, called `conn.OpenAsync()`, and ran `cmd.ExecuteReaderAsync()` with zero retry protection. A single transient fault — SQL Server pod restart, K8s DNS resolution delay, connection pool eviction — would generate an unhandled `SqlException` propagated to the client as a 500 from `GlobalExceptionHandler`.
+
+Changes made (March 10, 2026):
+- `api/Munientry.Api.csproj` — `Microsoft.Extensions.Resilience` version `10.3.0` added (Polly v8 DI integration; brings `Polly` and `Polly.Registry` as transitive dependencies).
+- `api/Services/Common/SqlServiceBase.cs` — new `abstract` base class in the `Munientry.Api.Services` namespace. Constructor accepts `IOptions<AuthorityCourtOptions>` and `ResiliencePipelineProvider<string>`; resolves the `"sql-transient"` `ResiliencePipeline` once on construction and stores it. Exposes two `protected` helpers:
+  - `ExecuteSpListAsync<T>(procedureName, parameterize, mapRow, ct)` — wraps the complete `OpenAsync` → `ExecuteReaderAsync` → `ReadAsync` → map cycle in `pipeline.ExecuteAsync`; returns `List<T>`.
+  - `ExecuteSpSingleAsync<T>(procedureName, parameterize, mapRow, ct)` — same, but returns `T?` from the first row or `null`.
+  Because the entire ADO.NET lifecycle (including `new SqlConnection(...)`) is inside each `ExecuteAsync` callback, every retry attempt opens a fresh connection — no stale or half-open connection is reused.
+- `api/ServiceRegistration.cs` — `services.AddResiliencePipeline("sql-transient", ...)` registered during startup:
+  - **Retry:** up to 3 attempts; 300 ms base delay; exponential back-off; jitter enabled.
+  - **Trigger condition:** `SqlException` where `IsTransient == true` (covers login timeout, transport-level error, server not found) or `TimeoutException`.
+  - **Per-attempt timeout:** 30 seconds via `AddTimeout(TimeSpan.FromSeconds(30))`.
+- All 7 concrete service classes — each updated to inherit `SqlServiceBase` and delegate to `ExecuteSpListAsync` / `ExecuteSpSingleAsync`. The `private readonly string _connectionString` field, the `using var conn = new SqlConnection(...)` block, and the manual `await conn.OpenAsync()` calls have been removed from all seven classes. Methods are now one-expression arrow bodies.
+
+Side fix: `BondHearingApiTests.PostBondHearing_ReturnsDocx` was missing `BondModificationDecision` from its test DTO. The `BondHearingValidator` requires this field — after the 422 fix from earlier in this session the test correctly failed instead of generating a 400. The field has been added with value `"Bond continued"`. Build: 0 errors, 0 warnings. **158/158 tests pass.**
+
+**P14. ~~Dead `reportDate` parameter in `DailyListService` / `IDailyListService`~~ — RESOLVED.**  
+All 6 daily-list stored procedures accept **no date input parameter** — they filter by date internally (`WHERE ce.EventDate = CAST(GETDATE() AS Date)` in production; a relaxed `> '01/01/2026'` on the test server). Despite this, `GetDailyListAsync` carried a `DateTime reportDate` parameter through the entire call chain: `IDailyListService` interface → `DailyListService` → `FakeDailyListService`, and the endpoint bound and forwarded it on every request even though it was never passed to `ExecuteSpListAsync`.
+
+Changes made (March 10, 2026):
+- `IDailyListService.cs` — removed `DateTime reportDate` from the interface signature; removed the now-redundant explicit `using System;`, `using System.Collections.Generic;`, and `using System.Threading.Tasks;` directives (implicit usings cover all three).
+- `DailyListService.cs` — matching signature update; the empty `_ => { }` parameterize lambda in `ExecuteSpListAsync` is correct and unchanged (the SPs take no parameters).
+- `FakeDailyListService.cs` — matching signature update; behavior unchanged.
+- `CaseDataEndpoints.cs` — `DateTime.TryParse` call kept (still provides a clean `400 Bad Request` for malformed client input); the parsed `reportDate` variable replaced with the discard `_` since the value is no longer forwarded. Updated the inline comment to document why the date is validated but not forwarded.
+
+Build: 0 errors, 0 warnings. 158/158 tests pass.
+
+**P16. ~~`ValidationProblem` `errors` key not parsed in client — validation messages silently swallowed~~ — RESOLVED.**  
+`FluentValidationFilter` returns RFC 7807 Problem Details via `Results.ValidationProblem()` — field-level messages are placed in the `errors` dictionary:  
+```json
+{ "status": 422, "title": "One or more validation errors occurred.", "errors": { "DefenseCounselName": ["Defense counsel name is required."] } }
+```  
+All other error responses from `GlobalExceptionHandler` use the `detail` field:  
+```json
+{ "status": 500, "title": "An error occurred processing your request.", "detail": "Contact support with trace ID: abc123" }
+```  
+`ReadErrorMessageAsync` in `FormPageBase.cs` previously read only the `detail` field. On any 422 response, `TryGetProperty("detail", ...)` returned `false` and the user always saw the generic fallback `"An error occurred. Please try again."` regardless of which fields failed validation.
+
+Changes made (March 10, 2026):
+- `client/Shared/FormPageBase.cs` — `ReadErrorMessageAsync` extended with a two-branch strategy:
+  1. **Status 422:** reads the `errors` property, iterates all field arrays, joins all messages into a single space-separated string for display.
+  2. **All other statuses:** reads the `detail` field as before (covers `GlobalExceptionHandler` server errors).
+  - Added XML doc comment explaining both branches.
+- Updated the XML doc summary to reflect the expanded behaviour.
+
+Validation field messages (e.g. `"Defense counsel name is required. Case number must be in the format XX-CRB-XXXX."`) now reach the UI for 422 responses. Server error trace IDs remain isolated to the `detail` branch. Build: 0 errors, 0 warnings. **158/158 tests pass.**
+
+**P15. ~~`string date` route parameter — replace with `DateTime date` for implicit framework 400~~ — NOT APPLICABLE.**  
+Attempted to replace the manual `DateTime.TryParse` guard in `CaseDataEndpoints.MapGet("/dailylist/{listType}/{date}")` with a typed `DateTime date` parameter, expecting ASP.NET Core minimal API route binding to return `400 Bad Request` automatically on parse failure (the documented behaviour from .NET 7+).  
+Actual behaviour in .NET 10: when the route segment can't be parsed as `DateTime`, the framework throws a `FormatException`-family exception instead of gracefully returning `400`. The exception propagates to `GlobalExceptionHandler`, which converts all unhandled exceptions to `500 Internal Server Error`. The three `DailyListApiTests.GetDailyList_InvalidDate_Returns400` test cases (`"not-a-date"`, `"20260228"`, `"yesterday"`) each returned `500` instead of `400`.  
+The `string date` + explicit `TryParse` approach has been reinstated with a code comment explaining the limitation. This is preferable anyway: it returns a descriptive message (`"Invalid date format. Use yyyy-MM-dd."`) rather than the framework's generic problem details body.
+
 **23. ~~Template paths fragile — `Path.Combine("Templates", "source", "*.docx")` could break if CWD changes~~ — NOT APPLICABLE.**  
 The concern was that relative paths in service classes (e.g. `Path.Combine("Templates", "source", "Foo_Template.docx")`) would resolve incorrectly if the process working directory differed from the publish output. This does not apply: `Munientry.Api.csproj` marks all template files with `<Content Include="Templates\source\*.docx" CopyToOutputDirectory="PreserveNewest" />`, so `dotnet publish` places them at `/app/Templates/source/` alongside the DLL. The Dockerfile sets `WORKDIR /app` and the entrypoint is `dotnet Munientry.Api.dll` — the working directory at runtime is always `/app`. The relative path resolves correctly without any `IWebHostEnvironment.ContentRootPath` indirection. No code change is required.
 
@@ -259,3 +312,7 @@ The concern was that relative paths in service classes (e.g. `Path.Combine("Temp
 | — | ~~Silent `catch {}` in API clients~~ — DONE (see item P10) |
 | — | ~~`Services/` flat folder, 89 files~~ — DONE (see item P11) |
 | — | ~~`ICriminalFormApiClient` misleading name~~ — DONE (see item P12) |
+| — | ~~No retry policy on SQL connections — `SqlServiceBase` + Polly~~ — DONE (see item P13) |
+| — | ~~Dead `reportDate` param in `DailyListService`~~ — DONE (see item P14) |
+| — | ~~`string date` route param → `DateTime date`~~ — NOT APPLICABLE (see item P15; .NET 10 binding throws → 500 via GlobalExceptionHandler) |
+| — | ~~`ValidationProblem` `errors` key not parsed in client~~ — DONE (see item P16) |

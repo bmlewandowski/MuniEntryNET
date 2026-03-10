@@ -38,7 +38,10 @@ namespace Munientry.Api.Tests
                 PayRestitutionTo = null,
                 PayRestitutionAmount = null,
                 OtherConditions = false,
-                OtherConditionsText = null
+                OtherConditionsText = null,
+                JudicialOfficerFirstName = "John",
+                JudicialOfficerLastName  = "Doe",
+                JudicialOfficerType      = "Judge",
             };
             var response = await client.PostAsJsonAsync("/api/v1/diversionplea", dto);
             response.EnsureSuccessStatusCode();

@@ -109,6 +109,17 @@ namespace Munientry.Client.Shared
                 return;
             }
 
+            // Guard: block submission if the judicial officer session was never resolved.
+            // This mirrors the Python app behaviour where officer context was required at
+            // startup. A null officer means the browser tab was opened without completing
+            // AppInitializer, or the mock / Entra ID provider returned null.
+            if (!OfficerSession.IsInitialized || OfficerSession.JudicialOfficer is null)
+            {
+                ErrorMessage = "No judicial officer is set for this session. " +
+                               "Reload the page and select a judicial officer before submitting.";
+                return;
+            }
+
             StampJudicialOfficer();
 
             IsSubmitting = true;
@@ -154,9 +165,16 @@ namespace Munientry.Client.Shared
         // -- Error helpers --------------------------------------------------------
 
         /// <summary>
-        /// Reads the RFC 7807 Problem Details <c>detail</c> field from a non-success
-        /// API response. Falls back to a generic message if the body is absent or unparseable.
-        /// Never surfaces raw exception messages or internal server paths to the UI.
+        /// Reads RFC 7807 Problem Details from a non-success API response and returns a
+        /// user-facing message.
+        /// <list type="bullet">
+        ///   <item>422 responses from <c>FluentValidationFilter</c> carry field messages in the
+        ///         <c>errors</c> dictionary — these are joined into a single string.</item>
+        ///   <item>All other error responses (4xx/5xx) carry a summary in the <c>detail</c> field
+        ///         produced by <c>GlobalExceptionHandler</c>.</item>
+        /// </list>
+        /// Falls back to a generic message if the body is absent or unparseable. Never surfaces
+        /// raw exception messages or internal server paths to the UI.
         /// </summary>
         private static async Task<string> ReadErrorMessageAsync(HttpResponseMessage response)
         {
@@ -166,7 +184,29 @@ namespace Munientry.Client.Shared
                 if (!string.IsNullOrWhiteSpace(body))
                 {
                     using var doc = JsonDocument.Parse(body);
-                    if (doc.RootElement.TryGetProperty("detail", out var detail))
+                    var root = doc.RootElement;
+
+                    // 422 Unprocessable Content — FluentValidation errors live in "errors", not "detail".
+                    if ((int)response.StatusCode == 422 &&
+                        root.TryGetProperty("errors", out var errors) &&
+                        errors.ValueKind == JsonValueKind.Object)
+                    {
+                        var messages = new List<string>();
+                        foreach (var field in errors.EnumerateObject())
+                        {
+                            foreach (var msg in field.Value.EnumerateArray())
+                            {
+                                var text = msg.GetString();
+                                if (!string.IsNullOrWhiteSpace(text))
+                                    messages.Add(text);
+                            }
+                        }
+                        if (messages.Count > 0)
+                            return string.Join(" ", messages);
+                    }
+
+                    // All other errors — detail field from GlobalExceptionHandler.
+                    if (root.TryGetProperty("detail", out var detail))
                         return detail.GetString() ?? "An error occurred. Please try again.";
                 }
             }

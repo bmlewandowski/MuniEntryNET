@@ -40,6 +40,19 @@
         </div>
     </div>
 }
+else if (_initFailed)
+{
+    <div class="modal-backdrop">
+        <div class="modal-box">
+            <h3>Account Not Recognised</h3>
+            <p>
+                Your account could not be matched to a judicial officer in this system.
+                No entries can be submitted until an officer is associated with your login.
+            </p>
+            <p class="text-muted">Contact IT and reference: <strong>JudicialOfficerSession unresolved</strong>.</p>
+        </div>
+    </div>
+}
 else if (!Session.IsInitialized)
 {
     <p class="initializing-message">Loading&hellip;</p>
@@ -53,6 +66,7 @@ else
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
     private bool _showVisitingJudgeModal;
+    private bool _initFailed;
     private string _visitingFirst = string.Empty;
     private string _visitingLast  = string.Empty;
     private string? _visitingError;
@@ -70,9 +84,11 @@ else
         var officer = await OfficerProvider.GetCurrentOfficerAsync();
         if (officer is not null)
             Session.SetJudicialOfficer(officer);
-        // If officer is null (unknown user), the app still loads but
-        // JudicialOfficerSession.IsInitialized stays false and forms
-        // will show a warning rather than submitting blank officer data.
+        else
+            // Provider returned null — account is not mapped to a known officer.
+            // Show a blocking error rather than leaving the user on an infinite
+            // Loading… screen with no explanation.
+            _initFailed = true;
     }
 
     private void ConfirmVisitingJudge()

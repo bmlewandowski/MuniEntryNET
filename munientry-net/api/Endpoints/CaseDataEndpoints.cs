@@ -22,14 +22,18 @@ internal static class CaseDataEndpoints
 
         // Daily case list — calls one of the 6 scheduled-hearing stored procedures.
         // listType: arraignments, slated, pleas, pcvh_fcvh, final_pretrial, trials_to_court
-        // date format: yyyy-MM-dd
+        // date: yyyy-MM-dd — validated here for a clean 400 response; the SPs filter by
+        //   GETDATE() internally and do not accept a date parameter.
+        // Note: string→DateTime conversion is done manually rather than via typed route
+        //   binding because .NET 10 minimal API throws on DateTime parse failure (hitting
+        //   GlobalExceptionHandler → 500) instead of returning 400 gracefully.
         app.MapGet("/dailylist/{listType}/{date}", async (string listType, string date, IDailyListService service) =>
         {
-            if (!DateTime.TryParse(date, out var reportDate))
+            if (!DateTime.TryParse(date, out _))
                 return Results.BadRequest("Invalid date format. Use yyyy-MM-dd.");
             try
             {
-                var result = await service.GetDailyListAsync(listType, reportDate);
+                var result = await service.GetDailyListAsync(listType);
                 return Results.Ok(result);
             }
             catch (ArgumentException ex)

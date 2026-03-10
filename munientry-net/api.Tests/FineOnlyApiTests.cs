@@ -20,7 +20,7 @@ namespace Munientry.Api.Tests
         public async Task Post_FineOnly_ReturnsDocx()
         {
             var client = _factory.CreateClient();
-            var dto = new FineOnlyPleaDto { CaseNumber = "CASE999", DefendantFirstName = "Test", DefendantLastName = "User", Date = System.DateTime.Today.AddDays(-1), DefenseCounselWaived = true, Charges = "Speeding", ChargeStatute = "4511.21", ChargeDegree = "MM", ChargePlea = "Guilty", ChargeFinding = "Guilty", ChargeFinesAmount = "150.00", ChargeFinesSuspended = "0.00", CourtCosts = "Yes", FineAmount = 150 };
+            var dto = new FineOnlyPleaDto { CaseNumber = "CASE999", DefendantFirstName = "Test", DefendantLastName = "User", Date = System.DateTime.Today.AddDays(-1), DefenseCounselWaived = true, Charges = "Speeding", ChargeStatute = "4511.21", ChargeDegree = "MM", ChargePlea = "Guilty", ChargeFinding = "Guilty", ChargeFinesAmount = "150.00", ChargeFinesSuspended = "0.00", CourtCosts = "Yes", FineAmount = 150, JudicialOfficerFirstName = "John", JudicialOfficerLastName = "Doe", JudicialOfficerType = "Judge" };
             var resp = await client.PostAsJsonAsync("/api/v1/fineonlyplea", dto);
             Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
             // Accepts either file or JSON response

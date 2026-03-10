@@ -17,7 +17,7 @@ namespace Munientry.Api.Tests.Fakes
         public static readonly string[] AllValidTypes =
             { "arraignments", "slated", "pleas", "pcvh_fcvh", "final_pretrial", "trials_to_court" };
 
-        public Task<List<DailyListResultDto>> GetDailyListAsync(string listType, DateTime reportDate)
+        public Task<List<DailyListResultDto>> GetDailyListAsync(string listType)
         {
             // Mirror the real service: throw on unknown list type.
             var procName = DailyListStoredProcs.GetProcName(listType);

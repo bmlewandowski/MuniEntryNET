@@ -54,7 +54,10 @@ namespace Munientry.Api.Tests
                 Monitoring = false,
                 MonitoringType = null,
                 ComplyProtectionOrder = false,
-                PublicSafetySuspension = false
+                PublicSafetySuspension = false,
+                JudicialOfficerFirstName = "John",
+                JudicialOfficerLastName  = "Doe",
+                JudicialOfficerType      = "Judge",
             };
             var response = await client.PostAsJsonAsync("/api/v1/notguiltyplea", dto);
             response.EnsureSuccessStatusCode();

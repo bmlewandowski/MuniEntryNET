@@ -3,51 +3,39 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using Munientry.Api.Options;
 using Munientry.Shared.Dtos;
+using Polly;
+using Polly.Registry;
 
 namespace Munientry.Api.Services
 {
-    public class DrivingCaseService : IDrivingCaseService
+    public class DrivingCaseService : SqlServiceBase, IDrivingCaseService
     {
-        private readonly string _connectionString;
+        public DrivingCaseService(
+            IOptions<AuthorityCourtOptions> options,
+            ResiliencePipelineProvider<string> pipelineProvider)
+            : base(options, pipelineProvider) { }
 
-        public DrivingCaseService(IOptions<AuthorityCourtOptions> options)
-        {
-            _connectionString = options.Value.ConnectionString;
-        }
-
-        public async Task<DrivingCaseInfoDto?> GetDrivingCaseInfoAsync(string caseNumber)
-        {
-            using var conn = new SqlConnection(_connectionString);
-            using var cmd = new SqlCommand("reports.DMCMuniEntryDrivingCaseSearch", conn)
-            {
-                CommandType = CommandType.StoredProcedure
-            };
-            cmd.Parameters.Add("@CaseNumber", SqlDbType.NVarChar, 20).Value = caseNumber;
-
-            await conn.OpenAsync();
-            using var reader = await cmd.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
-            {
-                return new DrivingCaseInfoDto
+        public Task<DrivingCaseInfoDto?> GetDrivingCaseInfoAsync(string caseNumber) =>
+            ExecuteSpSingleAsync(
+                "reports.DMCMuniEntryDrivingCaseSearch",
+                cmd => cmd.Parameters.Add("@CaseNumber", SqlDbType.NVarChar, 20).Value = caseNumber,
+                reader => new DrivingCaseInfoDto
                 {
-                    CaseNumber = reader["CaseNumber"]?.ToString(),
-                    DefLastName = CourtDataCleaner.CleanLastName(reader["DefLastName"]?.ToString()),
-                    DefFirstName = reader["DefFirstName"]?.ToString(),
-                    DefMiddleName = reader["DefMiddleName"]?.ToString(),
-                    DefSuffix = reader["DefSuffix"]?.ToString(),
-                    DefBirthDate = reader["DefBirthDate"]?.ToString(),
-                    DefCity = reader["DefCity"]?.ToString(),
-                    DefState = reader["DefState"]?.ToString(),
-                    DefZipcode = reader["DefZipcode"]?.ToString(),
-                    DefAddress = reader["DefAddress"]?.ToString(),
+                    CaseNumber       = reader["CaseNumber"]?.ToString(),
+                    DefLastName      = CourtDataCleaner.CleanLastName(reader["DefLastName"]?.ToString()),
+                    DefFirstName     = reader["DefFirstName"]?.ToString(),
+                    DefMiddleName    = reader["DefMiddleName"]?.ToString(),
+                    DefSuffix        = reader["DefSuffix"]?.ToString(),
+                    DefBirthDate     = reader["DefBirthDate"]?.ToString(),
+                    DefCity          = reader["DefCity"]?.ToString(),
+                    DefState         = reader["DefState"]?.ToString(),
+                    DefZipcode       = reader["DefZipcode"]?.ToString(),
+                    DefAddress       = reader["DefAddress"]?.ToString(),
                     DefLicenseNumber = reader["DefLicenseNumber"]?.ToString(),
-                    CaseAddress = reader["CaseAddress"]?.ToString(),
-                    CaseCity = reader["CaseCity"]?.ToString(),
-                    CaseState = reader["CaseState"]?.ToString(),
-                    CaseZipcode = reader["CaseZipcode"]?.ToString(),
-                };
-            }
-            return null;
-        }
+                    CaseAddress      = reader["CaseAddress"]?.ToString(),
+                    CaseCity         = reader["CaseCity"]?.ToString(),
+                    CaseState        = reader["CaseState"]?.ToString(),
+                    CaseZipcode      = reader["CaseZipcode"]?.ToString(),
+                });
     }
 }

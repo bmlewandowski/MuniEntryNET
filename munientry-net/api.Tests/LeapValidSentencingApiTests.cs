@@ -33,6 +33,9 @@ namespace Munientry.Api.Tests
                 ChargeStatute = "4511.19A1A",
                 ChargeDegree = "M1",
                 ChargePlea = "Guilty",
+                JudicialOfficerFirstName = "John",
+                JudicialOfficerLastName  = "Doe",
+                JudicialOfficerType      = "Judge",
             };
             var response = await client.PostAsJsonAsync("/api/v1/leapvalidsentencing", dto);
             response.EnsureSuccessStatusCode();

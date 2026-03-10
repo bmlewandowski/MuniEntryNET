@@ -1,8 +1,11 @@
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Munientry.Api.Middleware;
 using Munientry.Api.Options;
 using Munientry.Api.Services;
+using Polly;
+using Polly.Retry;
 
 namespace Munientry.Api;
 
@@ -28,6 +31,29 @@ internal static class ServiceRegistration
         services.AddProblemDetails();
         // ── Audit middleware (item #20) ───────────────────────────────────────
         services.AddTransient<AuditMiddleware>();
+
+        // ── SQL transient-fault resilience pipeline (item #13) ───────────────
+        // Shared by all 7 SqlServiceBase subclasses via ResiliencePipelineProvider<string>.
+        // Retries up to 3 times on transient SqlException or TimeoutException with
+        // exponential back-off (300 ms base, jitter) and a 30-second per-attempt timeout.
+        // The full open→execute→read cycle is inside each ExecuteAsync callback so a fresh
+        // SqlConnection is created on every retry — no stale connection is reused.
+        services.AddResiliencePipeline("sql-transient", pipeline =>
+            pipeline
+                .AddRetry(new RetryStrategyOptions
+                {
+                    MaxRetryAttempts = 3,
+                    Delay            = TimeSpan.FromMilliseconds(300),
+                    BackoffType      = DelayBackoffType.Exponential,
+                    UseJitter        = true,
+                    ShouldHandle     = args => args.Outcome switch
+                    {
+                        { Exception: SqlException { IsTransient: true } } => PredicateResult.True(),
+                        { Exception: TimeoutException }                   => PredicateResult.True(),
+                        _                                                 => PredicateResult.False(),
+                    },
+                })
+                .AddTimeout(TimeSpan.FromSeconds(30)));
 
         // ── Interface-bound (mockable / testable) ────────────────────────────
         services.AddScoped<ICaseSearchService, CaseSearchService>();

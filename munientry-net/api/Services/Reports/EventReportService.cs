@@ -3,6 +3,8 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using Munientry.Api.Options;
 using Munientry.Shared.Dtos;
+using Polly;
+using Polly.Registry;
 
 namespace Munientry.Api.Services
 {
@@ -16,32 +18,22 @@ namespace Munientry.Api.Services
     ///   @EventCode VARCHAR  — event type identifier, e.g. 'FIN'
     ///   @EventDate DATE     — the date to query
     /// </summary>
-    public class EventReportService : IEventReportService
+    public class EventReportService : SqlServiceBase, IEventReportService
     {
-        private readonly string _connectionString;
+        public EventReportService(
+            IOptions<AuthorityCourtOptions> options,
+            ResiliencePipelineProvider<string> pipelineProvider)
+            : base(options, pipelineProvider) { }
 
-        public EventReportService(IOptions<AuthorityCourtOptions> options)
-        {
-            _connectionString = options.Value.ConnectionString;
-        }
-
-        public async Task<List<EventReportResultDto>> GetEventReportAsync(string eventCode, DateTime eventDate)
-        {
-            var results = new List<EventReportResultDto>();
-
-            using var conn = new SqlConnection(_connectionString);
-            using var cmd = new SqlCommand("[reports].[DMCMuniEntryEventReport]", conn)
-            {
-                CommandType = CommandType.StoredProcedure
-            };
-            cmd.Parameters.Add("@EventCode", SqlDbType.VarChar, 10).Value = eventCode;
-            cmd.Parameters.Add("@EventDate", SqlDbType.Date).Value = eventDate.Date;
-
-            await conn.OpenAsync();
-            using var reader = await cmd.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                results.Add(new EventReportResultDto
+        public Task<List<EventReportResultDto>> GetEventReportAsync(string eventCode, DateTime eventDate) =>
+            ExecuteSpListAsync(
+                "[reports].[DMCMuniEntryEventReport]",
+                cmd =>
+                {
+                    cmd.Parameters.Add("@EventCode", SqlDbType.VarChar, 10).Value = eventCode;
+                    cmd.Parameters.Add("@EventDate", SqlDbType.Date).Value = eventDate.Date;
+                },
+                reader => new EventReportResultDto
                 {
                     Time           = Safe(reader, "Time"),
                     CaseNumber     = Safe(reader, "CaseNumber"),
@@ -52,10 +44,6 @@ namespace Munientry.Api.Services
                     JudgeId        = Safe(reader, "JudgeID"),
                     DefenseCounsel = Safe(reader, "DefenseCounsel"),
                 });
-            }
-
-            return results;
-        }
 
         private static string? Safe(System.Data.IDataReader r, string col)
         {

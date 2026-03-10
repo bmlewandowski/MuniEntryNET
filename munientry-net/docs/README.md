@@ -17,6 +17,9 @@ Start here to find the right doc for your question.
 | [Legacy_Save_Paths_And_Batch_FTA.md](Legacy_Save_Paths_And_Batch_FTA.md) | *"How did the Python app save files and run batch FTA?"* — migration reference for save paths and batch behavior |
 | [Pseudo_User_Analysis.md](Pseudo_User_Analysis.md) | *"What will a court staff user think of the Blazor app on day 1, week 2, and month 2?"* — simulated transition UX analysis |
 | [Pseudo_User_Response.md](Pseudo_User_Response.md) | *"What should we build next, in what order?"* — tiered engineering improvement plan with code examples |
+| [Pseudo_User_Analysis_2.md](Pseudo_User_Analysis_2.md) | *"Same user, second voice — first impressions through week 6, and things I wish I'd known."* — ground-level staff account used to drive the Round 2 response |
+| [Pseudo_User_Response_2.md](Pseudo_User_Response_2.md) | *"What does the engineer do about it?"* — Round 2 improvement plan; Problem 1 (wrong judge on submission) is implemented; Problems 2–7 are planned with code references |
+| [Testing.md](Testing.md) | *"How is the test suite structured? How do I run tests? How do I add validation tests?"* — test infrastructure, `MuniEntryWebApplicationFactory` fakes, happy-path and validation-failure test patterns, 422 bug history |
 
 ---
 
@@ -28,7 +31,9 @@ Start here to find the right doc for your question.
 
 **Understanding the legacy system?** → [Legacy_Save_Paths_And_Batch_FTA.md](Legacy_Save_Paths_And_Batch_FTA.md) for file save behavior, [Blazor_DOCX_Migration.md](Blazor_DOCX_Migration.md) for form equivalents
 
-**Prioritizing pre-launch work?** → [Pseudo_User_Response.md](Pseudo_User_Response.md) (improvement tiers) cross-referenced with [SECURITY_ARCHITECTURE_REVIEW.md](SECURITY_ARCHITECTURE_REVIEW.md) (security blockers)
+**Prioritizing pre-launch work?** → [Pseudo_User_Response_2.md](Pseudo_User_Response_2.md) (Round 2 improvement plan, Problem 1 implemented) cross-referenced with [SECURITY_ARCHITECTURE_REVIEW.md](SECURITY_ARCHITECTURE_REVIEW.md) (security blockers)
+
+**Writing or running tests?** → [Testing.md](Testing.md) for test structure, infrastructure fakes, validation-failure test patterns, and the `FluentValidationFilter` 422 fix history
 
 ---
 
@@ -43,4 +48,4 @@ Start here to find the right doc for your question.
 | `EntryLog` persistent audit table (UI-queryable) | 🟡 Open | [Pseudo_User_Response.md](Pseudo_User_Response.md) item 7 |
 | K8s TLS / Secrets management | 🟡 Open | [SECURITY_ARCHITECTURE_REVIEW.md](SECURITY_ARCHITECTURE_REVIEW.md) items 8–9 |
 
-_Last updated: March 3, 2026_
+_Last updated: March 10, 2026_

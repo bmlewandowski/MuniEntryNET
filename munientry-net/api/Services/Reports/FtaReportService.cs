@@ -3,6 +3,8 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using Munientry.Api.Options;
 using Munientry.Shared.Dtos;
+using Polly;
+using Polly.Registry;
 
 namespace Munientry.Api.Services
 {
@@ -25,37 +27,20 @@ namespace Munientry.Api.Services
     /// The caller receives the list and can generate one DOCX per case number using
     /// DMCMuniEntryCaseSearch to pre-populate the Batch_Failure_To_Appear_Arraignment_Template.
     /// </summary>
-    public class FtaReportService : IFtaReportService
+    public class FtaReportService : SqlServiceBase, IFtaReportService
     {
-        private readonly string _connectionString;
+        public FtaReportService(
+            IOptions<AuthorityCourtOptions> options,
+            ResiliencePipelineProvider<string> pipelineProvider)
+            : base(options, pipelineProvider) { }
 
-        public FtaReportService(IOptions<AuthorityCourtOptions> options)
-        {
-            _connectionString = options.Value.ConnectionString;
-        }
-
-        public async Task<List<FtaReportResultDto>> GetFtaReportAsync(DateTime eventDate)
-        {
-            var results = new List<FtaReportResultDto>();
-
-            using var conn = new SqlConnection(_connectionString);
-            using var cmd = new SqlCommand("[reports].[DMCMuniEntryFTAReport]", conn)
-            {
-                CommandType = CommandType.StoredProcedure
-            };
-            cmd.Parameters.Add("@EventDate", SqlDbType.Date).Value = eventDate.Date;
-
-            await conn.OpenAsync();
-            using var reader = await cmd.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                results.Add(new FtaReportResultDto
+        public Task<List<FtaReportResultDto>> GetFtaReportAsync(DateTime eventDate) =>
+            ExecuteSpListAsync(
+                "[reports].[DMCMuniEntryFTAReport]",
+                cmd => cmd.Parameters.Add("@EventDate", SqlDbType.Date).Value = eventDate.Date,
+                reader => new FtaReportResultDto
                 {
                     CaseNumber = reader["CaseNumber"]?.ToString(),
                 });
-            }
-
-            return results;
-        }
     }
 }

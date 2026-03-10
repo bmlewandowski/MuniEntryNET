@@ -41,7 +41,10 @@ namespace Munientry.Api.Tests
                 FraInCourt = "N/A",
                 LicenseSuspension = false,
                 CommunityService = false,
-                OtherConditions = false
+                OtherConditions = false,
+                JudicialOfficerFirstName = "John",
+                JudicialOfficerLastName  = "Doe",
+                JudicialOfficerType      = "Judge",
             };
             var response = await client.PostAsJsonAsync("/api/v1/diversiondialog", dto);
             response.EnsureSuccessStatusCode();

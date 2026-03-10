@@ -3,6 +3,8 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using Munientry.Api.Options;
 using Munientry.Shared.Dtos;
+using Polly;
+using Polly.Registry;
 
 namespace Munientry.Api.Services
 {
@@ -22,35 +24,24 @@ namespace Munientry.Api.Services
     ///   final_pretrial  → [reports].[DMCMuniEntryFinalPreTrials]
     ///   trials_to_court → [reports].[DMCMuniEntryBenchTrials]
     /// </summary>
-    public class DailyListService : IDailyListService
+    public class DailyListService : SqlServiceBase, IDailyListService
     {
-        private readonly string _connectionString;
+        public DailyListService(
+            IOptions<AuthorityCourtOptions> dbOptions,
+            ResiliencePipelineProvider<string> pipelineProvider)
+            : base(dbOptions, pipelineProvider) { }
 
-        public DailyListService(IOptions<AuthorityCourtOptions> dbOptions)
-        {
-            _connectionString = dbOptions.Value.ConnectionString;
-        }
-
-        public async Task<List<DailyListResultDto>> GetDailyListAsync(string listType, DateTime reportDate)
+        public async Task<List<DailyListResultDto>> GetDailyListAsync(string listType)
         {
             var procName = DailyListStoredProcs.GetProcName(listType);
             if (procName is null)
                 throw new ArgumentException(
                     $"Unknown list type '{listType}'. Valid values: {string.Join(", ", DailyListStoredProcs.ValidTypes)}");
 
-            var results = new List<DailyListResultDto>();
-
-            using var conn = new SqlConnection(_connectionString);
-            using var cmd = new SqlCommand(procName, conn)
-            {
-                CommandType = CommandType.StoredProcedure
-            };
-
-            await conn.OpenAsync();
-            using var reader = await cmd.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                results.Add(new DailyListResultDto
+            return await ExecuteSpListAsync(
+                procName,
+                _ => { },
+                reader => new DailyListResultDto
                 {
                     Time           = SafeString(reader, "Time"),
                     CaseNumber     = SafeString(reader, "CaseNumber"),
@@ -61,9 +52,6 @@ namespace Munientry.Api.Services
                     JudgeId        = SafeString(reader, "JudgeID"),
                     DefenseCounsel = CourtDataCleaner.CleanDefenseCounselName(SafeString(reader, "DefenseCounsel")),
                 });
-            }
-
-            return results;
         }
 
         private static string? SafeString(IDataReader reader, string column)

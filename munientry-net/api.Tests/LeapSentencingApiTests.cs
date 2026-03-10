@@ -48,6 +48,9 @@ namespace Munientry.Api.Tests
                 ChargeFinding = "Guilty",
                 ChargeFinesAmount = "375.00",
                 ChargeFinesSuspended = "0.00",
+                JudicialOfficerFirstName = "John",
+                JudicialOfficerLastName  = "Doe",
+                JudicialOfficerType      = "Judge",
             };
             var response = await client.PostAsJsonAsync("/api/v1/leapsentencing", dto);
             response.EnsureSuccessStatusCode();

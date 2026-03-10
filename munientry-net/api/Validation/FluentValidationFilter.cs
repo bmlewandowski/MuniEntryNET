@@ -33,7 +33,9 @@ public sealed class FluentValidationFilter : IEndpointFilter
                 validationContext, ctx.HttpContext.RequestAborted);
 
             if (!result.IsValid)
-                return Results.ValidationProblem(result.ToDictionary());
+                return Results.ValidationProblem(
+                    result.ToDictionary(),
+                    statusCode: StatusCodes.Status422UnprocessableEntity);
         }
 
         return await next(ctx);
