@@ -1,10 +1,12 @@
 @inherits LayoutComponentBase
+@inject JudicialOfficerSession OfficerSession
 
 @code {
     private bool sidebarCollapsed = false;
     private string SidebarClass => sidebarCollapsed ? "sidebar collapsed" : "sidebar";
 }
 
+<AppInitializer>
 <div class="layout-root">
     <aside class="@SidebarClass">
         <button class="sidebar-toggle" @onclick="() => sidebarCollapsed = !sidebarCollapsed" aria-label="Toggle navigation">
@@ -92,6 +94,19 @@
         </nav>
     </aside>
     <main class="main-content">
+        <div class="officer-banner">
+            @if (OfficerSession.IsInitialized && OfficerSession.JudicialOfficer is not null)
+            {
+                <span class="officer-label">
+                    @OfficerSession.JudicialOfficer.OfficerType: <strong>@OfficerSession.JudicialOfficer.FullName</strong>
+                </span>
+            }
+            else
+            {
+                <span class="officer-label officer-unknown">No judicial officer selected</span>
+            }
+        </div>
         @Body
     </main>
 </div>
+</AppInitializer>

@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Munientry.Client.Shared.Services;
 using Munientry.Shared.Dtos;
 
 namespace Munientry.Client.Shared
@@ -38,6 +40,7 @@ namespace Munientry.Client.Shared
         [Inject] protected IJSRuntime JS { get; set; } = default!;
         [Inject] protected IEntryFormApiClient ApiClient { get; set; } = default!;
         [Inject] protected CaseSearchApiClient CaseSearch { get; set; } = default!;
+        [Inject] protected JudicialOfficerSession OfficerSession { get; set; } = default!;
 
         // -- Abstract / virtual seam points ---------------------------------------
 
@@ -93,8 +96,9 @@ namespace Munientry.Client.Shared
         // -- Submit ---------------------------------------------------------------
 
         /// <summary>
-        /// Default submit handler: POSTs Model to ApiEndpoint. If the response is a DOCX,
-        /// triggers a browser download via JS interop; otherwise shows a success message.
+        /// Default submit handler: stamps the judicial officer onto the model, then POSTs
+        /// to ApiEndpoint. If the response is a DOCX, triggers a browser download via JS
+        /// interop; otherwise shows a success message.
         /// Forms that need custom submit logic can override this method.
         /// </summary>
         protected virtual async Task HandleValidSubmit()
@@ -104,6 +108,8 @@ namespace Munientry.Client.Shared
                 SubmitResult = "Submit not yet implemented for this form.";
                 return;
             }
+
+            StampJudicialOfficer();
 
             IsSubmitting = true;
             ErrorMessage = null;
@@ -180,6 +186,45 @@ namespace Munientry.Client.Shared
             _loadedCaseNumber = null;
             ErrorMessage = null;
             SubmitResult = null;
+        }
+
+        // -- Judicial Officer stamping -------------------------------------------
+
+        /// <summary>
+        /// Copies the session's JudicialOfficer into any of the judicial officer
+        /// properties that the DTO exposes.  Uses reflection so that every form
+        /// gets the correct officer without any per-form code.
+        ///
+        /// Two DTO patterns are handled:
+        ///   Split-field pattern (most forms):
+        ///     JudicialOfficerFirstName, JudicialOfficerLastName, JudicialOfficerType
+        ///   Single-field pattern (FiscalJournalEntryDto):
+        ///     JudicialOfficer  →  officer.FullName ("FirstName LastName")
+        ///
+        /// Mirrors what the legacy Python base builder did:
+        ///   self.entry.judicial_officer = self.dialog.judicial_officer
+        /// </summary>
+        protected void StampJudicialOfficer()
+        {
+            var officer = OfficerSession.JudicialOfficer;
+            if (officer is null || Model is null) return;
+
+            var type = typeof(TModel);
+
+            // Split-field pattern — used by ~35 DTOs
+            SetIfExists(type, "JudicialOfficerFirstName", officer.FirstName);
+            SetIfExists(type, "JudicialOfficerLastName",  officer.LastName);
+            SetIfExists(type, "JudicialOfficerType",      officer.OfficerType);
+
+            // Single-field pattern — used by FiscalJournalEntryDto
+            SetIfExists(type, "JudicialOfficer", officer.FullName);
+        }
+
+        private void SetIfExists(Type type, string propertyName, string value)
+        {
+            var prop = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+            if (prop is not null && prop.CanWrite)
+                prop.SetValue(Model, value);
         }
     }
 }

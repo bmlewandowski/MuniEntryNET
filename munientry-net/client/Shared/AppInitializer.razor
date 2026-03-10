@@ -1,0 +1,90 @@
+@using Munientry.Client.Shared.Models
+@using Munientry.Client.Shared.Services
+@inject IJudicialOfficerProvider OfficerProvider
+@inject JudicialOfficerSession Session
+
+@* =========================================================================
+   AppInitializer — judicial officer resolution on startup.
+
+   This component wraps the entire app body (placed in MainLayout.razor).
+   On first render it resolves the current judicial officer via the registered
+   IJudicialOfficerProvider (MockJudicialOfficerProvider during development,
+   EntraIdJudicialOfficerProvider once Entra ID is enabled).
+
+   If the resolved user is flagged as a visiting judge, a modal prompts for
+   the judge's name before the app becomes usable — mirroring the Python
+   QInputDialog(set_visiting_judge) behaviour.
+   ========================================================================= *@
+
+@if (_showVisitingJudgeModal)
+{
+    <div class="modal-backdrop">
+        <div class="modal-box">
+            <h3>Visiting Judge</h3>
+            <p>Enter the name of the visiting judge to continue.</p>
+            <div class="form-group">
+                <label>First Name</label>
+                <input class="form-control" @bind="_visitingFirst" placeholder="First name" />
+            </div>
+            <div class="form-group">
+                <label>Last Name</label>
+                <input class="form-control" @bind="_visitingLast" placeholder="Last name" />
+            </div>
+            @if (_visitingError is not null)
+            {
+                <p class="text-danger">@_visitingError</p>
+            }
+            <div class="modal-actions">
+                <button class="btn btn-primary" @onclick="ConfirmVisitingJudge">Confirm</button>
+            </div>
+        </div>
+    </div>
+}
+else if (!Session.IsInitialized)
+{
+    <p class="initializing-message">Loading&hellip;</p>
+}
+else
+{
+    @ChildContent
+}
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private bool _showVisitingJudgeModal;
+    private string _visitingFirst = string.Empty;
+    private string _visitingLast  = string.Empty;
+    private string? _visitingError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Session.IsInitialized) return;
+
+        if (OfficerProvider.IsVisitingJudge())
+        {
+            _showVisitingJudgeModal = true;
+            return;
+        }
+
+        var officer = await OfficerProvider.GetCurrentOfficerAsync();
+        if (officer is not null)
+            Session.SetJudicialOfficer(officer);
+        // If officer is null (unknown user), the app still loads but
+        // JudicialOfficerSession.IsInitialized stays false and forms
+        // will show a warning rather than submitting blank officer data.
+    }
+
+    private void ConfirmVisitingJudge()
+    {
+        if (string.IsNullOrWhiteSpace(_visitingFirst) || string.IsNullOrWhiteSpace(_visitingLast))
+        {
+            _visitingError = "Both first and last name are required.";
+            return;
+        }
+
+        var officer = new JudicialOfficer(_visitingFirst.Trim(), _visitingLast.Trim(), "Visiting Judge");
+        Session.SetJudicialOfficer(officer);
+        _showVisitingJudgeModal = false;
+    }
+}

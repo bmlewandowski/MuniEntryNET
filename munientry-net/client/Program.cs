@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
 using Munientry.Client.Shared;
+using Munientry.Client.Shared.Services;
 using Munientry.Shared.Validation;
 // Bring the generated App component into scope
 using Munientry.Client;
@@ -38,6 +39,27 @@ builder.Services.AddScoped(sp => new HttpClient());
 // These are the same validators the API uses server-side (FluentValidationFilter),
 // meaning validation rules are defined and enforced in exactly one place.
 builder.Services.AddValidatorsFromAssemblyContaining<NotGuiltyPleaValidator>(lifetime: ServiceLifetime.Singleton);
+
+// =====================================================================
+// JUDICIAL OFFICER RESOLUTION
+//
+// JudicialOfficerSession is scoped (one per browser session) and holds
+// the resolved JudicialOfficer — equivalent to mainwindow.judicial_officer
+// in the legacy Python app.
+//
+// During development / testing (no Entra ID):
+//   MockJudicialOfficerProvider reads "MockUser" from appsettings.json
+//   and maps it to a JudicialOfficer from the Staff:JudicialOfficers section.
+//   Change "MockUser" to "judge_2", "magistrate_1", "visiting_judge", etc.
+//
+// When Entra ID is enabled (follow the ENTRA ID steps above):
+//   Comment out the MockJudicialOfficerProvider line below and uncomment
+//   the EntraIdJudicialOfficerProvider line instead.
+// =====================================================================
+builder.Services.AddScoped<JudicialOfficerSession>();
+builder.Services.AddScoped<IJudicialOfficerProvider, MockJudicialOfficerProvider>();
+// ENTRA ID - Step 7: Replace the line above with the one below.
+// builder.Services.AddScoped<IJudicialOfficerProvider, EntraIdJudicialOfficerProvider>();
 
 // =====================================================================
 // ENTRA ID AUTHENTICATION — cityofdelawareoh.gov accounts (@cityofdelawareoh.gov)
