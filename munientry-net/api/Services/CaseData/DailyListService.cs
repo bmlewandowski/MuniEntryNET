@@ -8,25 +8,27 @@ namespace Munientry.Api.Services
 {
     /// <summary>
     /// Executes one of the 6 daily case list stored procedures to retrieve
-    /// the cases scheduled for a given date and list type.
+    /// the cases scheduled for the current court day.
+    ///
+    /// These SPs accept no date parameter — they filter by date internally:
+    ///   Production:  WHERE ce.EventDate = CAST(GETDATE() AS Date)  (today only)
+    ///   Test server: WHERE ce.EventDate > '01/01/2026'  (relaxed by DBA for dev)
     ///
     /// Stored procedures:
-    ///   arraignments    ? [reports].[DMCMuniEntryArraignment]
-    ///   slated          ? [reports].[DMCMuniEntrySlated]
-    ///   pleas           ? [reports].[DMCMuniEntryPleas]
-    ///   pcvh_fcvh       ? [reports].[DMCMuniEntryPrelimCommContViolHearings]
-    ///   final_pretrial  ? [reports].[DMCMuniEntryFinalPreTrials]
-    ///   trials_to_court ? [reports].[DMCMuniEntryBenchTrials]
+    ///   arraignments    → [reports].[DMCMuniEntryArraignment]
+    ///   slated          → [reports].[DMCMuniEntrySlated]
+    ///   pleas           → [reports].[DMCMuniEntryPleas]
+    ///   pcvh_fcvh       → [reports].[DMCMuniEntryPrelimCommContViolHearings]
+    ///   final_pretrial  → [reports].[DMCMuniEntryFinalPreTrials]
+    ///   trials_to_court → [reports].[DMCMuniEntryBenchTrials]
     /// </summary>
     public class DailyListService : IDailyListService
     {
         private readonly string _connectionString;
-        private readonly bool _passDateParameter;
 
-        public DailyListService(IOptions<AuthorityCourtOptions> dbOptions, IOptions<DailyListOptions> listOptions)
+        public DailyListService(IOptions<AuthorityCourtOptions> dbOptions)
         {
             _connectionString = dbOptions.Value.ConnectionString;
-            _passDateParameter = listOptions.Value.PassDateParameter;
         }
 
         public async Task<List<DailyListResultDto>> GetDailyListAsync(string listType, DateTime reportDate)
@@ -43,12 +45,6 @@ namespace Munientry.Api.Services
             {
                 CommandType = CommandType.StoredProcedure
             };
-
-            // PassDateParameter=true  ? forward the requested date to @ReportDate (dev/test).
-            // PassDateParameter=false ? omit the parameter; SP uses GETDATE() internally (production).
-            // Toggle via DailyList:PassDateParameter in appsettings.json / appsettings.Development.json.
-            if (_passDateParameter)
-                cmd.Parameters.Add("@ReportDate", SqlDbType.Date).Value = reportDate.Date;
 
             await conn.OpenAsync();
             using var reader = await cmd.ExecuteReaderAsync();

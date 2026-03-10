@@ -21,7 +21,6 @@ internal static class ServiceRegistration
         services.Configure<AuthorityCourtOptions>(opts =>
             opts.ConnectionString = configuration.GetConnectionString("AuthorityCourt")
                 ?? throw new InvalidOperationException("Missing connection string 'AuthorityCourt'."));
-        services.Configure<DailyListOptions>(configuration.GetSection("DailyList"));
         services.Configure<SchedulingOptions>(configuration.GetSection("Scheduling"));
 
         // ── Exception handling (item #5) ──────────────────────────────────────────

@@ -71,8 +71,14 @@ have been deployed and verified against this instance. Two issues were found and
 client before testing:
 
 1. **Input parameters were not coded correctly** — updated and re-catalogued.
-2. **Production SPs filter on `CAST(GETDATE() AS DATE)` internally** — altered for testing to
-   return any data `> 01/01/2026` so there is data available during development.
+2. **Production daily-list SPs filter on `CAST(GETDATE() AS DATE)` internally** — the DBA
+   considered adding a `@ReportDate DATE = NULL` parameter for testing but backtracked on that
+   approach. Instead, the WHERE clause threshold was relaxed to `> '01/01/2026'` so there is data
+   available during development. **These 6 SPs still accept no parameters on either server.**
+3. **Report SPs** (`FTAReport`, `NotGuiltyReport`, `EventReport`) — on the production scripts these
+   SPs declare `@EventDate`/`@EventCode` as local variables inside the body (not as input parameters).
+   The test server versions have been updated to accept those values as real input parameters.
+   **Confirm with the DBA that production SPs are similarly updated before pointing the API at production.**
 
 The following test executions were used by the client to confirm correct behavior:
 
@@ -95,14 +101,33 @@ exec reports.DMCMuniEntrySlated;
 
 ## Stored Procedures — Production vs. Testing Behavior
 
-Six SPs (**Arraignment, BenchTrials, FinalPreTrials, Pleas, PrelimCommContViolHearings, Slated**)
-take **no parameters**. In production they filter on `CAST(GETDATE() AS DATE)` internally,
-returning only today's scheduled cases. On the test database this filter has been relaxed to
-`> 01/01/2026`. These SPs must **not** be passed extra parameters — SQL Server will raise
-`"has too many arguments specified"`.
+### Daily-list SPs (no parameters — both environments)
 
-The remaining SPs (**CaseDocket, CaseSearch, DrivingCaseSearch, EventReport, FTAReport,
-NotGuiltyReport**) take explicit input parameters — see the individual entries below.
+Six SPs (**Arraignment, BenchTrials, FinalPreTrials, Pleas, PrelimCommContViolHearings, Slated**)
+take **no parameters on either the test server or in production.**
+
+| Environment | Date filter used |
+|---|---|
+| **Production** | `ce.EventDate = CAST(GETDATE() AS Date)` — returns today's cases only |
+| **Test server** | `ce.EventDate > '01/01/2026'` — returns all cases in the test window regardless of date |
+
+The approach mirrors the legacy Python app: the SQL handles date scoping internally; the
+application code never passes a date to these SPs.
+
+### Search SPs
+
+**CaseDocket, CaseSearch, DrivingCaseSearch** — take `@CaseNumber`. Behavior is identical on test
+and production.
+
+### Report SPs — ⚠️ production parameter status requires DBA confirmation
+
+**EventReport, FTAReport, NotGuiltyReport** — the production SP scripts (scripted 2026-01-27) show
+`@EventDate`/`@EventCode` declared as **local variables inside the body**, not as input parameters.
+The test server versions have been updated to accept them as real input parameters (confirmed by
+`exec reports.DMCMuniEntryFTAReport '01/02/2026'` succeeding). The Blazor API always passes these
+as parameters. **Before switching the connection string to production, confirm with the DBA that the
+production SPs have been updated to accept `@EventDate DATE` and `@EventCode VARCHAR(10)` as input
+parameters.** If they have not, the report endpoints will throw `"has too many arguments specified"`.
 
 ---
 
@@ -196,7 +221,9 @@ Used to populate the daily case list boxes in the main window so staff can selec
 | `final_pretrial`  | `[reports].[DMCMuniEntryFinalPreTrials]`            | `final_pretrial_cases_box`  |
 | `trials_to_court` | `[reports].[DMCMuniEntryBenchTrials]`               | `trials_to_court_cases_box` |
 
-**Parameter:** `@ReportDate` (date)
+**Parameters:** None. These SPs accept no input parameters on either the test server or in
+production. The `{date}` segment in the URL is accepted by the API endpoint and forwarded to the
+client home page for pre-populating entry forms, but it is **not** passed to the stored procedures.
 
 **API Endpoint:**
 ```
@@ -246,12 +273,11 @@ GET /api/dailylist/pleas/2026-02-22
 | `api/Services/Reports/EventReportService.cs` | Executes `DMCMuniEntryEventReport` |
 | `api/Services/Reports/FtaReportService.cs` | Executes `DMCMuniEntryFTAReport` |
 | `api/Services/Reports/NotGuiltyReportService.cs` | Executes `DMCMuniEntryNotGuiltyReport` |
-| `api/Services/CaseData/DailyListService.cs` | Executes one of the 6 daily-list SPs; forwards `@ReportDate` when `DailyList:PassDateParameter=true` |
+| `api/Services/CaseData/DailyListService.cs` | Executes one of the 6 daily-list SPs; no date parameter is passed (SP handles date internally) |
 | `api/Endpoints/CaseDataEndpoints.cs` | Maps `/case/search`, `/case/docket`, `/dailylist`, `/drivingcase` routes |
 | `api/Endpoints/ReportsEndpoints.cs` | Maps `/reports/not-guilty`, `/reports/events`, `/reports/fta`, `/reports/fta/entry`, `/reports/fta/batch` routes |
 | `api/ServiceRegistration.cs` | DI registrations for all services |
-| `api/appsettings.json` | Connection string config + `DailyList:PassDateParameter` flag (default `false`) |
-| `api/appsettings.Development.json` | Dev override — sets `DailyList:PassDateParameter: true` |
+| `api/appsettings.json` | Connection string config and `Scheduling` template map |
 | `client/Shared/ReportsApiClient.cs` | Client HTTP wrapper for all report/docket endpoints |
 | `shared/Dtos/CaseDocketEntryDto.cs` | Shared DTO used by both API and client for `CaseDocketEntryDto` |
 | `shared/Dtos/NotGuiltyReportResultDto.cs` | Shared DTO used by both API and client for `NotGuiltyReportResultDto` |
@@ -278,8 +304,9 @@ with a different result shape (`DrivingCaseInfoDto`).
 
 The main window (`client/Pages/Index.razor`) calls
 `DailyListApiClient.GetDailyListAsync(listType, date)` for each of the 6 list types, hitting
-`GET /api/v1/dailylist/{listType}/{date}`. The date is accepted and forwarded to the SP **when
-`DailyList:PassDateParameter=true`** (see the Date Parameter Handling section below).
+`GET /api/v1/dailylist/{listType}/{date}`. The `{date}` segment is accepted by the endpoint and
+used by the client home page to pre-populate entry forms when a case is selected; it is not
+forwarded to the stored procedures.
 
 ### Report Pages
 
@@ -362,73 +389,6 @@ names. **The DBA must confirm** what value(s) `[reports].[DMCMuniEntryEventRepor
    descriptive).
 2. If the SP supports a broader set of event types than the 5 currently listed, add the additional
    options to the dropdown.
-
----
-
-## Daily Case List — Date Parameter Handling
-
-### How the date flows
-
-```
-Blazor client
-  → GET /api/v1/dailylist/{listType}/{date:yyyy-MM-dd}
-      ↓
-DailyListService.GetDailyListAsync(listType, reportDate)
-  → reads DailyList:PassDateParameter from configuration
-        if true  → cmd.Parameters.AddWithValue("@ReportDate", reportDate.Date)
-        if false → no parameter passed (SP uses GETDATE() internally)
-      ↓
-[reports].[DMCMuniEntry*]  (one of the 6 SPs)
-```
-
-The Blazor client (`DailyListApiClient`) always sends today's date in normal operation. A dev
-tool or the Swagger UI can pass any date when `PassDateParameter=true`.
-
-### Config switch
-
-| File | Setting | Behavior |
-|---|---|---|
-| `api/appsettings.json` | `"PassDateParameter": false` | **Production default** — SP uses `GETDATE()` internally; no parameter forwarded |
-| `api/appsettings.Development.json` | `"PassDateParameter": true` | **Dev/test** — `@ReportDate` forwarded; any date in the URL is used |
-
-ASP.NET Core automatically layers `appsettings.Development.json` on top of `appsettings.json`
-when `ASPNETCORE_ENVIRONMENT=Development` (the `docker-compose.yml` default for local work). No
-code change, no rebuild — just the environment variable.
-
-### Required DBA SP update (one-time)
-
-Before enabling `PassDateParameter=true`, the DBA must apply this change to each of the 6 SPs
-on the target database:
-
-```sql
--- Example for DMCMuniEntryArraignment; repeat pattern for all 6.
-ALTER PROCEDURE [reports].[DMCMuniEntryArraignment]
-    @ReportDate DATE = NULL   -- NULL means "use today"
-AS
-BEGIN
-    -- Replace the existing GETDATE() / today filter line with:
-    WHERE CAST(EventDate AS DATE) = ISNULL(@ReportDate, CAST(GETDATE() AS DATE))
-    -- ...rest of SP body unchanged...
-END
-```
-
-**Production behavior is unchanged** — calling with no argument leaves `@ReportDate = NULL`,
-so `ISNULL(NULL, CAST(GETDATE() AS DATE))` still evaluates to today.
-
-Test executions to verify after the SP update:
-
-```sql
--- No argument → today's data (production equivalent)
-exec reports.DMCMuniEntryArraignment;
-
--- With a specific date → data for that day
-exec reports.DMCMuniEntryArraignment '2026-01-15';
-exec reports.DMCMuniEntryBenchTrials '2026-01-15';
-exec reports.DMCMuniEntryFinalPreTrials '2026-01-15';
-exec reports.DMCMuniEntryPleas '2026-01-15';
-exec reports.DMCMuniEntryPrelimCommContViolHearings '2026-01-15';
-exec reports.DMCMuniEntrySlated '2026-01-15';
-```
 
 ---
 
